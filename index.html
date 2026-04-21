@@ -21,7 +21,7 @@
 html{font-family:'DM Sans',sans-serif;font-size:16px;color:var(--text);background:var(--surface)}
 body{min-height:100vh}
 
-/* ── LOGIN ── */
+/* LOGIN */
 #login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:1.5rem;background:var(--surface)}
 .login-wrap{width:100%;max-width:380px}
 .login-brand{text-align:center;margin-bottom:2.5rem}
@@ -39,7 +39,7 @@ body{min-height:100vh}
 .login-error{font-size:13px;color:var(--red);text-align:center;margin-top:10px;min-height:20px}
 .login-hint{font-size:12px;color:var(--hint);text-align:center;margin-top:1.5rem}
 
-/* ── TOPBAR ── */
+/* TOPBAR */
 #main-screen{display:none;flex-direction:column;min-height:100vh}
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:56px;background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:20}
 .topbar-left{display:flex;align-items:center;gap:10px}
@@ -59,7 +59,7 @@ body{min-height:100vh}
 .btn-outline{padding:7px 12px;background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all 0.15s}
 .btn-outline:hover{background:var(--surface);color:var(--text)}
 
-/* ── TABS ── */
+/* TABS */
 .tab-bar{display:flex;background:var(--white);border-bottom:1px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .tab-bar::-webkit-scrollbar{display:none}
 .tab{padding:12px 18px;font-size:13px;color:var(--muted);cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;transition:all 0.15s;user-select:none}
@@ -69,7 +69,7 @@ body{min-height:100vh}
 .tab.active .tab-badge{background:var(--green-light);color:var(--green)}
 .content{flex:1;padding:20px;max-width:900px;margin:0 auto;width:100%}
 
-/* ── FILTER BAR ── */
+/* FILTER */
 .filter-bar{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;align-items:center}
 .search-wrap{flex:1;min-width:180px;position:relative}
 .search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--hint)}
@@ -77,7 +77,7 @@ body{min-height:100vh}
 .search-input:focus{border-color:var(--green-mid)}
 .filter-select{padding:9px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text);background:var(--white);outline:none;cursor:pointer}
 
-/* ── JOB CARDS ── */
+/* JOB CARDS */
 .jobs-list{display:flex;flex-direction:column;gap:8px}
 .job-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:16px;cursor:pointer;transition:border-color 0.15s,box-shadow 0.15s}
 .job-card:hover{border-color:var(--border-strong);box-shadow:var(--shadow)}
@@ -93,10 +93,8 @@ body{min-height:100vh}
 .next-btn{font-size:11px;color:var(--green);background:var(--green-light);border:none;border-radius:6px;padding:4px 9px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;white-space:nowrap;transition:background 0.15s}
 .next-btn:hover{background:#d4e8bc}
 .job-footer{display:flex;gap:12px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:12px;color:var(--hint);flex-wrap:wrap;align-items:center}
-/* gcal added badge */
 .gcal-added-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--blue);background:var(--blue-light);border-radius:6px;padding:3px 8px;font-weight:500}
 .gcal-added-badge svg{width:11px;height:11px;flex-shrink:0}
-/* gcal export btn */
 .gcal-export-btn{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);background:transparent;border:1px solid var(--border);border-radius:6px;padding:3px 8px;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:none;transition:all 0.15s}
 .gcal-export-btn:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-light)}
 .gcal-export-btn svg{width:11px;height:11px;flex-shrink:0}
@@ -112,18 +110,88 @@ body{min-height:100vh}
 .s8{background:#EAF3DE;color:#3B6D11}
 .s9{background:#EAF3DE;color:var(--green-dark)}
 
-/* ── DURATION ── */
+/* DURATION */
 .duration-wrap{display:flex;gap:8px;align-items:stretch}
 .duration-unit{display:flex;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;flex-shrink:0}
 .dur-opt{padding:9px 12px;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;color:var(--muted);background:var(--white);border:none;transition:all 0.15s;user-select:none}
 .dur-opt.active{background:var(--green);color:#fff}
 
-/* ── DEPOSIT ── */
-.deposit-display{background:var(--green-light);border:1px solid #c0dd97;border-radius:var(--radius-sm);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;height:100%}
+/* DEPOSIT */
+.deposit-display{background:var(--green-light);border:1px solid #c0dd97;border-radius:var(--radius-sm);padding:10px 14px;display:flex;align-items:center;justify-content:space-between}
 .deposit-label{font-size:12px;color:var(--green-dark)}
 .deposit-amount{font-size:16px;font-weight:500;color:var(--green);font-family:'DM Mono',monospace}
 
-/* ── PIPELINE ── */
+/* ── CALENDAR ── */
+.cal-outer{padding:20px;max-width:1000px;margin:0 auto;width:100%}
+.cal-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+.cal-toolbar-left{display:flex;align-items:center;gap:10px}
+.cal-nav-btn{width:32px;height:32px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;color:var(--muted);transition:all 0.15s;user-select:none;line-height:1}
+.cal-nav-btn:hover{background:var(--surface);color:var(--text)}
+.cal-month-title{font-size:16px;font-weight:500;color:var(--charcoal);min-width:180px}
+.cal-today-btn{padding:6px 14px;background:transparent;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;color:var(--muted);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s}
+.cal-today-btn:hover{background:var(--surface);color:var(--text)}
+.cal-gcal-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:var(--blue-light);color:var(--blue);border:1px solid #b5d4f4;border-radius:var(--radius-sm);font-size:12px;font-weight:500;font-family:'DM Sans',sans-serif;text-decoration:none;transition:background 0.15s;white-space:nowrap}
+.cal-gcal-btn:hover{background:#cfe0f5}
+.cal-gcal-btn svg{width:13px;height:13px;flex-shrink:0}
+
+/* Legend */
+.cal-legend{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:14px}
+.cal-legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.leg-swatch{width:14px;height:10px;border-radius:3px;flex-shrink:0}
+
+/* Grid */
+.cal-grid{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.cal-dow-row{display:grid;grid-template-columns:repeat(7,1fr);border-bottom:1px solid var(--border)}
+.cal-dow-cell{padding:8px 6px;text-align:center;font-size:11px;font-weight:500;color:var(--hint);text-transform:uppercase;letter-spacing:0.05em}
+.cal-days-grid{display:grid;grid-template-columns:repeat(7,1fr)}
+.cal-cell{min-height:100px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);padding:5px 4px;vertical-align:top;position:relative}
+.cal-cell:nth-child(7n){border-right:none}
+.cal-cell.other-month{background:var(--surface)}
+.cal-day-num{font-size:12px;font-weight:500;color:var(--muted);width:24px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:50%;margin-bottom:3px;flex-shrink:0}
+.cal-cell.is-today .cal-day-num{background:var(--green);color:#fff}
+.cal-cell.other-month .cal-day-num{color:var(--border-strong)}
+
+/* Event bars */
+.cal-event-bar{font-size:10px;font-weight:500;padding:2px 5px;border-radius:3px;margin-bottom:2px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.5;transition:opacity 0.1s}
+.cal-event-bar:hover{opacity:0.75}
+.ev-new{background:#B5D4F4;color:#0C447C}
+.ev-quoted{background:#FAC775;color:#633806}
+.ev-approved{background:#C0DD97;color:#27500A}
+.ev-active{background:#639922;color:#fff}
+.ev-done{background:#D3D1C7;color:#444441}
+.ev-overdue{background:#FAC775;color:#633806;border-left:2px solid #d4a96a}
+.cal-more-lnk{font-size:10px;color:var(--hint);cursor:pointer;padding:1px 4px;line-height:1.5}
+.cal-more-lnk:hover{color:var(--green)}
+
+/* Popover */
+.cal-popover{position:fixed;background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;box-shadow:0 8px 24px rgba(0,0,0,0.12);z-index:200;width:260px;max-height:320px;overflow-y:auto}
+.cal-popover-title{font-size:13px;font-weight:500;color:var(--charcoal);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);padding-right:20px}
+.cal-popover-close{position:absolute;top:10px;right:12px;background:none;border:none;font-size:18px;color:var(--hint);cursor:pointer;line-height:1}
+.cal-pop-item{padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer}
+.cal-pop-item:last-child{border-bottom:none}
+.cal-pop-item:hover .cal-pop-name{color:var(--green)}
+.cal-pop-name{font-size:13px;font-weight:500;color:var(--text);margin-bottom:2px}
+.cal-pop-meta{font-size:12px;color:var(--muted)}
+.cal-pop-dur{font-size:11px;color:var(--hint);margin-top:3px;font-family:'DM Mono',monospace}
+
+/* Upcoming strip below calendar */
+.upcoming-strip{margin-top:20px}
+.upcoming-strip-title{font-size:11px;font-weight:500;color:var(--hint);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:10px}
+.upcoming-items{display:flex;flex-direction:column;gap:6px}
+.upcoming-row{display:flex;align-items:center;gap:12px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;cursor:pointer;transition:border-color 0.15s}
+.upcoming-row:hover{border-color:var(--border-strong)}
+.upcoming-row.overdue{border-left:3px solid var(--amber-border)}
+.upc-date{text-align:center;min-width:40px;flex-shrink:0}
+.upc-day{font-size:20px;font-weight:300;color:var(--charcoal);line-height:1}
+.upc-mon{font-size:11px;color:var(--hint);text-transform:uppercase;letter-spacing:0.04em}
+.upc-info{flex:1;min-width:0}
+.upc-name{font-size:13px;font-weight:500;color:var(--charcoal);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.upc-meta{font-size:12px;color:var(--muted)}
+.upc-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
+.upc-away{font-size:11px;color:var(--hint);font-family:'DM Mono',monospace}
+.upc-away.late{color:var(--amber)}
+
+/* PIPELINE */
 .pipeline-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:8px}
 .pipeline{display:flex;gap:12px;min-width:max-content;align-items:flex-start}
 .pipeline-col{width:200px;flex-shrink:0}
@@ -139,16 +207,7 @@ body{min-height:100vh}
 .pip-val{font-size:12px;color:var(--green);font-weight:500;margin-top:4px;font-family:'DM Mono',monospace}
 .pip-empty{font-size:12px;color:var(--hint);padding:6px 0}
 
-/* ── CALENDAR TAB ── */
-.gcal-wrap{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:var(--white)}
-.gcal-wrap iframe{display:block;width:100%;border:none}
-.gcal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px}
-.gcal-heading{font-size:15px;font-weight:500;color:var(--charcoal)}
-.gcal-open-link{font-size:12px;color:var(--blue);text-decoration:none;display:inline-flex;align-items:center;gap:4px}
-.gcal-open-link:hover{text-decoration:underline}
-.gcal-tip{font-size:12px;color:var(--hint);margin-top:12px;line-height:1.6;background:var(--surface);border-radius:var(--radius-sm);padding:10px 14px}
-
-/* ── STATS ── */
+/* STATS */
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:24px}
 .stat-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
 .stat-label{font-size:12px;color:var(--muted);margin-bottom:8px}
@@ -169,7 +228,7 @@ body{min-height:100vh}
 .empty{text-align:center;padding:4rem 1rem;color:var(--muted)}
 .empty-title{font-size:16px;font-weight:500;color:var(--text);margin-bottom:8px}
 
-/* ── MODAL ── */
+/* MODAL */
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:100;overflow-y:auto;padding:20px 16px;backdrop-filter:blur(2px)}
 .modal-bg.open{display:flex;align-items:flex-start;justify-content:center}
 .modal{background:var(--white);border-radius:var(--radius);width:100%;max-width:580px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.12)}
@@ -189,20 +248,17 @@ body{min-height:100vh}
 .finput:focus{border-color:var(--green-mid)}
 .finput[readonly]{background:var(--surface);color:var(--hint);cursor:default}
 textarea.finput{resize:vertical;min-height:70px;line-height:1.5}
-
-/* gcal modal section */
-.gcal-modal-row{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap}
 .gcal-modal-btn{display:inline-flex;align-items:center;gap:6px;padding:9px 14px;background:var(--blue-light);color:var(--blue);border:1px solid #b5d4f4;border-radius:var(--radius-sm);font-size:13px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;text-decoration:none;transition:background 0.15s;white-space:nowrap}
 .gcal-modal-btn:hover{background:#cfe0f5}
 .gcal-modal-btn svg{width:14px;height:14px;flex-shrink:0}
-.gcal-modal-btn.disabled{opacity:0.4;pointer-events:none;cursor:default}
+.gcal-modal-btn.disabled{opacity:0.4;pointer-events:none}
 .gcal-toggle-wrap{display:flex;align-items:center;gap:8px;margin-top:10px;padding:10px 12px;background:var(--surface);border-radius:var(--radius-sm);cursor:pointer;user-select:none;border:1px solid var(--border);transition:border-color 0.15s}
 .gcal-toggle-wrap:hover{border-color:var(--border-strong)}
 .gcal-toggle-wrap.confirmed{background:var(--blue-light);border-color:#b5d4f4}
-.gcal-toggle-check{width:18px;height:18px;border-radius:4px;border:1.5px solid var(--border-strong);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.15s;background:var(--white)}
+.gcal-toggle-check{width:18px;height:18px;border-radius:4px;border:1.5px solid var(--border-strong);display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--white)}
 .gcal-toggle-wrap.confirmed .gcal-toggle-check{background:var(--blue);border-color:var(--blue)}
-.gcal-toggle-check svg{width:10px;height:10px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;display:none}
-.gcal-toggle-wrap.confirmed .gcal-toggle-check svg{display:block}
+.gcal-check-icon{width:10px;height:10px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;display:none}
+.gcal-toggle-wrap.confirmed .gcal-check-icon{display:block}
 .gcal-toggle-label{font-size:13px;color:var(--muted)}
 .gcal-toggle-wrap.confirmed .gcal-toggle-label{color:var(--blue);font-weight:500}
 .gcal-note{font-size:12px;color:var(--hint);margin-top:8px;line-height:1.5}
@@ -218,7 +274,6 @@ textarea.finput{resize:vertical;min-height:70px;line-height:1.5}
 .step-label{font-size:13px;color:var(--text);flex:1}
 .step-done .step-label{color:var(--muted)}
 .step-date{font-size:11px;color:var(--hint);font-family:'DM Mono',monospace;white-space:nowrap}
-
 .activity-log{display:flex;flex-direction:column}
 .act-item{display:flex;gap:12px;padding:8px 0;border-bottom:1px solid var(--border)}
 .act-item:last-child{border-bottom:none}
@@ -245,9 +300,11 @@ textarea.finput{resize:vertical;min-height:70px;line-height:1.5}
 @media(max-width:580px){
   .fg{grid-template-columns:1fr}
   .topbar-name{display:none}
-  .content{padding:14px}
-  .sync-status span:last-child{display:none}
+  .content,.cal-outer{padding:14px}
   .pv-grid{grid-template-columns:1fr}
+  .cal-cell{min-height:70px}
+  .cal-event-bar{display:none}
+  .cal-cell.has-ev::after{content:'';display:block;width:6px;height:6px;border-radius:50%;background:var(--green-mid);margin:2px auto 0}
 }
 </style>
 </head>
@@ -320,22 +377,37 @@ textarea.finput{resize:vertical;min-height:70px;line-height:1.5}
   </div>
 
   <!-- CALENDAR -->
-  <div class="content" id="tab-calendar" style="display:none;max-width:100%">
-    <div class="gcal-header">
-      <span class="gcal-heading">Google Calendar</span>
-      <a class="gcal-open-link" href="https://calendar.google.com" target="_blank">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-        Open in Google Calendar
-      </a>
-    </div>
-    <div class="gcal-wrap">
-      <iframe
-        src="https://calendar.google.com/calendar/embed?src=fraser.dovetail%40gmail.com&ctz=Europe%2FLondon&showTitle=0&showNav=1&showDate=1&showPrint=0&showTabs=0&showCalendars=0&mode=MONTH"
-        width="100%" height="640" frameborder="0" scrolling="no">
-      </iframe>
-    </div>
-    <div class="gcal-tip">
-      To add a job to this calendar: open the job, click <strong>Add to Google Calendar</strong>, then click <strong>Save</strong> in Google Calendar. The event will appear here within a few seconds. To move or reschedule, drag the event directly in Google Calendar — changes appear live in this view.
+  <div id="tab-calendar" style="display:none">
+    <div class="cal-outer">
+      <div class="cal-toolbar">
+        <div class="cal-toolbar-left">
+          <button class="cal-nav-btn" onclick="calPrev()">&#8249;</button>
+          <div class="cal-month-title" id="cal-month-title"></div>
+          <button class="cal-nav-btn" onclick="calNext()">&#8250;</button>
+          <button class="cal-today-btn" onclick="calGoToday()">Today</button>
+        </div>
+        <a class="cal-gcal-btn" href="https://calendar.google.com" target="_blank">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Open Google Calendar
+        </a>
+      </div>
+      <div class="cal-legend">
+        <div class="cal-legend-item"><div class="leg-swatch ev-new"></div>New / early stage</div>
+        <div class="cal-legend-item"><div class="leg-swatch ev-quoted"></div>Quoted / pending</div>
+        <div class="cal-legend-item"><div class="leg-swatch ev-approved"></div>Approved / deposit</div>
+        <div class="cal-legend-item"><div class="leg-swatch ev-active"></div>On site</div>
+        <div class="cal-legend-item"><div class="leg-swatch ev-done"></div>Completed</div>
+        <div class="cal-legend-item"><div class="leg-swatch ev-overdue" style="border-left:2px solid #d4a96a"></div>Overdue start</div>
+      </div>
+      <div class="cal-grid">
+        <div class="cal-dow-row">
+          <div class="cal-dow-cell">Mon</div><div class="cal-dow-cell">Tue</div><div class="cal-dow-cell">Wed</div>
+          <div class="cal-dow-cell">Thu</div><div class="cal-dow-cell">Fri</div>
+          <div class="cal-dow-cell">Sat</div><div class="cal-dow-cell">Sun</div>
+        </div>
+        <div class="cal-days-grid" id="cal-days-grid"></div>
+      </div>
+      <div class="upcoming-strip" id="upcoming-strip"></div>
     </div>
   </div>
 
@@ -368,17 +440,24 @@ textarea.finput{resize:vertical;min-height:70px;line-height:1.5}
   </div>
 </div>
 
+<!-- CALENDAR POPOVER -->
+<div class="cal-popover" id="cal-popover" style="display:none">
+  <button class="cal-popover-close" onclick="closePopover()">&#215;</button>
+  <div class="cal-popover-title" id="cal-pop-title"></div>
+  <div id="cal-pop-items"></div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
 const API  = 'https://script.google.com/macros/s/AKfycbyw1VCKKJ3sFE53P4gfoLKgvTw_d4RK0tXXQvnRZQYPn_Wisb5-qnH9CsmtB49KP9zT/exec';
 const PASS = 'Dovetail2025!';
 const STAGES = ['Initial contact','Viewed job','Quote submitted','Quote approved','Deposit issued','Deposit paid','Start date approved','Work commenced','Work completed','Invoice issued'];
-
-// Sheet columns — order must match row 1 of Google Sheet exactly
-const FIELDS = ['id','ref','name','client','email','address','value','startDate','durationNum','durationUnit','notes','stage','created','updated','activityLog','gcalAdded'];
+const MONTHS  = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const SMONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
 let jobs = [], currentStage = 0, saving = false, _durUnit = 'days', _gcalAdded = false;
+let calYear, calMonth; // current calendar view
 
 // ── AUTH ──
 function doLogin(){
@@ -393,124 +472,75 @@ function doLogin(){
   }
 }
 document.getElementById('pwd').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
-function logout(){
-  sessionStorage.removeItem('dtv');
-  document.getElementById('main-screen').style.display = 'none';
-  document.getElementById('login-screen').style.display = 'flex';
-}
-if(sessionStorage.getItem('dtv')==='1'){
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('main-screen').style.display = 'flex';
-  init();
+function logout(){ sessionStorage.removeItem('dtv'); document.getElementById('main-screen').style.display='none'; document.getElementById('login-screen').style.display='flex'; }
+if(sessionStorage.getItem('dtv')==='1'){ document.getElementById('login-screen').style.display='none'; document.getElementById('main-screen').style.display='flex'; init(); }
+
+function init(){
+  const n = new Date(); calYear = n.getFullYear(); calMonth = n.getMonth();
+  populateStageFilter(); loadJobs(); setInterval(loadJobs, 120000);
+  document.addEventListener('click', e => {
+    const pop = document.getElementById('cal-popover');
+    if(pop.style.display !== 'none' && !pop.contains(e.target) && !e.target.closest('.cal-cell')) closePopover();
+  });
 }
 
-function init(){ populateStageFilter(); loadJobs(); setInterval(loadJobs, 120000); }
+function setSyncing(s, l){ document.getElementById('sync-dot').className='sync-dot '+s; document.getElementById('sync-label').textContent=l; }
 
-function setSyncing(state, label){
-  document.getElementById('sync-dot').className = 'sync-dot ' + state;
-  document.getElementById('sync-label').textContent = label;
-}
-
-// ── SAFE VALUE HELPERS ──
-// Parse any value from sheet — handles numbers stored as strings, empty strings, undefined
-function safeNum(v){
-  if(v === '' || v === null || v === undefined) return 0;
-  const n = parseFloat(String(v).replace(/[^0-9.-]/g,''));
-  return isNaN(n) ? 0 : n;
-}
-function safeStr(v){ return (v === null || v === undefined) ? '' : String(v); }
-function safeBool(v){ return v === true || v === 'true' || v === 1 || v === '1'; }
-
-function fmtVal(v){
-  const n = safeNum(v);
-  if(n <= 0) return '';
-  return '£' + n.toLocaleString('en-GB', {minimumFractionDigits:0, maximumFractionDigits:2});
-}
-function depositAmt(v){
-  const n = safeNum(v);
-  if(n <= 0) return '';
-  return '£' + (n * 0.1).toLocaleString('en-GB', {minimumFractionDigits:2, maximumFractionDigits:2});
-}
-function durToDays(j){
-  const n = parseInt(safeStr(j.durationNum)) || 0; if(!n) return 0;
-  return safeStr(j.durationUnit) === 'weeks' ? n * 7 : n;
-}
-function durLabel(j){
-  const n = parseInt(safeStr(j.durationNum)) || 0; if(!n) return '';
-  const u = safeStr(j.durationUnit) === 'weeks' ? (n===1?'week':'weeks') : (n===1?'day':'days');
-  return n + ' ' + u;
-}
+// ── VALUE HELPERS ──
+function safeNum(v){ if(v===''||v===null||v===undefined) return 0; const n=parseFloat(String(v).replace(/[^0-9.-]/g,'')); return isNaN(n)?0:n; }
+function safeStr(v){ return (v===null||v===undefined)?'':String(v); }
+function safeBool(v){ return v===true||v==='true'||v===1||v==='1'; }
+function fmtVal(v){ const n=safeNum(v); if(n<=0) return ''; return '£'+n.toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:2}); }
+function depositAmt(v){ const n=safeNum(v); if(n<=0) return ''; return '£'+(n*0.1).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function durToDays(j){ const n=parseInt(safeStr(j.durationNum))||0; if(!n) return 0; return safeStr(j.durationUnit)==='weeks'?n*7:n; }
+function durLabel(j){ const n=parseInt(safeStr(j.durationNum))||0; if(!n) return ''; const u=safeStr(j.durationUnit)==='weeks'?(n===1?'week':'weeks'):(n===1?'day':'days'); return n+' '+u; }
 function toDateStr(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
-function isOverdue(j){
-  const sd = safeStr(j.startDate);
-  if(!sd || j.stage >= 7) return false;
-  try{ return new Date(sd) < new Date(new Date().toDateString()); } catch(e){ return false; }
+function addDays(ds, n){ const d=new Date(ds+'T12:00:00'); d.setDate(d.getDate()+n); return toDateStr(d); }
+function isOverdue(j){ const sd=safeStr(j.startDate); if(!sd||j.stage>=7) return false; try{ return new Date(sd)<new Date(new Date().toDateString()); }catch(e){ return false; } }
+
+// ── EVENT BAR CLASS ──
+function evClass(j){
+  if(isOverdue(j)) return 'ev-overdue';
+  if(j.stage===9)  return 'ev-done';
+  if(j.stage>=7)   return 'ev-active';
+  if(j.stage>=3)   return 'ev-approved';
+  if(j.stage>=1)   return 'ev-quoted';
+  return 'ev-new';
 }
 
-// ── GOOGLE CALENDAR URL ──
+// ── GCAL URL ──
 function calSvg(){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`; }
-
 function gcalUrl(j){
-  const sd = safeStr(j.startDate);
-  if(!sd) return null;
-  const days = durToDays(j);
-  const startD = sd.replace(/-/g,'');
-  let endD = startD;
-  if(days > 0){
-    const ed = new Date(sd + 'T12:00:00'); ed.setDate(ed.getDate() + days);
-    endD = toDateStr(ed).replace(/-/g,'');
-  }
-  const dep = depositAmt(j.value);
-  const durStr = days > 0 ? ' (' + durLabel(j) + ')' : '';
-  const title = encodeURIComponent('Dovetail: ' + (safeStr(j.name)||'Job') + (j.client ? ' — ' + safeStr(j.client) : '') + durStr);
-  const details = encodeURIComponent(
-    'Ref: ' + safeStr(j.ref) +
-    '\nClient: ' + safeStr(j.client) +
-    '\nAddress: ' + safeStr(j.address) +
-    '\nStage: ' + STAGES[j.stage] +
-    (days ? '\nDuration: ' + durLabel(j) : '') +
-    (fmtVal(j.value) ? '\nValue: ' + fmtVal(j.value) : '') +
-    (dep ? '\nDeposit (10%): ' + dep : '') +
-    '\n\nDovetail Carpentry & Building'
-  );
-  const loc = encodeURIComponent(safeStr(j.address));
-  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startD}/${endD}&details=${details}&location=${loc}`;
+  const sd=safeStr(j.startDate); if(!sd) return null;
+  const days=durToDays(j);
+  const startD=sd.replace(/-/g,'');
+  let endD=startD;
+  if(days>0){ const ed=new Date(sd+'T12:00:00'); ed.setDate(ed.getDate()+days); endD=toDateStr(ed).replace(/-/g,''); }
+  const dep=depositAmt(j.value);
+  const dl=durLabel(j);
+  const title=encodeURIComponent('Dovetail: '+(safeStr(j.name)||'Job')+(j.client?' — '+safeStr(j.client):'')+(dl?' ('+dl+')':''));
+  const details=encodeURIComponent('Ref: '+safeStr(j.ref)+'\nClient: '+safeStr(j.client)+'\nAddress: '+safeStr(j.address)+'\nStage: '+STAGES[j.stage]+(dl?'\nDuration: '+dl:'')+(fmtVal(j.value)?'\nValue: '+fmtVal(j.value):'')+(dep?'\nDeposit (10%): '+dep:'')+'\n\nDovetail Carpentry & Building');
+  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startD}/${endD}&details=${details}&location=${encodeURIComponent(safeStr(j.address))}`;
 }
 
 // ── API ──
-async function apiCall(body){
-  const r = await fetch(API, {method:'POST', body:JSON.stringify(body)});
-  return r.json();
-}
+async function apiCall(body){ const r=await fetch(API,{method:'POST',body:JSON.stringify(body)}); return r.json(); }
 
 async function loadJobs(){
   setSyncing('syncing','Loading...');
-  if(!jobs.length) document.getElementById('jobs-list').innerHTML = '<div class="loading-screen"><div class="spinner"></div> Loading jobs...</div>';
+  if(!jobs.length) document.getElementById('jobs-list').innerHTML='<div class="loading-screen"><div class="spinner"></div> Loading jobs...</div>';
   try{
-    const d = await apiCall({action:'getJobs'});
-    jobs = (d.jobs || []).map(j => {
-      // Explicitly map each field to guarantee correct reading regardless of column order
-      return {
-        id:          safeStr(j.id),
-        ref:         safeStr(j.ref),
-        name:        safeStr(j.name),
-        client:      safeStr(j.client),
-        email:       safeStr(j.email),
-        address:     safeStr(j.address),
-        value:       safeStr(j.value),
-        startDate:   safeStr(j.startDate),
-        durationNum: safeStr(j.durationNum),
-        durationUnit:safeStr(j.durationUnit) || 'days',
-        notes:       safeStr(j.notes),
-        stage:       parseInt(safeStr(j.stage)) || 0,
-        created:     safeStr(j.created),
-        updated:     safeStr(j.updated),
-        activityLog: (() => { try{ const v=j.activityLog; if(!v||v==='') return []; return typeof v==='string'?JSON.parse(v):v; }catch(e){return [];} })(),
-        gcalAdded:   safeBool(j.gcalAdded)
-      };
-    });
-    const n = new Date();
-    setSyncing('synced','Synced '+n.getHours()+':'+String(n.getMinutes()).padStart(2,'0'));
+    const d=await apiCall({action:'getJobs'});
+    jobs=(d.jobs||[]).map(j=>({
+      id:safeStr(j.id), ref:safeStr(j.ref), name:safeStr(j.name), client:safeStr(j.client),
+      email:safeStr(j.email), address:safeStr(j.address), value:safeStr(j.value),
+      startDate:safeStr(j.startDate), durationNum:safeStr(j.durationNum),
+      durationUnit:safeStr(j.durationUnit)||'days', notes:safeStr(j.notes),
+      stage:parseInt(safeStr(j.stage))||0, created:safeStr(j.created), updated:safeStr(j.updated),
+      activityLog:(()=>{ try{ const v=j.activityLog; if(!v||v==='') return []; return typeof v==='string'?JSON.parse(v):v; }catch(e){return [];} })(),
+      gcalAdded:safeBool(j.gcalAdded)
+    }));
+    const n=new Date(); setSyncing('synced','Synced '+n.getHours()+':'+String(n.getMinutes()).padStart(2,'0'));
     renderAll();
   } catch(e){ setSyncing('error','Offline — click to retry'); }
 }
@@ -518,60 +548,48 @@ async function loadJobs(){
 async function pushJob(job){
   setSyncing('syncing','Saving...');
   try{
-    const toSave = {...job, activityLog: JSON.stringify(job.activityLog||[])};
-    await apiCall({action:'saveJob', job:toSave});
-    const n = new Date();
-    setSyncing('synced','Saved '+n.getHours()+':'+String(n.getMinutes()).padStart(2,'0'));
-    showToast('Job saved');
+    await apiCall({action:'saveJob',job:{...job,activityLog:JSON.stringify(job.activityLog||[])}});
+    const n=new Date(); setSyncing('synced','Saved '+n.getHours()+':'+String(n.getMinutes()).padStart(2,'0')); showToast('Job saved');
   } catch(e){ setSyncing('error','Save failed'); showToast('Save failed — click sync to retry'); }
 }
+async function deleteJobApi(id){ setSyncing('syncing','Deleting...'); try{ await apiCall({action:'deleteJob',id}); setSyncing('synced','Synced'); showToast('Job deleted'); }catch(e){ setSyncing('error','Error'); showToast('Delete failed'); } }
 
-async function deleteJobApi(id){
-  setSyncing('syncing','Deleting...');
-  try{ await apiCall({action:'deleteJob',id}); setSyncing('synced','Synced'); showToast('Job deleted'); }
-  catch(e){ setSyncing('error','Error'); showToast('Delete failed'); }
-}
-
-function renderAll(){ renderJobs(); renderPipeline(); renderStats(); document.getElementById('tb-jobs').textContent = jobs.length; }
+function renderAll(){ renderJobs(); renderCalendar(); renderPipeline(); renderStats(); document.getElementById('tb-jobs').textContent=jobs.length; }
 
 function populateStageFilter(){
-  const s = document.getElementById('stage-filter');
-  STAGES.forEach((st,i) => { const o=document.createElement('option'); o.value=i; o.textContent=st; s.appendChild(o); });
+  const s=document.getElementById('stage-filter');
+  STAGES.forEach((st,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent=st; s.appendChild(o); });
 }
 
 function getSorted(list){
-  const s = document.getElementById('sort-select').value;
-  return [...list].sort((a,b) => {
-    if(s==='value-desc') return safeNum(b.value) - safeNum(a.value);
-    if(s==='value-asc')  return safeNum(a.value) - safeNum(b.value);
-    if(s==='stage')      return a.stage - b.stage;
-    if(s==='overdue')    return (isOverdue(b)?1:0)-(isOverdue(a)?1:0) || safeNum(b.updated)-safeNum(a.updated);
-    return safeNum(b.updated) - safeNum(a.updated);
+  const s=document.getElementById('sort-select').value;
+  return [...list].sort((a,b)=>{
+    if(s==='value-desc') return safeNum(b.value)-safeNum(a.value);
+    if(s==='value-asc')  return safeNum(a.value)-safeNum(b.value);
+    if(s==='stage')      return a.stage-b.stage;
+    if(s==='overdue')    return (isOverdue(b)?1:0)-(isOverdue(a)?1:0)||safeNum(b.updated)-safeNum(a.updated);
+    return safeNum(b.updated)-safeNum(a.updated);
   });
 }
 
-// ── RENDER JOBS ──
+// ── JOBS ──
 function renderJobs(){
-  const q  = (document.getElementById('search').value||'').toLowerCase();
-  const sf = document.getElementById('stage-filter').value;
-  let list = getSorted(jobs.filter(j => {
-    const ms = sf==='' || j.stage == sf;
-    const mq = !q || [j.name,j.client,j.ref,j.address].some(f => safeStr(f).toLowerCase().includes(q));
-    return ms && mq;
+  const q=(document.getElementById('search').value||'').toLowerCase();
+  const sf=document.getElementById('stage-filter').value;
+  let list=getSorted(jobs.filter(j=>{
+    const ms=sf===''||j.stage==sf;
+    const mq=!q||[j.name,j.client,j.ref,j.address].some(f=>safeStr(f).toLowerCase().includes(q));
+    return ms&&mq;
   }));
-  const el = document.getElementById('jobs-list');
-  if(!list.length){
-    el.innerHTML = `<div class="empty"><div class="empty-title">${jobs.length?'No matching jobs':'No jobs yet'}</div><p>${jobs.length?'Try adjusting your search':'Click "New job" to add your first'}</p></div>`;
-    return;
-  }
-  el.innerHTML = list.map(j => {
-    const od = isOverdue(j), dl = durLabel(j), val = fmtVal(j.value);
-    const url = gcalUrl(j);
-    const gcalFooter = j.gcalAdded
-      ? `<span class="gcal-added-badge">${calSvg()} In Google Calendar</span>`
-      : (url ? `<a class="gcal-export-btn" href="${url}" target="_blank" onclick="event.stopPropagation()">${calSvg()} Add to Google Calendar</a>` : '');
+  const el=document.getElementById('jobs-list');
+  if(!list.length){ el.innerHTML=`<div class="empty"><div class="empty-title">${jobs.length?'No matching jobs':'No jobs yet'}</div><p>${jobs.length?'Try adjusting your search':'Click "New job" to add your first'}</p></div>`; return; }
+  el.innerHTML=list.map(j=>{
+    const od=isOverdue(j), dl=durLabel(j), val=fmtVal(j.value), url=gcalUrl(j);
+    const gcalFoot=j.gcalAdded
+      ?`<span class="gcal-added-badge">${calSvg()} In Google Calendar</span>`
+      :(url?`<a class="gcal-export-btn" href="${url}" target="_blank" onclick="event.stopPropagation()">${calSvg()} Add to Google Calendar</a>`:'');
     return `<div class="job-card${od?' overdue':''}" onclick="openJob('${j.id}')">
-      ${od ? '<div class="overdue-flag">&#9888; Start date passed</div>' : ''}
+      ${od?'<div class="overdue-flag">&#9888; Start date passed</div>':''}
       <div class="job-card-top">
         <div class="job-card-meta">
           <div class="job-ref">${j.ref}</div>
@@ -580,45 +598,155 @@ function renderJobs(){
         </div>
         <div class="job-card-right">
           <span class="stage-pill s${j.stage}">${STAGES[j.stage]}</span>
-          ${j.stage<9 ? `<button class="next-btn" onclick="advance(event,'${j.id}')">&#8594; ${STAGES[j.stage+1]}</button>` : ''}
+          ${j.stage<9?`<button class="next-btn" onclick="advance(event,'${j.id}')">&#8594; ${STAGES[j.stage+1]}</button>`:''}
         </div>
       </div>
       <div class="job-footer">
-        ${val ? `<span>${val}</span>` : ''}
-        ${j.startDate ? `<span>Start: ${j.startDate}</span>` : ''}
-        ${dl ? `<span>${dl}</span>` : ''}
-        ${j.address ? `<span>${esc(j.address.split(',')[0])}</span>` : ''}
-        ${gcalFooter}
+        ${val?`<span>${val}</span>`:''}
+        ${j.startDate?`<span>Start: ${j.startDate}</span>`:''}
+        ${dl?`<span>${dl}</span>`:''}
+        ${j.address?`<span>${esc(j.address.split(',')[0])}</span>`:''}
+        ${gcalFoot}
       </div>
     </div>`;
   }).join('');
 }
 
-async function advance(e, id){
+async function advance(e,id){
   e.stopPropagation();
-  const idx = jobs.findIndex(x=>x.id===id);
-  if(idx<0 || jobs[idx].stage>=9) return;
-  const job = {...jobs[idx]}, ns = job.stage+1;
-  job.activityLog = [...(job.activityLog||[]), {stage:ns, stageName:STAGES[ns], ts:Date.now()}];
-  job.stage = ns; job.updated = Date.now();
-  jobs[idx] = job; renderAll(); await pushJob(job);
+  const idx=jobs.findIndex(x=>x.id===id); if(idx<0||jobs[idx].stage>=9) return;
+  const job={...jobs[idx]}, ns=job.stage+1;
+  job.activityLog=[...(job.activityLog||[]),{stage:ns,stageName:STAGES[ns],ts:Date.now()}];
+  job.stage=ns; job.updated=String(Date.now()); jobs[idx]=job; renderAll(); await pushJob(job);
+}
+
+// ── CALENDAR ──
+function calPrev(){ calMonth--; if(calMonth<0){calMonth=11;calYear--;} renderCalendar(); }
+function calNext(){ calMonth++; if(calMonth>11){calMonth=0;calYear++;} renderCalendar(); }
+function calGoToday(){ const n=new Date(); calYear=n.getFullYear(); calMonth=n.getMonth(); renderCalendar(); }
+
+function renderCalendar(){
+  document.getElementById('cal-month-title').textContent = MONTHS[calMonth] + ' ' + calYear;
+
+  const today = new Date(); today.setHours(0,0,0,0);
+  const todayStr = toDateStr(today);
+
+  // First day of month — Monday-first grid (Mon=0...Sun=6)
+  const firstDay = new Date(calYear, calMonth, 1);
+  let startDow = firstDay.getDay(); // 0=Sun
+  startDow = startDow === 0 ? 6 : startDow - 1; // convert to Mon=0
+  const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+  const daysInPrev  = new Date(calYear, calMonth, 0).getDate();
+  const totalCells  = Math.ceil((startDow + daysInMonth) / 7) * 7;
+
+  // Build per-date job list (jobs active on each day, considering duration)
+  const dateMap = {}; // dateStr -> [{job, isStart, isEnd}]
+  jobs.forEach(j => {
+    if(!j.startDate) return;
+    const days = durToDays(j);
+    for(let d=0; d<=days; d++){
+      const ds = addDays(j.startDate, d);
+      if(!dateMap[ds]) dateMap[ds] = [];
+      dateMap[ds].push({job:j, isStart:d===0, isEnd:d===days, spanLen:days});
+    }
+  });
+
+  let html = '';
+  for(let i=0; i<totalCells; i++){
+    const cellNum = i - startDow + 1;
+    let date, isOther = false;
+    if(cellNum < 1){ date = new Date(calYear, calMonth-1, daysInPrev+cellNum); isOther=true; }
+    else if(cellNum > daysInMonth){ date = new Date(calYear, calMonth+1, cellNum-daysInMonth); isOther=true; }
+    else{ date = new Date(calYear, calMonth, cellNum); }
+    const ds = toDateStr(date);
+    const isToday = ds === todayStr;
+    const entries = dateMap[ds] || [];
+    const hasEv = entries.length > 0;
+    const cls = ['cal-cell', isOther?'other-month':'', isToday?'is-today':'', hasEv?'has-ev':''].filter(Boolean).join(' ');
+
+    const evBars = entries.slice(0,3).map(({job:j, isStart, isEnd, spanLen}) => {
+      const cls2 = 'cal-event-bar ' + evClass(j);
+      const label = isStart || spanLen===0 ? esc(j.name||'Untitled') : '';
+      return `<div class="${cls2}" onclick="event.stopPropagation();closePopover();openJob('${j.id}')" title="${esc(j.name||'Untitled')} — ${esc(j.client||'')}${durLabel(j)?' · '+durLabel(j):''}">${label}</div>`;
+    }).join('');
+    const more = entries.length > 3 ? `<div class="cal-more-lnk" onclick="event.stopPropagation();showPopover('${ds}',event)">+${entries.length-3} more</div>` : '';
+    const clickAttr = hasEv ? `onclick="showPopover('${ds}',event)"` : '';
+
+    html += `<div class="${cls}" ${clickAttr}>
+      <div class="cal-day-num">${date.getDate()}</div>
+      ${evBars}${more}
+    </div>`;
+  }
+  document.getElementById('cal-days-grid').innerHTML = html;
+  renderUpcoming(todayStr, today);
+}
+
+function showPopover(ds, e){
+  const entries = [];
+  jobs.forEach(j=>{
+    if(!j.startDate) return;
+    const days=durToDays(j), endDs=addDays(j.startDate,days);
+    if(ds>=j.startDate && ds<=endDs) entries.push(j);
+  });
+  if(!entries.length) return;
+  const d = new Date(ds+'T12:00:00');
+  document.getElementById('cal-pop-title').textContent = d.getDate()+' '+MONTHS[d.getMonth()]+' '+d.getFullYear();
+  document.getElementById('cal-pop-items').innerHTML = entries.map(j=>`
+    <div class="cal-pop-item" onclick="closePopover();openJob('${j.id}')">
+      <div class="cal-pop-name">${esc(j.name||'Untitled')}</div>
+      <div class="cal-pop-meta">${esc(j.client||'—')}</div>
+      ${durLabel(j)?`<div class="cal-pop-dur">${j.startDate} · ${durLabel(j)}</div>`:`<div class="cal-pop-dur">${j.startDate}</div>`}
+    </div>`).join('');
+  const pop = document.getElementById('cal-popover');
+  const x = Math.min(e.clientX, window.innerWidth-275);
+  const y = Math.min(e.clientY+8, window.innerHeight-200);
+  pop.style.left = x+'px'; pop.style.top = y+'px'; pop.style.display = 'block';
+}
+function closePopover(){ document.getElementById('cal-popover').style.display='none'; }
+
+function renderUpcoming(todayStr, today){
+  const withDates = jobs.filter(j=>j.startDate).sort((a,b)=>a.startDate.localeCompare(b.startDate));
+  const past   = withDates.filter(j=>j.startDate<todayStr).slice(-3);
+  const future = withDates.filter(j=>j.startDate>=todayStr);
+  const list   = [...past,...future];
+  const strip  = document.getElementById('upcoming-strip');
+  if(!strip) return;
+  if(!list.length){ strip.innerHTML=''; return; }
+  strip.innerHTML = `<div class="upcoming-strip-title">Upcoming & recent starts</div>
+    <div class="upcoming-items">${list.map(j=>{
+      const d=new Date(j.startDate+'T12:00:00');
+      const diff=Math.round((d-today)/86400000);
+      const od=isOverdue(j), dl=durLabel(j);
+      const away = diff===0?'Today':diff===1?'Tomorrow':diff===-1?'Yesterday':diff<0?Math.abs(diff)+'d ago':'In '+diff+'d';
+      return `<div class="upcoming-row${od?' overdue':''}" onclick="openJob('${j.id}')">
+        <div class="upc-date"><div class="upc-day">${d.getDate()}</div><div class="upc-mon">${SMONTHS[d.getMonth()]}</div></div>
+        <div class="upc-info">
+          <div class="upc-name">${esc(j.name||'Untitled job')}</div>
+          <div class="upc-meta">${esc(j.client||'—')}${dl?' · '+dl:''}</div>
+        </div>
+        <div class="upc-right">
+          <span class="stage-pill s${j.stage}" style="font-size:10px;padding:3px 8px">${STAGES[j.stage]}</span>
+          <div class="upc-away${od?' late':''}">${away}</div>
+        </div>
+      </div>`;
+    }).join('')}</div>`;
 }
 
 // ── PIPELINE ──
 function renderPipeline(){
-  document.getElementById('pipeline').innerHTML = STAGES.map((s,i) => {
-    const cols = jobs.filter(j=>j.stage===i);
-    const val  = cols.reduce((a,j) => a + safeNum(j.value), 0);
+  document.getElementById('pipeline').innerHTML=STAGES.map((s,i)=>{
+    const cols=jobs.filter(j=>j.stage===i);
+    const val=cols.reduce((a,j)=>a+safeNum(j.value),0);
     return `<div class="pipeline-col">
       <div class="pipeline-col-hd">${s}<span class="pipeline-count">${cols.length}</span></div>
-      <div class="pipeline-col-val">${val>0 ? '£'+val.toLocaleString() : ''}</div>
+      <div class="pipeline-col-val">${val>0?'£'+val.toLocaleString():''}</div>
       <div class="pipeline-cards">${cols.length
-        ? cols.map(j=>`<div class="pip-card${isOverdue(j)?' overdue':''}" onclick="openJob('${j.id}')">
-            <div class="pip-name">${esc(j.name||'Untitled')}</div>
-            <div class="pip-client">${esc(j.client||'—')}</div>
-            ${fmtVal(j.value) ? `<div class="pip-val">${fmtVal(j.value)}</div>` : ''}
-          </div>`).join('')
-        : '<div class="pip-empty">—</div>'}
+        ?cols.map(j=>`<div class="pip-card${isOverdue(j)?' overdue':''}" onclick="openJob('${j.id}')">
+          <div class="pip-name">${esc(j.name||'Untitled')}</div>
+          <div class="pip-client">${esc(j.client||'—')}</div>
+          ${fmtVal(j.value)?`<div class="pip-val">${fmtVal(j.value)}</div>`:''}
+        </div>`).join('')
+        :'<div class="pip-empty">—</div>'}
       </div>
     </div>`;
   }).join('');
@@ -626,52 +754,42 @@ function renderPipeline(){
 
 // ── STATS ──
 function renderStats(){
-  const total    = jobs.length;
-  const active   = jobs.filter(j=>j.stage>0&&j.stage<9).length;
-  const complete = jobs.filter(j=>j.stage===9).length;
-  const od       = jobs.filter(j=>isOverdue(j)).length;
-  const totalVal = jobs.reduce((a,j)=>a+safeNum(j.value),0);
-  const activeVal= jobs.filter(j=>j.stage>0&&j.stage<9).reduce((a,j)=>a+safeNum(j.value),0);
-  document.getElementById('stats-grid').innerHTML = `
+  const total=jobs.length,active=jobs.filter(j=>j.stage>0&&j.stage<9).length;
+  const complete=jobs.filter(j=>j.stage===9).length,od=jobs.filter(j=>isOverdue(j)).length;
+  const totalVal=jobs.reduce((a,j)=>a+safeNum(j.value),0);
+  const activeVal=jobs.filter(j=>j.stage>0&&j.stage<9).reduce((a,j)=>a+safeNum(j.value),0);
+  document.getElementById('stats-grid').innerHTML=`
     <div class="stat-card"><div class="stat-label">Total jobs</div><div class="stat-val">${total}</div></div>
     <div class="stat-card"><div class="stat-label">Active</div><div class="stat-val">${active}</div><div class="stat-sub">£${activeVal.toLocaleString()} in progress</div></div>
     <div class="stat-card"><div class="stat-label">Completed</div><div class="stat-val">${complete}</div></div>
     <div class="stat-card"><div class="stat-label">Total value</div><div class="stat-val">£${totalVal>=1000?Math.round(totalVal/1000)+'k':totalVal.toLocaleString()}</div></div>
-    ${od ? `<div class="stat-card" style="border-color:var(--amber-border)"><div class="stat-label" style="color:var(--amber)">Overdue starts</div><div class="stat-val" style="color:var(--amber)">${od}</div></div>` : ''}`;
-  const pvStages = STAGES.map((s,i) => ({name:s, val:jobs.filter(j=>j.stage===i).reduce((a,j)=>a+safeNum(j.value),0), count:jobs.filter(j=>j.stage===i).length})).filter(s=>s.val>0);
-  document.getElementById('pv-grid').innerHTML = pvStages.length
-    ? pvStages.map(s=>`<div class="pv-card"><div class="pv-stage">${s.name}</div><div class="pv-val">£${s.val.toLocaleString()}</div><div class="pv-count">${s.count} job${s.count!==1?'s':''}</div></div>`).join('')
-    : '<p style="font-size:13px;color:var(--hint);grid-column:1/-1">Add job values to see pipeline breakdown</p>';
-  document.getElementById('stage-bars').innerHTML = STAGES.map((s,i) => {
-    const c = jobs.filter(j=>j.stage===i).length, pct = total ? Math.round(c/total*100) : 0;
+    ${od?`<div class="stat-card" style="border-color:var(--amber-border)"><div class="stat-label" style="color:var(--amber)">Overdue starts</div><div class="stat-val" style="color:var(--amber)">${od}</div></div>`:''}`;
+  const pvs=STAGES.map((s,i)=>({name:s,val:jobs.filter(j=>j.stage===i).reduce((a,j)=>a+safeNum(j.value),0),count:jobs.filter(j=>j.stage===i).length})).filter(s=>s.val>0);
+  document.getElementById('pv-grid').innerHTML=pvs.length
+    ?pvs.map(s=>`<div class="pv-card"><div class="pv-stage">${s.name}</div><div class="pv-val">£${s.val.toLocaleString()}</div><div class="pv-count">${s.count} job${s.count!==1?'s':''}</div></div>`).join('')
+    :'<p style="font-size:13px;color:var(--hint);grid-column:1/-1">Add job values to see pipeline breakdown</p>';
+  document.getElementById('stage-bars').innerHTML=STAGES.map((s,i)=>{
+    const c=jobs.filter(j=>j.stage===i).length,pct=total?Math.round(c/total*100):0;
     return `<div class="bar-row"><div class="bar-label">${s}</div><div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div><div class="bar-count">${c}</div></div>`;
   }).join('');
 }
 
 // ── MODAL ──
 function genId(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
-function genRef(){
-  const max = jobs.reduce((m,j) => Math.max(m, parseInt(safeStr(j.ref).replace('DCB-',''))||0), 0);
-  return 'DCB-' + String(max+1).padStart(3,'0');
-}
+function genRef(){ const max=jobs.reduce((m,j)=>Math.max(m,parseInt(safeStr(j.ref).replace('DCB-',''))||0),0); return 'DCB-'+String(max+1).padStart(3,'0'); }
 function openNew(){ openJob(null); }
 
 function openJob(id){
-  const j = id ? jobs.find(x=>x.id===id) : null;
-  const isNew = !j;
-  const d = j || {id:genId(),ref:genRef(),name:'',client:'',email:'',address:'',value:'',startDate:'',durationNum:'',durationUnit:'days',notes:'',stage:0,created:Date.now(),updated:Date.now(),activityLog:[],gcalAdded:false};
+  closePopover();
+  const j=id?jobs.find(x=>x.id===id):null;
+  const isNew=!j;
+  const d=j||{id:genId(),ref:genRef(),name:'',client:'',email:'',address:'',value:'',startDate:'',durationNum:'',durationUnit:'days',notes:'',stage:0,created:String(Date.now()),updated:String(Date.now()),activityLog:[],gcalAdded:false};
+  _durUnit=safeStr(d.durationUnit)||'days'; _gcalAdded=safeBool(d.gcalAdded); currentStage=d.stage;
+  const log=Array.isArray(d.activityLog)?d.activityLog:[];
+  const dep=depositAmt(d.value); const url=gcalUrl(d);
 
-  _durUnit    = safeStr(d.durationUnit) || 'days';
-  _gcalAdded  = safeBool(d.gcalAdded);
-  currentStage= d.stage;
-
-  const log = Array.isArray(d.activityLog) ? d.activityLog : [];
-  const dep = depositAmt(d.value);
-  const url = gcalUrl(d);
-
-  document.getElementById('modal-title').textContent = isNew ? 'New job' : (d.ref + (d.name ? ' — ' + d.name : ''));
-
-  document.getElementById('modal-body').innerHTML = `
+  document.getElementById('modal-title').textContent=isNew?'New job':(d.ref+(d.name?' — '+d.name:''));
+  document.getElementById('modal-body').innerHTML=`
     <div class="modal-section">
       <div class="sec-title">Job details</div>
       <div class="fg">
@@ -679,22 +797,14 @@ function openJob(id){
         <div class="fgroup"><label class="flabel">Job description</label><input class="finput" id="f-name" value="${esc(d.name)}" placeholder="e.g. Kitchen extension"/></div>
       </div>
       <div class="fg">
-        <div class="fgroup">
-          <label class="flabel">Total value (£)</label>
-          <input class="finput" id="f-value" type="number" min="0" step="0.01" value="${esc(d.value)}" placeholder="0" oninput="updateDeposit()"/>
-        </div>
-        <div class="fgroup">
-          <label class="flabel">Deposit required (10%)</label>
+        <div class="fgroup"><label class="flabel">Total value (£)</label><input class="finput" id="f-value" type="number" min="0" step="0.01" value="${esc(d.value)}" placeholder="0" oninput="updateDeposit()"/></div>
+        <div class="fgroup"><label class="flabel">Deposit required (10%)</label>
           <div class="deposit-display"><span class="deposit-label">10% deposit</span><span class="deposit-amount" id="deposit-amount">${dep||'—'}</span></div>
         </div>
       </div>
       <div class="fg">
-        <div class="fgroup">
-          <label class="flabel">Target start date</label>
-          <input class="finput" id="f-start" type="date" value="${esc(d.startDate)}" oninput="refreshGcalSection()"/>
-        </div>
-        <div class="fgroup">
-          <label class="flabel">Duration</label>
+        <div class="fgroup"><label class="flabel">Target start date</label><input class="finput" id="f-start" type="date" value="${esc(d.startDate)}" oninput="refreshGcalSection()"/></div>
+        <div class="fgroup"><label class="flabel">Duration</label>
           <div class="duration-wrap">
             <input class="finput" id="f-durnum" type="number" min="1" max="999" value="${esc(d.durationNum)}" placeholder="e.g. 5" style="flex:1" oninput="refreshGcalSection()"/>
             <div class="duration-unit">
@@ -707,7 +817,6 @@ function openJob(id){
       <div class="fg full"><div class="fgroup"><label class="flabel">Site address</label><input class="finput" id="f-addr" value="${esc(d.address)}" placeholder="e.g. 12 High Street, Stamford"/></div></div>
       <div class="fg full"><div class="fgroup"><label class="flabel">Notes</label><textarea class="finput" id="f-notes">${esc(d.notes)}</textarea></div></div>
     </div>
-
     <div class="modal-section">
       <div class="sec-title">Client</div>
       <div class="fg">
@@ -715,157 +824,129 @@ function openJob(id){
         <div class="fgroup"><label class="flabel">Email</label><input class="finput" id="f-email" type="email" value="${esc(d.email)}" placeholder="client@email.com"/></div>
       </div>
     </div>
-
     <div class="modal-section">
       <div class="sec-title">Google Calendar</div>
       <div id="gcal-section">${buildGcalSection(d)}</div>
     </div>
-
     <div class="modal-section">
       <div class="sec-title">Workflow stage</div>
-      <div class="stepper" id="stepper">${buildStepper(currentStage, log)}</div>
+      <div class="stepper" id="stepper">${buildStepper(currentStage,log)}</div>
     </div>
-
-    ${log.length ? `<div class="modal-section"><div class="sec-title">Activity log</div>
+    ${log.length?`<div class="modal-section"><div class="sec-title">Activity log</div>
       <div class="activity-log">${log.slice().reverse().map(e=>`
         <div class="act-item"><div class="act-dot"></div><div>
           <div class="act-stage">Moved to: ${e.stageName||STAGES[e.stage]||'Stage '+(e.stage+1)}</div>
           <div class="act-time">${fmtTs(e.ts)}</div>
         </div></div>`).join('')}
-      </div></div>` : ''}`;
+      </div></div>`:''}`;
 
-  document.getElementById('modal-ft').innerHTML = `
-    <div>${!isNew ? `<button class="btn-del" onclick="deleteJob('${d.id}')">Delete job</button>` : '<span></span>'}</div>
+  document.getElementById('modal-ft').innerHTML=`
+    <div>${!isNew?`<button class="btn-del" onclick="deleteJob('${d.id}')">Delete job</button>`:'<span></span>'}</div>
     <div class="modal-ft-right">
       <button class="btn-cancel" onclick="closeModal()">Cancel</button>
       <button class="btn-save" id="save-btn" onclick="saveJob('${d.id}','${isNew}')">Save job</button>
     </div>`;
-
   document.getElementById('modal').classList.add('open');
 }
 
 function buildGcalSection(jobData){
-  const url = gcalUrl(jobData);
-  const added = _gcalAdded;
-  const hasDate = !!safeStr(jobData.startDate);
-  const dl = durLabel(jobData);
-  const durNote = dl ? `Spans <strong>${dl}</strong> from start date.` : 'Single day event (no duration set).';
-  return `
-    <div class="gcal-modal-row">
-      ${url
-        ? `<a class="gcal-modal-btn" href="${url}" target="_blank">${calSvg()} Add to Google Calendar</a>`
-        : `<span class="gcal-modal-btn disabled">${calSvg()} Add to Google Calendar</span>`}
-    </div>
-    ${!hasDate ? '<p class="gcal-note">Set a start date above to enable Google Calendar export.</p>' : `<p class="gcal-note">${durNote} Opens Google Calendar pre-filled — click Save Event to confirm.</p>`}
-    <div class="gcal-toggle-wrap${added?' confirmed':''}" onclick="toggleGcalAdded()" id="gcal-toggle">
-      <div class="gcal-toggle-check"><svg viewBox="0 0 12 10"><polyline points="1 5 4 8 11 1"/></svg></div>
-      <span class="gcal-toggle-label">${added ? 'Added to Google Calendar' : 'Mark as added to Google Calendar'}</span>
-    </div>`;
+  const url=gcalUrl(jobData);
+  const hasDate=!!safeStr(jobData.startDate);
+  const dl=durLabel(jobData);
+  const durNote=dl?`Spans <strong>${dl}</strong> from start date.`:'Single day event — add a duration above to block out the full period.';
+  return `${url
+    ?`<a class="gcal-modal-btn" href="${url}" target="_blank">${calSvg()} Add to Google Calendar</a>`
+    :`<span class="gcal-modal-btn disabled">${calSvg()} Add to Google Calendar</span>`}
+  ${!hasDate?'<p class="gcal-note">Set a start date above to enable Google Calendar export.</p>':`<p class="gcal-note">${durNote} Opens Google Calendar pre-filled — click Save Event to confirm.</p>`}
+  <div class="gcal-toggle-wrap${_gcalAdded?' confirmed':''}" onclick="toggleGcalAdded()" id="gcal-toggle">
+    <div class="gcal-toggle-check"><svg class="gcal-check-icon" viewBox="0 0 12 10"><polyline points="1 5 4 8 11 1"/></svg></div>
+    <span class="gcal-toggle-label">${_gcalAdded?'Added to Google Calendar':'Mark as added to Google Calendar'}</span>
+  </div>`;
 }
 
 function toggleGcalAdded(){
-  _gcalAdded = !_gcalAdded;
-  const wrap = document.getElementById('gcal-toggle');
-  if(!wrap) return;
-  wrap.className = 'gcal-toggle-wrap' + (_gcalAdded ? ' confirmed' : '');
-  wrap.querySelector('.gcal-toggle-label').textContent = _gcalAdded ? 'Added to Google Calendar' : 'Mark as added to Google Calendar';
-  wrap.querySelector('.gcal-toggle-check').querySelector('svg').style.display = _gcalAdded ? 'block' : 'none';
+  _gcalAdded=!_gcalAdded;
+  const w=document.getElementById('gcal-toggle'); if(!w) return;
+  w.className='gcal-toggle-wrap'+(_gcalAdded?' confirmed':'');
+  w.querySelector('.gcal-toggle-label').textContent=_gcalAdded?'Added to Google Calendar':'Mark as added to Google Calendar';
+  const icon=w.querySelector('.gcal-check-icon'); if(icon) icon.style.display=_gcalAdded?'block':'none';
 }
 
 function refreshGcalSection(){
-  const el = document.getElementById('gcal-section'); if(!el) return;
-  const tmp = {
-    startDate:   (document.getElementById('f-start')||{}).value  || '',
-    durationNum: (document.getElementById('f-durnum')||{}).value || '',
-    durationUnit: _durUnit,
-    name:    (document.getElementById('f-name')||{}).value   || '',
-    client:  (document.getElementById('f-client')||{}).value || '',
-    address: (document.getElementById('f-addr')||{}).value   || '',
-    ref:     (document.getElementById('f-ref')||{}).value    || '',
-    value:   (document.getElementById('f-value')||{}).value  || '',
-    stage:   currentStage
+  const el=document.getElementById('gcal-section'); if(!el) return;
+  const tmp={
+    startDate:(document.getElementById('f-start')||{}).value||'',
+    durationNum:(document.getElementById('f-durnum')||{}).value||'',
+    durationUnit:_durUnit,
+    name:(document.getElementById('f-name')||{}).value||'',
+    client:(document.getElementById('f-client')||{}).value||'',
+    address:(document.getElementById('f-addr')||{}).value||'',
+    ref:(document.getElementById('f-ref')||{}).value||'',
+    value:(document.getElementById('f-value')||{}).value||'',
+    stage:currentStage
   };
-  el.innerHTML = buildGcalSection(tmp);
+  el.innerHTML=buildGcalSection(tmp);
 }
 
 function updateDeposit(){
-  const v = (document.getElementById('f-value')||{}).value || '';
-  const el = document.getElementById('deposit-amount');
-  if(el) el.textContent = depositAmt(v) || '—';
+  const v=(document.getElementById('f-value')||{}).value||'';
+  const el=document.getElementById('deposit-amount');
+  if(el) el.textContent=depositAmt(v)||'—';
   refreshGcalSection();
 }
+function setDurUnit(u){ _durUnit=u; document.getElementById('dur-days').className='dur-opt'+(u==='days'?' active':''); document.getElementById('dur-weeks').className='dur-opt'+(u==='weeks'?' active':''); refreshGcalSection(); }
 
-function setDurUnit(u){
-  _durUnit = u;
-  document.getElementById('dur-days').className  = 'dur-opt' + (u==='days'  ? ' active' : '');
-  document.getElementById('dur-weeks').className = 'dur-opt' + (u==='weeks' ? ' active' : '');
-  refreshGcalSection();
-}
+function fmtTs(ts){ if(!ts) return ''; const d=new Date(Number(ts)); return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})+' at '+d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}); }
 
-function fmtTs(ts){
-  if(!ts) return '';
-  const d = new Date(Number(ts));
-  return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) + ' at ' + d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
-}
-
-function buildStepper(current, log){
-  return STAGES.map((s,i) => {
-    const entry = (log||[]).find(e=>e.stage===i);
+function buildStepper(current,log){
+  return STAGES.map((s,i)=>{
+    const entry=(log||[]).find(e=>e.stage===i);
     return `<div class="step ${i<current?'step-done':i===current?'step-current':''}" onclick="setStage(${i})">
-      <div class="step-num">${i<current ? '&#10003;' : i+1}</div>
+      <div class="step-num">${i<current?'&#10003;':i+1}</div>
       <div class="step-label">${s}</div>
-      ${entry ? `<div class="step-date">${fmtTs(entry.ts)}</div>` : ''}
+      ${entry?`<div class="step-date">${fmtTs(entry.ts)}</div>`:''}
     </div>`;
   }).join('');
 }
 
-function setStage(i){ currentStage = i; document.getElementById('stepper').innerHTML = buildStepper(i,[]); refreshGcalSection(); }
-
+function setStage(i){ currentStage=i; document.getElementById('stepper').innerHTML=buildStepper(i,[]); refreshGcalSection(); }
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-async function saveJob(id, isNew){
-  if(saving) return; saving = true;
-  const btn = document.getElementById('save-btn'); btn.disabled = true; btn.textContent = 'Saving...';
-  const existing = jobs.find(x=>x.id===id) || {};
-  const existingLog = Array.isArray(existing.activityLog) ? existing.activityLog : [];
-  let newLog = [...existingLog];
-  if(currentStage !== existing.stage || isNew==='true'){
-    newLog.push({stage:currentStage, stageName:STAGES[currentStage], ts:Date.now()});
-  }
-  const job = {
-    id,
-    ref:         document.getElementById('f-ref').value,
-    name:        document.getElementById('f-name').value,
-    client:      document.getElementById('f-client').value,
-    email:       document.getElementById('f-email').value,
-    address:     document.getElementById('f-addr').value,
-    value:       document.getElementById('f-value').value,
-    startDate:   document.getElementById('f-start').value,
-    durationNum: document.getElementById('f-durnum').value,
-    durationUnit:_durUnit,
-    notes:       document.getElementById('f-notes').value,
-    stage:       currentStage,
-    activityLog: newLog,
-    gcalAdded:   _gcalAdded,
-    created:     isNew==='true' ? Date.now() : (safeNum(existing.created) || Date.now()),
-    updated:     Date.now()
+async function saveJob(id,isNew){
+  if(saving) return; saving=true;
+  const btn=document.getElementById('save-btn'); btn.disabled=true; btn.textContent='Saving...';
+  const existing=jobs.find(x=>x.id===id)||{};
+  const existingLog=Array.isArray(existing.activityLog)?existing.activityLog:[];
+  let newLog=[...existingLog];
+  if(currentStage!==existing.stage||isNew==='true') newLog.push({stage:currentStage,stageName:STAGES[currentStage],ts:Date.now()});
+  const job={
+    id, ref:document.getElementById('f-ref').value, name:document.getElementById('f-name').value,
+    client:document.getElementById('f-client').value, email:document.getElementById('f-email').value,
+    address:document.getElementById('f-addr').value, value:document.getElementById('f-value').value,
+    startDate:document.getElementById('f-start').value,
+    durationNum:document.getElementById('f-durnum').value, durationUnit:_durUnit,
+    notes:document.getElementById('f-notes').value, stage:currentStage, activityLog:newLog,
+    gcalAdded:_gcalAdded,
+    created:isNew==='true'?String(Date.now()):(safeStr(existing.created)||String(Date.now())),
+    updated:String(Date.now())
   };
-  const idx = jobs.findIndex(x=>x.id===id);
+  const idx=jobs.findIndex(x=>x.id===id);
   if(idx>=0) jobs[idx]=job; else jobs.push(job);
-  closeModal(); renderAll(); await pushJob(job); saving = false;
+  closeModal(); renderAll(); await pushJob(job); saving=false;
 }
 
 async function deleteJob(id){
   if(!confirm('Delete this job? This cannot be undone.')) return;
-  jobs = jobs.filter(x=>x.id!==id); closeModal(); renderAll(); await deleteJobApi(id);
+  jobs=jobs.filter(x=>x.id!==id); closeModal(); renderAll(); await deleteJobApi(id);
 }
 
 function closeModal(){ document.getElementById('modal').classList.remove('open'); _durUnit='days'; _gcalAdded=false; }
 function bgClick(e){ if(e.target===document.getElementById('modal')) closeModal(); }
 
-function switchTab(name, el){
+function switchTab(name,el){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); el.classList.add('active');
-  ['jobs','calendar','pipeline','stats'].forEach(t=>{ document.getElementById('tab-'+t).style.display = t===name ? '' : 'none'; });
+  ['jobs','calendar','pipeline','stats'].forEach(t=>{ document.getElementById('tab-'+t).style.display=t===name?'':'none'; });
+  if(name==='calendar') renderCalendar();
   if(name==='pipeline') renderPipeline();
   if(name==='stats') renderStats();
 }
