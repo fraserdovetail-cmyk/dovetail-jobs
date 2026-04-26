@@ -1368,7 +1368,28 @@ async function saveJob(id,isNew){
   const existingLog=Array.isArray(existing.activityLog)?existing.activityLog:[];
   let newLog=[...existingLog];
   if(currentStage!==existing.stage||isNew==='true') newLog.push({stage:currentStage,stageName:STAGES[currentStage],ts:Date.now()});
-  const job={id,ref:document.getElementById('f-ref').value,name:document.getElementById('f-name').value,client:document.getElementById('f-client').value,email:document.getElementById('f-email').value,address:document.getElementById('f-addr').value,value:document.getElementById('f-value').value,startDate:document.getElementById('f-start').value,durationNum:document.getElementById('f-durnum').value,durationUnit:_durUnit,notes:document.getElementById('f-notes').value,stage:currentStage,activityLog:newLog,gcalAdded:_gcalAdded,created:isNew==='true'?String(Date.now()):(safeStr(existing.created)||String(Date.now())),updated:String(Date.now())};
+  const job={
+    id,
+    ref:document.getElementById('f-ref').value,
+    name:document.getElementById('f-name').value,
+    client:document.getElementById('f-client').value,
+    email:document.getElementById('f-email').value,
+    address:document.getElementById('f-addr').value,
+    value:document.getElementById('f-value').value,
+    startDate:document.getElementById('f-start').value,
+    prestartDate:document.getElementById('f-prestart')?(document.getElementById('f-prestart').value||''):(safeStr(existing.prestartDate)||''),
+    durationNum:document.getElementById('f-durnum').value,
+    durationUnit:_durUnit,
+    notes:document.getElementById('f-notes').value,
+    stage:currentStage,
+    activityLog:newLog,
+    gcalAdded:_gcalAdded,
+    // Always preserve these from existing — never wipe on modal save
+    siteLog:Array.isArray(existing.siteLog)?existing.siteLog:[],
+    promptHistory:Array.isArray(existing.promptHistory)?existing.promptHistory:[],
+    created:isNew==='true'?String(Date.now()):(safeStr(existing.created)||String(Date.now())),
+    updated:String(Date.now())
+  };
   const idx=jobs.findIndex(x=>x.id===id);
   if(idx>=0) jobs[idx]=job; else jobs.push(job);
   closeModal(); renderAll(); await pushJob(job); saving=false;
@@ -1601,63 +1622,63 @@ ${pc ? `PC sums / preferred materials: ${pc}` : ''}
 ━━━ ADDITIONAL NOTES ━━━
 ${notes}
 
-━━━ INSTRUCTIONS FOR EACH TAB ━━━
+━━━ CRITICAL FORMATTING RULES — READ FIRST ━━━
 
-The template has 9 sections and 15 line item rows per section. You must trim it down to only what this job needs. Follow the deletion rules below precisely — they apply identically across all four tabs.
+DO NOT delete, insert, or move any rows or columns anywhere in the workbook.
+DO NOT reformat, recolour, resize, or restyle any cells.
+DO NOT change any cell that is not explicitly listed below as writable.
+The template structure, layout, formulas, and formatting must be completely preserved.
+Only write values into the specific cells listed below. Everything else stays exactly as it is.
 
-━━━ ROW & SECTION DELETION RULES (apply to ALL tabs) ━━━
+━━━ PRICING WORKBOOK — WHAT TO WRITE ━━━
 
-UNUSED LINE ITEM ROWS (within a section):
-• Each section has 15 line item rows. Populate only the rows you need.
-• Delete any remaining blank rows from the bottom up (delete row 15 first, then 14, etc.) until only the populated rows remain.
-• Deleting upward from the sub-total row ensures the SUM formula contracts correctly and still captures all populated rows.
-• Never leave blank line item rows in the finished workbook.
+HEADER CELLS (write these values only):
+• B1 — Project name
+• B2 — Client name
+• B3 — Property address
+• B4 — Date
+• B6 — Project ref
 
-UNUSED SECTIONS:
-• Only use the sections listed in the SECTIONS OF WORK above. Delete all unused sections entirely.
-• To delete a section: select and delete the section header row, all its line item rows, and its sub-total row in one operation. Do not leave any orphan rows.
-• Delete unused sections from the bottom up (delete section 9 first if unused, then 8, etc.) to avoid row reference drift.
-• After all deletions, verify that every sub-total SUM formula still references the correct first and last line item row in its section.
+SECTION HEADERS — the 9 dark green merged rows:
+• Write the section name into the leftmost cell of each green section header row
+• Only rename sections you are using. For unused sections leave the header text as-is (e.g. "[Section 7 name]")
+• Never touch the row height, merge, fill colour, or font of these rows
 
-CARRY-THROUGH — apply the same deletions to all four tabs:
-• Pricing Workbook: delete unused line item rows and unused section blocks as above.
-• Bill of Materials: delete the matching section blocks (header + sub-headers + line item rows). Match the Pricing Workbook section count and order exactly.
-• Client Proposal — Section 2 Scope of Works: one row per section. Delete the scope row for any deleted section. Each scope row is a single merged row — increase its row height to fit the paragraph text rather than adding extra rows.
-• Client Proposal — Section 4 Cost Summary: delete the corresponding section cost row for any deleted section.
-• Client Cost Report: delete the corresponding section cost row for any deleted section. The sub-total and grand total rows must remain.
+LINE ITEM ROWS — for each section, rows are pre-formatted. For each line item you need:
+• Col B — description (text)
+• Col C — quantity (number)
+• Col D — unit (m², m, lm, Nr, Item, etc.)
+• Col E — material rate £ (number, no £ sign — the cell is already formatted)
+• Col G — labour rate £ (number, no £ sign)
+• Col J — notes / assumptions / "Excluded — by others" for excluded trades
+• Leave unused line item rows completely blank (B, C, D, E, G, J all empty) — do not write zeros into unused rows
+• NEVER touch columns F, H, or I — these contain formulas and must not be overwritten
 
-━━━ PRICING WORKBOOK — POPULATION RULES ━━━
-• Fill header cells B1–B4, B6 (project name, client, address, date, ref)
-• Rename each section header (the merged green row) to match the section names above
-• For each line item: clear description in col B, quantity in col C, unit in col D (m², m, lm, Nr, Item), material rate in col E, labour rate in col G
-• Never overwrite or delete formula cells in columns F, H, or I — these calculate automatically
-• Calculate quantities from the brief and dimensions. Apply waste factors (5–10% sheet materials, 10–15% brickwork and tiles)
-• Derive labour rates from the day rate: e.g. blockwork at 8m² per person-day = £300 ÷ 8 = £37.50/m²
-• Fixed-price allowances: single line item, stated value as material rate, £0 labour
-• Excluded trades: description filled, all rates 0, notes column = "Excluded — by others"
-• Notes column J: per-line assumptions, spec caveats, or exclusion flags only — not overflow description text
-• Add numbered assumptions at the bottom notes rows for any items needing client or architect sign-off
+NOTES ROWS (below cost summary):
+• Write numbered assumptions into the pre-existing notes rows at the bottom of the sheet
 
-━━━ BILL OF MATERIALS — POPULATION RULES ━━━
-• Materials only — no rates, no labour columns
-• Mirror the section structure from the Pricing Workbook exactly (same sections, same order, same deletions)
-• List every material with quantity, unit, and waste factor applied
-• Notes column: spec detail — grade, size, product name or equivalent
+━━━ BILL OF MATERIALS — WHAT TO WRITE ━━━
 
-━━━ CLIENT PROPOSAL — POPULATION RULES ━━━
-• Section 1 Introduction: 2–3 sentences on what Dovetail will deliver for this client
-• Section 2 Scope of Works: one row per section. Write a full paragraph per section in professional tone covering what is being done, the spec, and key details. Increase the row height of each scope row to fit — do not add extra rows
-• Section 3 Exclusions: list all confirmed exclusions clearly
-• Section 4 Cost Summary: one row per section showing client-facing cost (profit + contingency baked in, never broken out). Excluded items = "Not included". VAT shown separately on its own row
-• Section 5 Programme: realistic duration in weeks
-• Section 6 Payment Terms: 30% deposit on acceptance / 30% at mid-point / 25% near completion / 15% on practical completion
+• Only write into col B (item/material name), col C (quantity), col D (unit), col E (notes/spec)
+• Match the section order from the Pricing Workbook
+• For sections not used, leave all cells in that section blank
+• Never touch section header rows, column widths, or formatting
 
-━━━ CLIENT COST REPORT — POPULATION RULES ━━━
-• One row per section — client-facing costs only, profit and contingency baked in, never shown separately
-• No mention of margins, contingency, or internal rates anywhere in this tab
-• Excluded items: "Not included"
-• Retain the sub-total ex VAT, VAT @ 20%, and grand total inc VAT rows — never delete these
-• Footer row: "A full itemised schedule of works and bill of materials is available on request."
+━━━ CLIENT PROPOSAL — WHAT TO WRITE ━━━
+
+• Introduction cell — write 2–3 sentences summarising what Dovetail will deliver
+• Scope of works — one pre-existing row per section. Write a full professional paragraph into the text cell for each section you are using. For unused sections leave the cell blank. Increase row height only by dragging the row border — do not insert rows
+• Exclusions cell — list all confirmed exclusions
+• Cost summary — the section name and cost cells already pull from the Client Cost Report via formula. Do not overwrite these formula cells. If a section is unused its row will show a blank name and £0 — leave it
+• Programme cell — write realistic duration in weeks
+• Payment terms — already pre-filled; do not change unless specifically instructed
+
+━━━ CLIENT COST REPORT — WHAT TO WRITE ━━━
+
+• The section name cells (col B, rows 19–27) and cost cells (col H) already pull from the Pricing Workbook via formula — do not overwrite them
+• If a section is unused it will show the placeholder name and £0 — leave it exactly as is
+• Never touch the sub-total, VAT, or grand total rows
+• Never write anything into this tab — it is entirely formula-driven
 
 ━━━ AFTER COMPLETING THE WORKBOOK ━━━
 Provide a numbered list of:
