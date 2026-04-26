@@ -3,9 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Dovetail Job Portal</title>
+<meta name="apple-mobile-web-app-title" content="Dovetail Portal">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&family=DM+Serif+Display&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -26,7 +27,7 @@ html{font-family:'DM Sans',sans-serif;font-size:16px;color:var(--text);backgroun
 body{min-height:100vh}
 
 /* LOGIN */
-#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:1.5rem;background:var(--surface)}
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:max(env(safe-area-inset-top,0px),44px) 1.5rem 1.5rem;background:var(--surface)}
 .login-wrap{width:100%;max-width:380px}
 .login-brand{text-align:center;margin-bottom:2.5rem}
 .login-logo{display:inline-flex;align-items:center;gap:10px;margin-bottom:8px}
@@ -98,7 +99,8 @@ body{min-height:100vh}
 
 /* TOPBAR */
 #main-screen{display:none;flex-direction:column;min-height:100vh}
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 20px;padding-top:env(safe-area-inset-top,0px);height:calc(56px + env(safe-area-inset-top,0px));background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:20}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 20px;padding-top:max(env(safe-area-inset-top,0px),44px);height:calc(56px + max(env(safe-area-inset-top,0px),44px));background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:20}
+@media not all and (display-mode:standalone){.topbar{padding-top:0;height:56px}}
 .topbar-left{display:flex;align-items:center;gap:10px}
 .topbar-logo{width:28px;height:28px;background:var(--green);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .topbar-logo svg{width:16px;height:16px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
