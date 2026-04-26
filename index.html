@@ -229,21 +229,21 @@ body{min-height:100vh}
 .cal-pop-name{font-size:13px;font-weight:500;color:var(--text);margin-bottom:2px}
 .cal-pop-meta{font-size:12px;color:var(--muted)}
 .cal-pop-dur{font-size:11px;color:var(--hint);margin-top:3px;font-family:'DM Mono',monospace}
-.upcoming-strip{margin-top:20px}
-.upcoming-strip-title{font-size:11px;font-weight:500;color:var(--hint);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:10px}
-.upcoming-items{display:flex;flex-direction:column;gap:6px}
-.upcoming-row{display:flex;align-items:center;gap:12px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;cursor:pointer;transition:border-color 0.15s}
-.upcoming-row:hover{border-color:var(--border-strong)}
-.upcoming-row.overdue{border-left:3px solid var(--amber-border)}
-.upc-date{text-align:center;min-width:40px;flex-shrink:0}
-.upc-day{font-size:20px;font-weight:300;color:var(--charcoal);line-height:1}
-.upc-mon{font-size:11px;color:var(--hint);text-transform:uppercase;letter-spacing:0.04em}
-.upc-info{flex:1;min-width:0}
-.upc-name{font-size:13px;font-weight:500;color:var(--charcoal);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.upc-meta{font-size:12px;color:var(--muted)}
-.upc-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
-.upc-away{font-size:11px;color:var(--hint);font-family:'DM Mono',monospace}
-.upc-away.late{color:var(--amber)}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* PIPELINE */
 .pipeline-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:8px}
@@ -621,7 +621,6 @@ textarea.pp-input{resize:vertical;min-height:80px}
         </div>
         <div class="cal-weeks" id="cal-weeks"></div>
       </div>
-      <div class="upcoming-strip" id="upcoming-strip"></div>
     </div>
   </div>
 
@@ -673,7 +672,6 @@ textarea.pp-input{resize:vertical;min-height:80px}
         </div>
         <div class="cal-weeks" id="cal-weeks"></div>
       </div>
-      <div class="upcoming-strip" id="upcoming-strip"></div>
     </div>
   </div>
 
@@ -1225,7 +1223,6 @@ function renderCalendar(){
     html+='</div>';
   });
   document.getElementById('cal-weeks').innerHTML=html;
-  renderUpcoming(todayStr,today);
 }
 function showPopover(ds,e){
   const entries=[]; jobs.forEach(j=>{ if(jobWorkingDays(j).includes(ds)) entries.push(j); }); if(!entries.length) return;
@@ -1236,23 +1233,6 @@ function showPopover(ds,e){
   pop.style.left=Math.min(e.clientX,window.innerWidth-275)+'px'; pop.style.top=Math.min(e.clientY+8,window.innerHeight-200)+'px'; pop.style.display='block';
 }
 function closePopover(){ document.getElementById('cal-popover').style.display='none'; }
-function renderUpcoming(todayStr,today){
-  // Combine job starts + prestart meetings into one sorted list
-  const items=[];
-  jobs.forEach(j=>{
-    if(j.startDate) items.push({job:j,date:j.startDate,type:'start'});
-    if(j.prestartDate) items.push({job:j,date:j.prestartDate,type:'prestart'});
-  });
-  items.sort((a,b)=>a.date.localeCompare(b.date));
-  const list=[...items.filter(x=>x.date<todayStr).slice(-3),...items.filter(x=>x.date>=todayStr)];
-  const strip=document.getElementById('upcoming-strip'); if(!strip) return;
-  if(!list.length){ strip.innerHTML=''; return; }
-  strip.innerHTML=`<div class="upcoming-strip-title">Upcoming & recent starts</div><div class="upcoming-items">${list.map(j=>{
-    const d=new Date(j.startDate+'T12:00:00'),diff=Math.round((d-today)/86400000),od=isOverdue(j),dl=durLabel(j);
-    const away=diff===0?'Today':diff===1?'Tomorrow':diff===-1?'Yesterday':diff<0?Math.abs(diff)+'d ago':'In '+diff+'d';
-    return `<div class="upcoming-row${od?' overdue':''}" onclick="openJob('${j.id}')"><div class="upc-date"><div class="upc-day">${d.getDate()}</div><div class="upc-mon">${SMONTHS[d.getMonth()]}</div></div><div class="upc-info"><div class="upc-name">${esc(j.name||'Untitled job')}</div><div class="upc-meta">${esc(j.client||'—')}${dl?' · '+dl:''}</div></div><div class="upc-right"><span class="stage-pill s${j.stage}" style="font-size:10px;padding:3px 8px">${STAGES[j.stage]}</span><div class="upc-away${od?' late':''}">${away}</div></div></div>`;
-  }).join('')}</div>`;
-}
 
 // ── PIPELINE ──
 function renderPipeline(){
