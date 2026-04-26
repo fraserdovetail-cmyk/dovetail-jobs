@@ -19,7 +19,6 @@
   --red:#A32D2D;--red-light:#FCEBEB;
   --amber:#854F0B;--amber-light:#FAEEDA;--amber-border:#d4a96a;
   --blue:#185FA5;--blue-light:#E6F1FB;
-  --weekend:#f8f7f4;
   --radius:12px;--radius-sm:8px;
   --shadow:0 1px 3px rgba(0,0,0,0.06),0 4px 12px rgba(0,0,0,0.04);
 }
@@ -194,22 +193,22 @@ body{min-height:100vh}
 .cal-legend{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
 .cal-legend-item{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted)}
 .leg-swatch{width:14px;height:10px;border-radius:3px;flex-shrink:0}
-.leg-wknd{width:14px;height:10px;border-radius:3px;background:var(--weekend);border:1px solid var(--border);flex-shrink:0}
+
 .cal-grid{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
 .cal-dow-row{display:grid;grid-template-columns:repeat(7,1fr);border-bottom:1px solid var(--border)}
 .cal-dow-cell{padding:8px 6px;text-align:center;font-size:11px;font-weight:500;color:var(--hint);text-transform:uppercase;letter-spacing:0.05em}
-.cal-dow-cell.weekend{color:var(--border-strong)}
+
 .cal-weeks{display:flex;flex-direction:column}
 .cal-week-row{display:grid;grid-template-columns:repeat(7,1fr);border-bottom:1px solid var(--border)}
 .cal-week-row:last-child{border-bottom:none}
 .cal-cell{min-height:90px;border-right:1px solid var(--border);padding:5px 4px;position:relative;vertical-align:top}
 .cal-cell:last-child{border-right:none}
 .cal-cell.other-month{background:var(--surface)}
-.cal-cell.is-weekend{background:var(--weekend)}
+.cal-cell.is-weekend{}
 .cal-cell.is-today .cal-day-num{background:var(--green);color:#fff}
 .cal-day-num{font-size:12px;font-weight:500;color:var(--muted);width:24px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:50%;margin-bottom:3px}
 .cal-cell.other-month .cal-day-num{color:var(--border-strong)}
-.cal-cell.is-weekend .cal-day-num{color:var(--border-strong)}
+
 .cal-event-bar{font-size:10px;font-weight:500;padding:2px 5px;border-radius:3px;margin-bottom:2px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.5;transition:opacity 0.1s}
 .cal-event-bar:hover{opacity:0.75}
 .ev-new{background:#B5D4F4;color:#0C447C}
@@ -220,7 +219,7 @@ body{min-height:100vh}
 .ev-overdue{background:#FAC775;color:#633806;border-left:2px solid #d4a96a}
 .cal-more-lnk{font-size:10px;color:var(--hint);cursor:pointer;padding:1px 4px;line-height:1.5}
 .cal-more-lnk:hover{color:var(--green)}
-.cal-wknd-label{font-size:9px;color:var(--border-strong);text-align:center;margin-top:4px;letter-spacing:0.02em}
+
 .cal-popover{position:fixed;background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;box-shadow:0 8px 24px rgba(0,0,0,0.12);z-index:200;width:260px;max-height:340px;overflow-y:auto}
 .cal-popover-title{font-size:13px;font-weight:500;color:var(--charcoal);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);padding-right:20px}
 .cal-popover-close{position:absolute;top:10px;right:12px;background:none;border:none;font-size:18px;color:var(--hint);cursor:pointer;line-height:1}
@@ -613,13 +612,12 @@ textarea.pp-input{resize:vertical;min-height:80px}
         <div class="cal-legend-item"><div class="leg-swatch ev-active"></div>On site</div>
         <div class="cal-legend-item"><div class="leg-swatch ev-done"></div>Completed</div>
         <div class="cal-legend-item"><div class="leg-swatch ev-overdue" style="border-left:2px solid #d4a96a"></div>Overdue</div>
-        <div class="cal-legend-item"><div class="leg-wknd"></div>Weekend</div>
       </div>
       <div class="cal-grid">
         <div class="cal-dow-row">
           <div class="cal-dow-cell">Mon</div><div class="cal-dow-cell">Tue</div><div class="cal-dow-cell">Wed</div>
           <div class="cal-dow-cell">Thu</div><div class="cal-dow-cell">Fri</div>
-          <div class="cal-dow-cell weekend">Sat</div><div class="cal-dow-cell weekend">Sun</div>
+          <div class="cal-dow-cell">Sat</div><div class="cal-dow-cell">Sun</div>
         </div>
         <div class="cal-weeks" id="cal-weeks"></div>
       </div>
@@ -666,13 +664,12 @@ textarea.pp-input{resize:vertical;min-height:80px}
         <div class="cal-legend-item"><div class="leg-swatch ev-active"></div>On site</div>
         <div class="cal-legend-item"><div class="leg-swatch ev-done"></div>Completed</div>
         <div class="cal-legend-item"><div class="leg-swatch ev-overdue" style="border-left:2px solid #d4a96a"></div>Overdue</div>
-        <div class="cal-legend-item"><div class="leg-wknd"></div>Weekend</div>
       </div>
       <div class="cal-grid">
         <div class="cal-dow-row">
           <div class="cal-dow-cell">Mon</div><div class="cal-dow-cell">Tue</div><div class="cal-dow-cell">Wed</div>
           <div class="cal-dow-cell">Thu</div><div class="cal-dow-cell">Fri</div>
-          <div class="cal-dow-cell weekend">Sat</div><div class="cal-dow-cell weekend">Sun</div>
+          <div class="cal-dow-cell">Sat</div><div class="cal-dow-cell">Sun</div>
         </div>
         <div class="cal-weeks" id="cal-weeks"></div>
       </div>
@@ -1066,9 +1063,26 @@ function jobWorkingDays(j){
   const sd=safeStr(j.startDate); if(!sd) return [];
   const wdNeeded=durToWorkingDays(j);
   const cur=new Date(sd+'T12:00:00'); if(isNaN(cur.getTime())) return [];
-  while(isWeekend(cur)) cur.setDate(cur.getDate()+1);
-  const days=[]; const limit=Math.max(wdNeeded,1); let counted=0,iters=0;
-  while(counted<limit&&iters<500){ iters++; if(!isWeekend(cur)){ days.push(toDateStr(cur)); counted++; } if(counted<limit) cur.setDate(cur.getDate()+1); }
+  const startIsWeekend=isWeekend(cur);
+  // If start is a weekday, only plot Mon-Fri (original behaviour)
+  // If start is a weekend, include the weekend start day(s) then continue Mon-Fri
+  const days=[]; let counted=0, iters=0;
+  const limit=Math.max(wdNeeded,1);
+  // Always include the actual start date regardless of day
+  days.push(toDateStr(cur));
+  if(!isWeekend(cur)) counted++;
+  cur.setDate(cur.getDate()+1);
+  while(counted<limit&&iters<500){
+    iters++;
+    // If we started on a weekend, include following weekend days until we hit a weekday
+    if(startIsWeekend&&days.length<=2&&isWeekend(cur)){
+      days.push(toDateStr(cur));
+    } else if(!isWeekend(cur)){
+      days.push(toDateStr(cur));
+      counted++;
+    }
+    if(counted<limit) cur.setDate(cur.getDate()+1);
+  }
   return days;
 }
 function durToWorkingDays(j){ const n=parseInt(safeStr(j.durationNum))||0; if(!n) return 0; return safeStr(j.durationUnit)==='weeks'?n*5:n; }
@@ -1201,13 +1215,12 @@ function renderCalendar(){
     html+='<div class="cal-week-row">';
     week.forEach(date=>{
       const ds=toDateStr(date),isOther=date.getMonth()!==calMonth,isToday=ds===todayStr,weekend=isWeekend(date);
-      const entries=weekend?[]:(dateMap[ds]||[]);
-      const cls=['cal-cell',isOther?'other-month':'',isToday?'is-today':'',weekend?'is-weekend':''].filter(Boolean).join(' ');
+      const entries=dateMap[ds]||[];
+      const cls=['cal-cell',isOther?'other-month':'',isToday?'is-today':''].filter(Boolean).join(' ');
       const clickAttr=entries.length?`onclick="showPopover('${ds}',event)"`:'';
       const bars=entries.slice(0,2).map(({job:j,isFirst})=>`<div class="cal-event-bar ${evClass(j)}" onclick="event.stopPropagation();closePopover();openJob('${j.id}')" title="${esc(j.name||'Untitled')} — ${esc(j.client||'')}">${isFirst?esc(j.name||'Untitled'):''}</div>`).join('');
       const more=entries.length>2?`<div class="cal-more-lnk" onclick="event.stopPropagation();showPopover('${ds}',event)">+${entries.length-2} more</div>`:'';
-      const wkndLabel=weekend?'<div class="cal-wknd-label">weekend</div>':'';
-      html+=`<div class="${cls}" ${clickAttr}><div class="cal-day-num">${date.getDate()}</div>${bars}${more}${wkndLabel}</div>`;
+      html+=`<div class="${cls}" ${clickAttr}><div class="cal-day-num">${date.getDate()}</div>${bars}${more}</div>`;
     });
     html+='</div>';
   });
@@ -1351,7 +1364,7 @@ function openJob(id){
 
 function buildGcalSection(jobData){
   const url=gcalUrl(jobData),hasDate=!!safeStr(jobData.startDate),dl=durLabel(jobData);
-  const durNote=dl?`Spans <strong>${dl}</strong> (Mon–Fri only, weekends skipped).`:'Single day event — add a duration above to block out the full period.';
+  const durNote=dl?`Spans <strong>${dl}</strong> (Mon–Fri working days from start date).`:'Single day event — add a duration above to block out the full period.';
   return `${url?`<a class="gcal-modal-btn" href="${url}" target="_blank">${calSvg()} Add to Google Calendar</a>`:`<span class="gcal-modal-btn disabled">${calSvg()} Add to Google Calendar</span>`}
   ${!hasDate?'<p class="gcal-note">Set a start date above to enable Google Calendar export.</p>':`<p class="gcal-note">${durNote} Opens Google Calendar pre-filled.</p>`}
   <div class="gcal-toggle-wrap${_gcalAdded?' confirmed':''}" onclick="toggleGcalAdded()" id="gcal-toggle">
