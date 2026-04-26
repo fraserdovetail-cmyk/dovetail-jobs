@@ -2,18 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Dovetail Job Portal</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&family=DM+Serif+Display&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 
-.dark{
-  --surface:#141412;--white:#1e1e1c;--border:#2e2d29;--border-strong:#3e3d38;
-  --text:#e8e6df;--muted:#9b9a94;--hint:#6b6a64;
-  --green-light:#1a2e0a;--amber-light:#2a1a08;--blue-light:#0a1e35;
-  --weekend:#191917;--shadow:0 1px 3px rgba(0,0,0,0.3),0 4px 12px rgba(0,0,0,0.2);
-}
 :root{
   --green:#3B6D11;--green-light:#EAF3DE;--green-mid:#639922;--green-dark:#27500A;
   --charcoal:#1e1e1c;--surface:#f5f4f0;--white:#ffffff;
@@ -102,7 +98,7 @@ body{min-height:100vh}
 
 /* TOPBAR */
 #main-screen{display:none;flex-direction:column;min-height:100vh}
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:56px;background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:20}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 20px;padding-top:env(safe-area-inset-top,0px);height:calc(56px + env(safe-area-inset-top,0px));background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:20}
 .topbar-left{display:flex;align-items:center;gap:10px}
 .topbar-logo{width:28px;height:28px;background:var(--green);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .topbar-logo svg{width:16px;height:16px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
@@ -528,8 +524,6 @@ textarea.pp-input{resize:vertical;min-height:80px}
 .btn-price svg{width:13px;height:13px;flex-shrink:0}
 
 
-.btn-icon{width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:transparent;border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;color:var(--muted);transition:all 0.15s}
-.btn-icon:hover{background:var(--surface);color:var(--text)}
 @media(max-width:600px){
   .fg{grid-template-columns:1fr}
   .topbar-name{display:none}
@@ -576,9 +570,6 @@ textarea.pp-input{resize:vertical;min-height:80px}
         <div class="sync-dot" id="sync-dot"></div>
         <span id="sync-label">Loading</span>
       </div>
-      <button class="btn-icon" onclick="toggleDark()" title="Toggle dark mode">
-        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="7" cy="7" r="3"/><line x1="7" y1="1" x2="7" y2="2"/><line x1="7" y1="12" x2="7" y2="13"/><line x1="1" y1="7" x2="2" y2="7"/><line x1="12" y1="7" x2="13" y2="7"/><line x1="2.5" y1="2.5" x2="3.2" y2="3.2"/><line x1="10.8" y1="10.8" x2="11.5" y2="11.5"/><line x1="11.5" y1="2.5" x2="10.8" y2="3.2"/><line x1="3.2" y1="10.8" x2="2.5" y2="11.5"/></svg>
-      </button>
       <button class="btn-new" onclick="openNew()">
         <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="6.5" y1="1" x2="6.5" y2="12"/><line x1="1" y1="6.5" x2="12" y2="6.5"/></svg>
         New job
@@ -589,16 +580,49 @@ textarea.pp-input{resize:vertical;min-height:80px}
   <div class="tab-bar">
     <div class="tab active" onclick="switchTab('dashboard',this)">Dashboard</div>
     <div class="tab" onclick="switchTab('jobs',this)">Jobs <span class="tab-badge" id="tb-jobs">0</span></div>
-    <div class="tab" onclick="switchTab('calendar',this)">Calendar</div>
     <div class="tab" onclick="switchTab('pipeline',this)">Pipeline</div>
-    <div class="tab" onclick="switchTab('stats',this)">Overview</div>
   </div>
 
     <!-- DASHBOARD TAB -->
-  <div class="content" id="tab-dashboard">
-    <div class="dash-grid" id="dash-grid"></div>
-    <div id="dash-starts-section" class="dash-section"></div>
-    <div id="dash-chase-section" class="dash-section"></div>
+  <div id="tab-dashboard" style="display:flex;flex-direction:column">
+    <div class="content" style="padding-bottom:0">
+      <div class="dash-grid" id="dash-grid"></div>
+      <div id="dash-pv-section" class="dash-section"></div>
+      <div id="dash-starts-section" class="dash-section"></div>
+      <div id="dash-chase-section" class="dash-section"></div>
+    </div>
+    <div class="cal-outer" style="padding-top:0">
+      <div class="cal-toolbar">
+        <div class="cal-toolbar-left">
+          <button class="cal-nav-btn" onclick="calPrev()">&#8249;</button>
+          <div class="cal-month-title" id="cal-month-title"></div>
+          <button class="cal-nav-btn" onclick="calNext()">&#8250;</button>
+          <button class="cal-today-btn" onclick="calGoToday()">Today</button>
+        </div>
+        <a class="cal-gcal-btn" href="https://calendar.google.com" target="_blank">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Open Google Calendar
+        </a>
+      </div>
+      <div class="cal-legend">
+        <div class="cal-legend-item"><div class="leg-swatch ev-new"></div>New enquiry</div>
+        <div class="cal-legend-item"><div class="leg-swatch ev-quoted"></div>Quoted</div>
+        <div class="cal-legend-item"><div class="leg-swatch ev-approved"></div>Approved</div>
+        <div class="cal-legend-item"><div class="leg-swatch ev-active"></div>On site</div>
+        <div class="cal-legend-item"><div class="leg-swatch ev-done"></div>Completed</div>
+        <div class="cal-legend-item"><div class="leg-swatch ev-overdue" style="border-left:2px solid #d4a96a"></div>Overdue</div>
+        <div class="cal-legend-item"><div class="leg-wknd"></div>Weekend</div>
+      </div>
+      <div class="cal-grid">
+        <div class="cal-dow-row">
+          <div class="cal-dow-cell">Mon</div><div class="cal-dow-cell">Tue</div><div class="cal-dow-cell">Wed</div>
+          <div class="cal-dow-cell">Thu</div><div class="cal-dow-cell">Fri</div>
+          <div class="cal-dow-cell weekend">Sat</div><div class="cal-dow-cell weekend">Sun</div>
+        </div>
+        <div class="cal-weeks" id="cal-weeks"></div>
+      </div>
+      <div class="upcoming-strip" id="upcoming-strip"></div>
+    </div>
   </div>
 
   <div class="content" id="tab-jobs" style="display:none">
@@ -1006,12 +1030,11 @@ function doLogin(){
 }
 document.getElementById('pwd').addEventListener('keydown',e=>{ if(e.key==='Enter') doLogin(); });
 function logout(){ sessionStorage.removeItem('dtv'); document.getElementById('main-screen').style.display='none'; document.getElementById('login-screen').style.display='flex'; }
-if(sessionStorage.getItem('dtv')==='1'){ document.getElementById('login-screen').style.display='none'; document.getElementById('main-screen').style.display='flex'; if(localStorage.getItem('dtv-dark')==='1') document.documentElement.classList.add('dark'); init(); }
+if(sessionStorage.getItem('dtv')==='1'){ document.getElementById('login-screen').style.display='none'; document.getElementById('main-screen').style.display='flex'; init(); }
 
 function init(){
   const n=new Date(); calYear=n.getFullYear(); calMonth=n.getMonth();
-  if(_darkMode) document.documentElement.classList.add('dark');
-  populateStageFilter(); loadJobs(); setInterval(loadJobs,120000);
+    populateStageFilter(); loadJobs(); setInterval(loadJobs,120000);
   ppInitSections();
   document.addEventListener('click',e=>{
     const pop=document.getElementById('cal-popover');
@@ -1071,7 +1094,7 @@ async function loadJobs(){
     jobs=(d.jobs||[]).map(j=>({
       id:safeStr(j.id),ref:safeStr(j.ref),name:safeStr(j.name),client:safeStr(j.client),
       email:safeStr(j.email),address:safeStr(j.address),value:safeStr(j.value),
-      startDate:parseDate(j.startDate),durationNum:safeStr(j.durationNum),
+      startDate:parseDate(j.startDate),prestartDate:parseDate(j.prestartDate||''),durationNum:safeStr(j.durationNum),
       durationUnit:safeStr(j.durationUnit)||'days',notes:safeStr(j.notes),
       stage:parseInt(safeStr(j.stage))||0,created:safeStr(j.created),updated:safeStr(j.updated),
       activityLog:(()=>{ try{ const v=j.activityLog; if(!v||v==='') return []; return typeof v==='string'?JSON.parse(v):v; }catch(e){return [];} })(),
@@ -1090,7 +1113,7 @@ async function pushJob(job){
 }
 async function deleteJobApi(id){ setSyncing('syncing','Deleting...'); try{ await apiCall({action:'deleteJob',id}); setSyncing('synced','Synced'); showToast('Job deleted'); }catch(e){ setSyncing('error','Error'); showToast('Delete failed'); } }
 
-function renderAll(){ renderDashboard(); renderJobs(); renderCalendar(); renderPipeline(); renderStats(); document.getElementById('tb-jobs').textContent=jobs.length; }
+function renderAll(){ renderDashboard(); renderCalendar(); renderJobs(); renderPipeline(); document.getElementById('tb-jobs').textContent=jobs.length; }
 function populateStageFilter(){ const s=document.getElementById('stage-filter'); STAGES.forEach((st,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent=st; s.appendChild(o); }); }
 function getSorted(list){
   const s=document.getElementById('sort-select').value;
@@ -1137,6 +1160,7 @@ function renderJobs(){
       </div>
       <div class="job-footer">
         ${val?`<span>${val}</span>`:''}
+        ${j.prestartDate?`<span style="color:var(--blue)">Pre-start: ${j.prestartDate}</span>`:''}
         ${j.startDate?`<span>Start: ${j.startDate}</span>`:''}
         ${dl?`<span>${dl}</span>`:''}
         ${j.address?`<span>${esc(j.address.split(',')[0])}</span>`:''}
@@ -1198,8 +1222,14 @@ function showPopover(ds,e){
 }
 function closePopover(){ document.getElementById('cal-popover').style.display='none'; }
 function renderUpcoming(todayStr,today){
-  const withDates=jobs.filter(j=>j.startDate).sort((a,b)=>a.startDate.localeCompare(b.startDate));
-  const list=[...withDates.filter(j=>j.startDate<todayStr).slice(-3),...withDates.filter(j=>j.startDate>=todayStr)];
+  // Combine job starts + prestart meetings into one sorted list
+  const items=[];
+  jobs.forEach(j=>{
+    if(j.startDate) items.push({job:j,date:j.startDate,type:'start'});
+    if(j.prestartDate) items.push({job:j,date:j.prestartDate,type:'prestart'});
+  });
+  items.sort((a,b)=>a.date.localeCompare(b.date));
+  const list=[...items.filter(x=>x.date<todayStr).slice(-3),...items.filter(x=>x.date>=todayStr)];
   const strip=document.getElementById('upcoming-strip'); if(!strip) return;
   if(!list.length){ strip.innerHTML=''; return; }
   strip.innerHTML=`<div class="upcoming-strip-title">Upcoming & recent starts</div><div class="upcoming-items">${list.map(j=>{
@@ -1236,7 +1266,7 @@ function openJob(id){
   closePopover();
   const j=id?jobs.find(x=>x.id===id):null;
   const isNew=!j;
-  const d=j||{id:genId(),ref:genRef(),name:'',client:'',email:'',address:'',value:'',startDate:'',durationNum:'',durationUnit:'days',notes:'',stage:0,created:String(Date.now()),updated:String(Date.now()),activityLog:[],gcalAdded:false,siteLog:[],promptHistory:[]};
+  const d=j||{id:genId(),ref:genRef(),name:'',client:'',email:'',address:'',value:'',startDate:'',prestartDate:'',durationNum:'',durationUnit:'days',notes:'',stage:0,created:String(Date.now()),updated:String(Date.now()),activityLog:[],gcalAdded:false,siteLog:[],promptHistory:[]};
   _durUnit=safeStr(d.durationUnit)||'days'; _gcalAdded=safeBool(d.gcalAdded); currentStage=d.stage;
   const log=Array.isArray(d.activityLog)?d.activityLog:[];
   const slog=Array.isArray(d.siteLog)?d.siteLog:[];
@@ -1256,7 +1286,11 @@ function openJob(id){
         </div>
       </div>
       <div class="fg">
-        <div class="fgroup"><label class="flabel">Target start date</label><input class="finput" id="f-start" type="date" value="${esc(d.startDate)}" oninput="refreshGcalSection()"/></div>
+        <div class="fgroup"><label class="flabel">Pre-start meeting date</label><input class="finput" id="f-prestart" type="date" value="${esc(d.prestartDate||'')}"/></div>
+        <div class="fgroup"><label class="flabel">Job start date</label><input class="finput" id="f-start" type="date" value="${esc(d.startDate)}" oninput="refreshGcalSection()"/></div>
+      </div>
+      <div class="fg">
+        <div class="fgroup"></div>
         <div class="fgroup"><label class="flabel">Duration</label>
           <div class="duration-wrap">
             <input class="finput" id="f-durnum" type="number" min="1" max="999" value="${esc(d.durationNum)}" placeholder="e.g. 5" style="flex:1" oninput="refreshGcalSection()"/>
@@ -1349,11 +1383,9 @@ function closeModal(){ document.getElementById('modal').classList.remove('open')
 function bgClick(e){ if(e.target===document.getElementById('modal')) closeModal(); }
 function switchTab(name,el){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); el.classList.add('active');
-  ['dashboard','jobs','calendar','pipeline','stats'].forEach(t=>{ document.getElementById('tab-'+t).style.display=t===name?'':'none'; });
-  if(name==='calendar') renderCalendar();
+  ['dashboard','jobs','pipeline'].forEach(t=>{ document.getElementById('tab-'+t).style.display=t===name?'':'none'; });
   if(name==='pipeline') renderPipeline();
-  if(name==='stats') renderStats();
-  if(name==='dashboard') renderDashboard();
+  if(name==='dashboard'){ renderDashboard(); renderCalendar(); }
 }
 function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
 
@@ -1576,42 +1608,65 @@ ${notes}
 
 ━━━ INSTRUCTIONS FOR EACH TAB ━━━
 
-PRICING WORKBOOK
-• Fill in all header fields (project name, client, address, date, ref)
-• Rename each section header to match the sections listed above
-• For each line item: clear description, quantity, correct unit (m², m, lm, Nr, Item), material rate (£), labour rate (£). Do not overwrite the formula cells
-• Calculate all quantities from the dimensions and brief. State units clearly and apply appropriate waste factors (typically 5–10% on sheet materials, 10–15% on brickwork and tiles)
-• Derive labour rates from the day rate: estimate person-hours per unit of work, then convert. e.g. if laying blockwork takes 1 person 1 day per 8m², the labour rate is £300 ÷ 8 = £37.50/m²
-• Enter fixed-price allowances as single line items with the stated value as the material rate and £0 labour
-• For excluded trades: complete the description cell but enter 0 in all rate cells and add "Excluded — by others" in the notes column
-• Use the notes column for assumptions, spec details, or caveats against individual line items
-• Add numbered notes at the bottom for any assumptions needing client or architect sign-off
+The template has 9 sections and 15 line item rows per section. You must trim it down to only what this job needs. Follow the deletion rules below precisely — they apply identically across all four tabs.
 
-BILL OF MATERIALS
-• Materials-only list — no rates, no labour
-• Match section structure from Pricing Workbook exactly
-• List every material needed with quantity and unit, including waste factors
-• Include spec detail in the notes column (grade, size, product name or equivalent)
+━━━ ROW & SECTION DELETION RULES (apply to ALL tabs) ━━━
 
-CLIENT PROPOSAL
-• Introduction: 2–3 sentences summarising the project and what Dovetail will deliver
-• Scope of works: written paragraph per section — full sentences, professional tone. Describe what is being done, the spec, and key details the client needs to understand
-• Exclusions: list all confirmed exclusions clearly
-• Cost summary: client-facing figures only (profit + contingency baked in, no breakdown shown). One line per section. Excluded items shown as "Not included". VAT shown separately
-• Programme: realistic duration in weeks based on the scope
-• Payment terms: 4 milestones — 30% deposit on acceptance, 30% at agreed mid-point, 25% near completion, 15% on practical completion
+UNUSED LINE ITEM ROWS (within a section):
+• Each section has 15 line item rows. Populate only the rows you need.
+• Delete any remaining blank rows from the bottom up (delete row 15 first, then 14, etc.) until only the populated rows remain.
+• Deleting upward from the sub-total row ensures the SUM formula contracts correctly and still captures all populated rows.
+• Never leave blank line item rows in the finished workbook.
 
-CLIENT COST REPORT
-• Client-facing section costs only — profit and contingency baked in, never shown separately
+UNUSED SECTIONS:
+• Only use the sections listed in the SECTIONS OF WORK above. Delete all unused sections entirely.
+• To delete a section: select and delete the section header row, all its line item rows, and its sub-total row in one operation. Do not leave any orphan rows.
+• Delete unused sections from the bottom up (delete section 9 first if unused, then 8, etc.) to avoid row reference drift.
+• After all deletions, verify that every sub-total SUM formula still references the correct first and last line item row in its section.
+
+CARRY-THROUGH — apply the same deletions to all four tabs:
+• Pricing Workbook: delete unused line item rows and unused section blocks as above.
+• Bill of Materials: delete the matching section blocks (header + sub-headers + line item rows). Match the Pricing Workbook section count and order exactly.
+• Client Proposal — Section 2 Scope of Works: one row per section. Delete the scope row for any deleted section. Each scope row is a single merged row — increase its row height to fit the paragraph text rather than adding extra rows.
+• Client Proposal — Section 4 Cost Summary: delete the corresponding section cost row for any deleted section.
+• Client Cost Report: delete the corresponding section cost row for any deleted section. The sub-total and grand total rows must remain.
+
+━━━ PRICING WORKBOOK — POPULATION RULES ━━━
+• Fill header cells B1–B4, B6 (project name, client, address, date, ref)
+• Rename each section header (the merged green row) to match the section names above
+• For each line item: clear description in col B, quantity in col C, unit in col D (m², m, lm, Nr, Item), material rate in col E, labour rate in col G
+• Never overwrite or delete formula cells in columns F, H, or I — these calculate automatically
+• Calculate quantities from the brief and dimensions. Apply waste factors (5–10% sheet materials, 10–15% brickwork and tiles)
+• Derive labour rates from the day rate: e.g. blockwork at 8m² per person-day = £300 ÷ 8 = £37.50/m²
+• Fixed-price allowances: single line item, stated value as material rate, £0 labour
+• Excluded trades: description filled, all rates 0, notes column = "Excluded — by others"
+• Notes column J: per-line assumptions, spec caveats, or exclusion flags only — not overflow description text
+• Add numbered assumptions at the bottom notes rows for any items needing client or architect sign-off
+
+━━━ BILL OF MATERIALS — POPULATION RULES ━━━
+• Materials only — no rates, no labour columns
+• Mirror the section structure from the Pricing Workbook exactly (same sections, same order, same deletions)
+• List every material with quantity, unit, and waste factor applied
+• Notes column: spec detail — grade, size, product name or equivalent
+
+━━━ CLIENT PROPOSAL — POPULATION RULES ━━━
+• Section 1 Introduction: 2–3 sentences on what Dovetail will deliver for this client
+• Section 2 Scope of Works: one row per section. Write a full paragraph per section in professional tone covering what is being done, the spec, and key details. Increase the row height of each scope row to fit — do not add extra rows
+• Section 3 Exclusions: list all confirmed exclusions clearly
+• Section 4 Cost Summary: one row per section showing client-facing cost (profit + contingency baked in, never broken out). Excluded items = "Not included". VAT shown separately on its own row
+• Section 5 Programme: realistic duration in weeks
+• Section 6 Payment Terms: 30% deposit on acceptance / 30% at mid-point / 25% near completion / 15% on practical completion
+
+━━━ CLIENT COST REPORT — POPULATION RULES ━━━
+• One row per section — client-facing costs only, profit and contingency baked in, never shown separately
 • No mention of margins, contingency, or internal rates anywhere in this tab
-• One line per section matching the Proposal
 • Excluded items: "Not included"
-• Totals: sub-total ex VAT, VAT @ 20%, grand total inc VAT
-• Footer: "A full itemised schedule of works and bill of materials is available on request."
+• Retain the sub-total ex VAT, VAT @ 20%, and grand total inc VAT rows — never delete these
+• Footer row: "A full itemised schedule of works and bill of materials is available on request."
 
 ━━━ AFTER COMPLETING THE WORKBOOK ━━━
 Provide a numbered list of:
-1. All assumptions made (dimensions assumed, specs assumed, quantities derived, etc.)
+1. All assumptions made (dimensions assumed, specs assumed, quantities derived, waste factors used, etc.)
 2. Any items in the brief that were ambiguous or could not be priced with confidence
 3. Any value engineering options worth flagging to the client`;
 }
@@ -1670,15 +1725,6 @@ function ppClearForm(){
 }
 
 
-// ── DARK MODE ──────────────────────────────────────────────────────────────
-let _darkMode = localStorage.getItem('dtv-dark')==='1';
-if(_darkMode) document.documentElement.classList.add('dark');
-
-function toggleDark(){
-  _darkMode=!_darkMode;
-  localStorage.setItem('dtv-dark',_darkMode?'1':'0');
-  document.documentElement.classList.toggle('dark',_darkMode);
-}
 
 // ── DASHBOARD ──────────────────────────────────────────────────────────────
 const CHASE_DAYS = 7;
@@ -1768,6 +1814,19 @@ function renderDashboard(){
       </div>`;
     }).join('')}`;
   } else { chaseEl.innerHTML=''; }
+
+  // Pipeline value by stage
+  const pvStages=STAGES.map((s,i)=>({name:s,val:jobs.filter(j=>j.stage===i).reduce((a,j)=>a+safeNum(j.value),0),count:jobs.filter(j=>j.stage===i).length})).filter(s=>s.val>0);
+  const pvEl=document.getElementById('dash-pv-section');
+  if(pvEl){
+    if(pvStages.length){
+      pvEl.innerHTML=`<div class="dash-section-title">Pipeline value by stage</div>
+      <div class="pv-grid" style="margin-bottom:0">${pvStages.map(s=>`<div class="pv-card"><div class="pv-stage">${s.name}</div><div class="pv-val">£${s.val.toLocaleString()}</div><div class="pv-count">${s.count} job${s.count!==1?'s':''}</div></div>`).join('')}</div>`;
+    } else {
+      pvEl.innerHTML='';
+    }
+  }
+
 }
 
 function isChaseNeeded(j){
