@@ -695,12 +695,13 @@ select.sem-input{cursor:pointer}
     <div class="tab active" onclick="switchTab('dashboard',this)">Dashboard</div>
     <div class="tab" onclick="switchTab('jobs',this)">Jobs <span class="tab-badge" id="tb-jobs">0</span></div>
     <div class="tab" onclick="switchTab('pipeline',this)">Pipeline</div>
-    <div class="tab" onclick="switchTab('schedule',this)">Schedule</div>
   </div>
 
   <!-- DASHBOARD -->
-  <div id="tab-dashboard" style="display:flex;flex-direction:column">
-    <div class="content" style="padding-bottom:0">
+  <div id="tab-dashboard" style="display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden">
+
+    <!-- KPIs + action panels -->
+    <div class="content" style="padding-bottom:10px;flex-shrink:0">
       <div class="offline-queue-bar" id="offline-queue-bar">⚡ <span id="offline-queue-count">0</span> job(s) queued to sync when back online. <button onclick="retrySyncQueue()" style="background:none;border:none;color:var(--amber);font-weight:600;cursor:pointer;font-size:12px;margin-left:4px">Retry now</button></div>
       <div class="dash-kpi-row" id="dash-kpis"></div>
       <div class="dash-row">
@@ -715,70 +716,7 @@ select.sem-input{cursor:pointer}
       </div>
     </div>
 
-    <!-- CALENDAR -->
-    <div class="content" style="padding-top:0">
-      <div class="cal-wrap">
-        <div class="cal-toolbar">
-          <div class="cal-toolbar-left">
-            <button class="cal-nav" onclick="calPrev()">&#8249;</button>
-            <div class="cal-month" id="cal-month-title"></div>
-            <button class="cal-nav" onclick="calNext()">&#8250;</button>
-            <button class="cal-today" onclick="calGoToday()">Today</button>
-          </div>
-          <a class="gcal-link" href="https://calendar.google.com" target="_blank">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            Google Calendar
-          </a>
-        </div>
-        <div class="cal-legend">
-          <div class="leg-item"><div class="leg-dot ev-new"></div>Enquiry</div>
-          <div class="leg-item"><div class="leg-dot ev-quoted"></div>Quoted</div>
-          <div class="leg-item"><div class="leg-dot ev-approved"></div>Approved</div>
-          <div class="leg-item"><div class="leg-dot ev-active"></div>On site</div>
-          <div class="leg-item"><div class="leg-dot ev-done"></div>Complete</div>
-          <div class="leg-item"><div class="leg-dot ev-overdue" style="border-left:2px solid var(--amber-border)"></div>Overdue</div>
-        </div>
-        <div class="cal-dow-row">
-          <div class="cal-dow-cell">Mon</div><div class="cal-dow-cell">Tue</div><div class="cal-dow-cell">Wed</div>
-          <div class="cal-dow-cell">Thu</div><div class="cal-dow-cell">Fri</div>
-          <div class="cal-dow-cell">Sat</div><div class="cal-dow-cell">Sun</div>
-        </div>
-        <div class="cal-weeks" id="cal-weeks"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- JOBS -->
-  <div class="content" id="tab-jobs" style="display:none">
-    <div class="filter-bar">
-      <div class="search-wrap">
-        <svg class="search-ico" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="8.5" cy="8.5" r="5.5"/><line x1="13" y1="13" x2="18" y2="18"/></svg>
-        <input type="text" class="search-input" id="search" placeholder="Search jobs, clients..." oninput="renderJobs()">
-      </div>
-      <select class="filter-sel" id="stage-filter" onchange="renderJobs()"><option value="">All stages</option></select>
-      <select class="filter-sel" id="sort-select" onchange="renderJobs()">
-        <option value="updated">Last updated</option>
-        <option value="value-desc">Value ↓</option>
-        <option value="value-asc">Value ↑</option>
-        <option value="stage">By stage</option>
-        <option value="overdue">Overdue first</option>
-      </select>
-    </div>
-    <div class="jobs-list" id="jobs-list"></div>
-  </div>
-
-  <!-- PIPELINE -->
-  <div id="tab-pipeline" style="display:none">
-    <div class="pipeline-scroll">
-      <div class="pipeline" id="pipeline"></div>
-    </div>
-  </div>
-
-
-  <!-- SCHEDULE TAB -->
-  <div id="tab-schedule" style="display:none;flex-direction:column;flex:1;min-height:0;overflow:hidden">
-
-    <!-- Controls bar -->
+    <!-- CREW SCHEDULE (replaces old calendar) -->
     <div class="sched-controls">
       <button class="sched-wn-btn" onclick="schedShift(-1)">&#8249;</button>
       <div class="sched-range-label" id="sched-range-label">Loading…</div>
@@ -810,26 +748,53 @@ select.sem-input{cursor:pointer}
       <button class="col-toggle-btn active" data-col="notes" onclick="schedToggleCol('notes',this)"><span class="ctb-dot" style="background:var(--hint)"></span>Notes/Orders</button>
     </div>
 
-    <!-- Unscheduled jobs tray -->
+    <!-- Unscheduled tray -->
     <div class="unsched-tray" id="unsched-tray">
       <span class="unsched-tray-label">⚠ Unscheduled</span>
       <div id="unsched-chips"></div>
     </div>
 
-    <!-- Scrollable grid -->
-    <div class="sched-scroll" id="sched-scroll">
+    <!-- Scrollable crew grid -->
+    <div class="sched-scroll" id="sched-scroll" style="flex:1;min-height:0">
       <div class="sched-grid-wrap">
         <div class="sched-col-header-row" id="sched-col-headers"></div>
         <div id="sched-grid-body"></div>
       </div>
     </div>
 
-    <!-- Footer summary -->
+    <!-- Footer -->
     <div class="sched-footer" id="sched-footer">
       <span style="color:var(--hint);font-size:11px">Loading schedule…</span>
     </div>
 
   </div>
+
+  <!-- JOBS -->
+  <div class="content" id="tab-jobs" style="display:none">
+    <div class="filter-bar">
+      <div class="search-wrap">
+        <svg class="search-ico" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="8.5" cy="8.5" r="5.5"/><line x1="13" y1="13" x2="18" y2="18"/></svg>
+        <input type="text" class="search-input" id="search" placeholder="Search jobs, clients..." oninput="renderJobs()">
+      </div>
+      <select class="filter-sel" id="stage-filter" onchange="renderJobs()"><option value="">All stages</option></select>
+      <select class="filter-sel" id="sort-select" onchange="renderJobs()">
+        <option value="updated">Last updated</option>
+        <option value="value-desc">Value ↓</option>
+        <option value="value-asc">Value ↑</option>
+        <option value="stage">By stage</option>
+        <option value="overdue">Overdue first</option>
+      </select>
+    </div>
+    <div class="jobs-list" id="jobs-list"></div>
+  </div>
+
+  <!-- PIPELINE -->
+  <div id="tab-pipeline" style="display:none">
+    <div class="pipeline-scroll">
+      <div class="pipeline" id="pipeline"></div>
+    </div>
+  </div>
+
 
   <!-- SCHEDULE ENTRY MODAL -->
   <div class="sem-bg" id="sem-modal" onclick="semBgClick(event)">
@@ -1181,6 +1146,7 @@ function init(){
     if(pop.style.display!=='none'&&!pop.contains(e.target)&&!e.target.closest('.cal-cell')) closePopover();
   });
   schedInit();
+  schedRender();
 }
 
 function updateOfflineBanner(){
@@ -1351,7 +1317,7 @@ async function deleteJobApi(id){
 // ══════════════════════════════════════════════════════════════════════════
 //  RENDER ALL
 // ══════════════════════════════════════════════════════════════════════════
-function renderAll(){ renderDashboard(); renderCalendar(); renderJobs(); renderPipeline(); document.getElementById('tb-jobs').textContent=jobs.length; if(document.getElementById('tab-schedule')&&document.getElementById('tab-schedule').style.display!=='none') schedRender(); }
+function renderAll(){ renderDashboard(); renderJobs(); renderPipeline(); document.getElementById('tb-jobs').textContent=jobs.length; const dash=document.getElementById('tab-dashboard'); if(dash&&dash.style.display!=='none') schedRender(); }
 function populateStageFilter(){ const s=document.getElementById('stage-filter'); STAGES.forEach((st,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent=st; s.appendChild(o); }); }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -1881,11 +1847,8 @@ async function addSiteLog(jobId){
 function switchTab(name,el){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); el.classList.add('active');
   ['dashboard','jobs','pipeline'].forEach(t=>{ document.getElementById('tab-'+t).style.display=t===name?'':'none'; });
-  const schedEl=document.getElementById('tab-schedule');
-  if(schedEl) schedEl.style.display=name==='schedule'?'flex':'none';
   if(name==='pipeline') renderPipeline();
-  if(name==='dashboard'){ renderDashboard(); renderCalendar(); }
-  if(name==='schedule') schedRender();
+  if(name==='dashboard'){ renderDashboard(); schedRender(); }
 }
 
 function filterToStage(s){ document.getElementById('stage-filter').value=s; switchTab('jobs',document.querySelectorAll('.tab')[1]); renderJobs(); }
