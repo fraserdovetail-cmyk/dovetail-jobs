@@ -73,34 +73,7 @@ body{min-height:100vh;overflow-x:hidden}
 .offline-banner{display:none;background:#92400E;color:#FEF3C7;font-size:12px;font-weight:500;text-align:center;padding:6px;letter-spacing:0.02em}
 .offline-banner.show{display:block}
 
-/* ── QUICK CAPTURE ── */
-.quick-capture{
-  display:flex;gap:8px;padding:12px 18px;
-  background:var(--charcoal);border-bottom:1px solid rgba(255,255,255,0.06);
-}
-.qc-input{
-  flex:1;padding:9px 13px;background:rgba(255,255,255,0.09);
-  border:1px solid rgba(255,255,255,0.1);border-radius:var(--radius-sm);
-  font-size:14px;font-family:'Inter',sans-serif;color:#fff;outline:none;
-  transition:border-color 0.15s;
-}
-.qc-input::placeholder{color:rgba(255,255,255,0.3)}
-.qc-input:focus{border-color:var(--green-mid);background:rgba(255,255,255,0.12)}
-.btn-qc{
-  padding:9px 14px;background:var(--green);color:#fff;border:none;
-  border-radius:var(--radius-sm);font-size:13px;font-weight:600;
-  font-family:'Inter',sans-serif;cursor:pointer;white-space:nowrap;
-  transition:background 0.15s;display:flex;align-items:center;gap:5px;
-}
-.btn-qc:hover{background:var(--green-mid)}
-.btn-qc svg{width:13px;height:13px;flex-shrink:0}
-.btn-full-job{
-  padding:9px 12px;background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.65);
-  border:1px solid rgba(255,255,255,0.1);border-radius:var(--radius-sm);
-  font-size:13px;font-family:'Inter',sans-serif;cursor:pointer;
-  transition:all 0.15s;white-space:nowrap;
-}
-.btn-full-job:hover{background:rgba(255,255,255,0.13);color:#fff}
+/* quick-capture removed */
 
 /* ── TABS ── */
 .tab-bar{
@@ -385,20 +358,7 @@ textarea.finput{resize:vertical;min-height:68px;line-height:1.5}
 .btn-price:hover{background:#D4EDBA}
 .btn-price svg{width:13px;height:13px;flex-shrink:0}
 
-/* ── QUICK CAPTURE CONFIRM ── */
-.qc-confirm{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:150;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)}
-.qc-confirm.open{display:flex}
-.qc-card{background:var(--white);border-radius:var(--radius);width:100%;max-width:380px;overflow:hidden;box-shadow:var(--shadow-lg)}
-.qc-card-hd{background:var(--charcoal);padding:14px 18px;display:flex;align-items:center;justify-content:space-between}
-.qc-card-hd span{font-size:14px;font-weight:600;color:#fff}
-.qc-card-close{background:none;border:none;color:rgba(255,255,255,0.45);font-size:20px;cursor:pointer;line-height:1}
-.qc-card-body{padding:18px;display:flex;flex-direction:column;gap:12px}
-.qc-label{font-size:12px;font-weight:500;color:var(--muted);margin-bottom:5px}
-.qc-saved-name{font-size:16px;font-weight:600;color:var(--charcoal)}
-.qc-saved-desc{font-size:14px;color:var(--muted)}
-.qc-card-ft{display:flex;gap:8px;padding:0 18px 18px;justify-content:flex-end}
-.btn-qc-save{padding:9px 18px;background:var(--green);color:#fff;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer}
-.btn-qc-edit{padding:9px 14px;background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;cursor:pointer}
+
 
 /* ── PRICING PANEL ── */
 #pricing-panel{display:none;position:fixed;inset:0;background:var(--surface);z-index:500;flex-direction:column;overflow:hidden}
@@ -729,15 +689,7 @@ select.sem-input{cursor:pointer}
     </div>
   </div>
 
-  <!-- QUICK CAPTURE -->
-  <div class="quick-capture">
-    <input class="qc-input" id="qc-name" placeholder="Client name..." autocomplete="off"/>
-    <input class="qc-input" id="qc-desc" placeholder="Job description..." autocomplete="off"/>
-    <button class="btn-qc" onclick="quickCapture()">
-      <svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="6.5" y1="1" x2="6.5" y2="12"/><line x1="1" y1="6.5" x2="12" y2="6.5"/></svg>
-      Log enquiry
-    </button>
-  </div>
+
 
   <div class="tab-bar">
     <div class="tab active" onclick="switchTab('dashboard',this)">Dashboard</div>
@@ -941,30 +893,7 @@ select.sem-input{cursor:pointer}
 
 </div><!-- /main-screen -->
 
-<!-- ══ QUICK CAPTURE CONFIRM ══ -->
-<div class="qc-confirm" id="qc-confirm">
-  <div class="qc-card">
-    <div class="qc-card-hd">
-      <span>Enquiry logged</span>
-      <button class="qc-card-close" onclick="closeQcConfirm()">&#215;</button>
-    </div>
-    <div class="qc-card-body">
-      <div>
-        <div class="qc-label">Client</div>
-        <div class="qc-saved-name" id="qc-conf-name">—</div>
-      </div>
-      <div>
-        <div class="qc-label">Job</div>
-        <div class="qc-saved-desc" id="qc-conf-desc">—</div>
-      </div>
-      <div style="font-size:12px;color:var(--hint)">Saved as <strong id="qc-conf-ref" style="font-family:'JetBrains Mono',monospace;color:var(--text)"></strong> · Stage: Initial contact</div>
-    </div>
-    <div class="qc-card-ft">
-      <button class="btn-qc-edit" onclick="openQcJob()">Edit full details</button>
-      <button class="btn-qc-save" onclick="closeQcConfirm()">Done</button>
-    </div>
-  </div>
-</div>
+
 
 <!-- ══ JOB MODAL ══ -->
 <div class="modal-bg" id="modal" onclick="bgClick(event)">
@@ -1203,7 +1132,7 @@ const CHASE_DAYS = 7;
 let jobs = [], saving = false, _durUnit = 'days', _gcalAdded = false, _depositReceived = false;
 let currentStage = 0, calYear, calMonth;
 let _pricingJobId = null, _ppSections = [];
-let _lastQcId = null; // for "edit full details" from quick capture confirm
+
 let syncQueue = []; // offline queue
 let isOnline = navigator.onLine;
 
@@ -1246,9 +1175,7 @@ function init(){
   window.addEventListener('online',()=>{ isOnline=true; updateOfflineBanner(); retrySyncQueue(); });
   window.addEventListener('offline',()=>{ isOnline=false; updateOfflineBanner(); });
   updateOfflineBanner();
-  // quick capture enter
-  document.getElementById('qc-desc').addEventListener('keydown',e=>{ if(e.key==='Enter') quickCapture(); });
-  document.getElementById('qc-name').addEventListener('keydown',e=>{ if(e.key==='Enter') document.getElementById('qc-desc').focus(); });
+
   document.addEventListener('click',e=>{
     const pop=document.getElementById('popover');
     if(pop.style.display!=='none'&&!pop.contains(e.target)&&!e.target.closest('.cal-cell')) closePopover();
@@ -1658,39 +1585,6 @@ function renderPipeline(){
     </div>`;
   }).join('');
 }
-
-// ══════════════════════════════════════════════════════════════════════════
-//  QUICK CAPTURE
-// ══════════════════════════════════════════════════════════════════════════
-async function quickCapture(){
-  const name=(document.getElementById('qc-name').value||'').trim();
-  const desc=(document.getElementById('qc-desc').value||'').trim();
-  if(!name&&!desc){ showToast('Enter at least a client name or job description'); return; }
-  const id=genId(), ref=genRef();
-  const job={
-    id,ref,name:desc,client:name,phone:'',email:'',address:'',value:'',
-    startDate:'',startTime:'',prestartDate:'',prestartTime:'',
-    durationNum:'',durationUnit:'days',notes:'',stage:0,
-    gcalAdded:false,depositReceived:false,
-    activityLog:[{stage:0,stageName:STAGES[0],ts:Date.now()}],
-    siteLog:[],promptHistory:[],
-    created:String(Date.now()),updated:String(Date.now())
-  };
-  jobs.push(job);
-  document.getElementById('qc-name').value='';
-  document.getElementById('qc-desc').value='';
-  renderAll();
-  // show confirm
-  _lastQcId=id;
-  document.getElementById('qc-conf-name').textContent=name||'—';
-  document.getElementById('qc-conf-desc').textContent=desc||'—';
-  document.getElementById('qc-conf-ref').textContent=ref;
-  document.getElementById('qc-confirm').classList.add('open');
-  await pushJob(job);
-}
-
-function closeQcConfirm(){ document.getElementById('qc-confirm').classList.remove('open'); _lastQcId=null; }
-function openQcJob(){ document.getElementById('qc-confirm').classList.remove('open'); if(_lastQcId) openJob(_lastQcId); }
 
 // ══════════════════════════════════════════════════════════════════════════
 //  JOB MODAL
