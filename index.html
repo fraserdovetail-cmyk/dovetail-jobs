@@ -815,6 +815,7 @@ select.sem-input{cursor:pointer}
           <select class="sem-input" id="sem-col">
             <option value="tom">Tom</option>
             <option value="fraser">Fraser</option>
+            <option value="both">Tom &amp; Fraser</option>
             <option value="barnetts">Barnetts (plumber)</option>
             <option value="sec">SEC (electrician)</option>
             <option value="kbc">KBC (bricklayer)</option>
@@ -2446,7 +2447,9 @@ function schedOpenEdit(id){
 
 function semSave(){
   const isNote=schedEntryType==='note';
-  const col=isNote?'notes':document.getElementById('sem-col').value;
+  const colVal=isNote?'notes':document.getElementById('sem-col').value;
+  const cols=colVal==='both'?['tom','fraser']:[colVal];
+  const col=cols[0];
   const jobId=isNote?'':document.getElementById('sem-job').value;
   const text=document.getElementById('sem-text').value.trim();
   const start=document.getElementById('sem-start').value;
@@ -2459,9 +2462,12 @@ function semSave(){
     const idx=schedEntries.findIndex(x=>x.id===schedEditId);
     if(idx>=0) schedEntries[idx]={...schedEntries[idx],col,jobId,text,start,end,colour,type:schedEntryType,isPlaceholder:false};
   } else {
-    schedEntries.push({id:genId(),col,jobId,text,start,end,colour,type:schedEntryType,isPlaceholder:false});
+    cols.forEach(c=>{
+      schedEntries.push({id:genId(),col:c,jobId,text,start,end,colour,type:schedEntryType,isPlaceholder:false});
+    });
   }
-  schedSaveLocal(); semClose(); schedRender(); showToast(schedEditId?'Updated':'Entry added');
+  schedSaveLocal(); semClose(); schedRender();
+  showToast(schedEditId?'Updated':colVal==='both'?'Added for Tom & Fraser':'Entry added');
 }
 
 function semClose(){ document.getElementById('sem-modal').classList.remove('open'); schedEditId=null; }
