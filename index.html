@@ -1172,6 +1172,27 @@ select.sem-input{cursor:pointer}
 // ══════════════════════════════════════════════════════════════════════════
 //  CONSTANTS & STATE
 // ══════════════════════════════════════════════════════════════════════════
+
+const BOM_LEAD_DEFAULTS = [
+  {keys:['window','door','glazing','bifold','bi-fold','skylight','rooflight'],days:35,label:'Bespoke — 7wk lead'},
+  {keys:['steel','rsj','beam','lintel','structural'],days:14,label:'Structural — 2wk lead'},
+  {keys:['brick','block','masonry','stone'],days:10,label:'Brickwork — 2wk lead'},
+  {keys:['roof tile','slate','batten','felt','truss','rafter'],days:10,label:'Roofing — 2wk lead'},
+  {keys:['timber','joist','stud','carcassing','softwood','hardwood','engineered'],days:5,label:'Timber — 1wk lead'},
+  {keys:['insulation','celotex','kingspan','rockwool','urethane','pir'],days:5,label:'Insulation — 1wk lead'},
+  {keys:['plasterboard','plaster','render','board','drywall'],days:3,label:'Dry lining — 3d lead'},
+  {keys:['pipe','copper','soil','waste','drain','duct'],days:5,label:'Plumbing — 1wk lead'},
+  {keys:['cable','conduit','socket','consumer','isolator'],days:5,label:'Electrical — 1wk lead'},
+  {keys:['tile','ceramic','porcelain','grout','adhesive'],days:7,label:'Tiling — 1wk lead'},
+  {keys:['kitchen','unit','worktop','cabinet','vanity','bathroom'],days:21,label:'Joinery units — 3wk lead'},
+  {keys:['carpet','flooring','vinyl','laminate','hardwood floor'],days:10,label:'Floor coverings — 2wk lead'},
+  {keys:['skip','waste','disposal'],days:2,label:'Skip — 2d lead'},
+  {keys:['scaffold'],days:5,label:'Scaffold — 1wk lead'},
+  {keys:['paint','primer','undercoat','eggshell','emulsion'],days:2,label:'Decoration — 2d lead'},
+  {keys:['sand','cement','aggregate','concrete','mortar','screed'],days:3,label:'Site materials — 3d lead'},
+  {keys:['fixing','screw','bolt','nail','bracket','joist hanger'],days:2,label:'Fixings — 2d lead'},
+];
+
 const API  = 'https://script.google.com/macros/s/AKfycbyw1VCKKJ3sFE53P4gfoLKgvTw_d4RK0tXXQvnRZQYPn_Wisb5-qnH9CsmtB49KP9zT/exec';
 const PASS = 'Dovetail2025!';
 const STAGES = ['Initial contact','Viewed job','Quote submitted','Quote approved','Deposit issued','Deposit paid','Start date approved','Work commenced','Work completed','Invoice issued'];
@@ -1699,6 +1720,9 @@ function openJob(id){
   document.getElementById('modal-title').textContent=isNew?'New job':(d.ref+(d.name?' — '+d.name:''));
 
   document.getElementById('modal-body').innerHTML=`
+    <div class="modal-section" id="bom-header-section" style="margin-bottom:12px">
+      \${buildBomHeader(d.id,isNew)}
+    </div>
     <div class="modal-section">
       <div class="sec-hd">Job details</div>
       <div class="fg">
@@ -1789,14 +1813,8 @@ function openJob(id){
   document.getElementById('modal-ft').innerHTML=`
     <div class="modal-ft-left">
       ${!isNew?`<button class="btn-del" onclick="deleteJob('${d.id}')">Delete</button>`:''}
-      ${!isNew?`<button class="btn-dup" onclick="duplicateJob('${d.id}')">
-        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-        Duplicate
-      </button>`:''}
-      ${!isNew&&(d.client||d.phone)?`<a class="btn-whatsapp" href="${whatsappUrl(d)}" target="_blank" onclick="event.stopPropagation()">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-        WhatsApp
-      </a>`:''}
+
+
     </div>
     <div class="modal-ft-right">
       <button class="btn-cancel" onclick="closeModal()">Cancel</button>
@@ -2644,25 +2662,6 @@ function schedInit(){
 
 // item.state: 'pending' | 'ordered' | 'delivered'
 
-const BOM_LEAD_DEFAULTS = [
-  {keys:['window','door','glazing','bifold','bi-fold','skylight','rooflight'],days:35,label:'Bespoke — 7wk lead'},
-  {keys:['steel','rsj','beam','lintel','structural'],days:14,label:'Structural — 2wk lead'},
-  {keys:['brick','block','masonry','stone'],days:10,label:'Brickwork — 2wk lead'},
-  {keys:['roof tile','slate','batten','felt','truss','rafter'],days:10,label:'Roofing — 2wk lead'},
-  {keys:['timber','joist','stud','carcassing','softwood','hardwood','engineered'],days:5,label:'Timber — 1wk lead'},
-  {keys:['insulation','celotex','kingspan','rockwool','urethane','pir'],days:5,label:'Insulation — 1wk lead'},
-  {keys:['plasterboard','plaster','render','board','drywall'],days:3,label:'Dry lining — 3d lead'},
-  {keys:['pipe','copper','soil','waste','drain','duct'],days:5,label:'Plumbing — 1wk lead'},
-  {keys:['cable','conduit','socket','consumer','isolator'],days:5,label:'Electrical — 1wk lead'},
-  {keys:['tile','ceramic','porcelain','grout','adhesive'],days:7,label:'Tiling — 1wk lead'},
-  {keys:['kitchen','unit','worktop','cabinet','vanity','bathroom'],days:21,label:'Joinery units — 3wk lead'},
-  {keys:['carpet','flooring','vinyl','laminate','hardwood floor'],days:10,label:'Floor coverings — 2wk lead'},
-  {keys:['skip','waste','disposal'],days:2,label:'Skip — 2d lead'},
-  {keys:['scaffold'],days:5,label:'Scaffold — 1wk lead'},
-  {keys:['paint','primer','undercoat','eggshell','emulsion'],days:2,label:'Decoration — 2d lead'},
-  {keys:['sand','cement','aggregate','concrete','mortar','screed'],days:3,label:'Site materials — 3d lead'},
-  {keys:['fixing','screw','bolt','nail','bracket','joist hanger'],days:2,label:'Fixings — 2d lead'},
-];
 
 function bomGetLeadDays(name, overrides, ref){
   const key=(ref||'')+'|'+(name||'');
@@ -2689,6 +2688,44 @@ function bomUrgency(orderDate){
 }
 
 function bomGetOverrides(bom){ const o={}; (bom||[]).forEach(i=>{ if(i.leadOverride!=null) o[(i.ref||'')+'|'+(i.name||'')]=i.leadOverride; }); return o; }
+
+
+function buildBomHeader(jobId, isNew){
+  if(isNew) return '<div style="font-size:12px;color:var(--hint);font-style:italic">Save this job first to attach a scope of work Excel.</div>';
+  const j=jobs.find(x=>x.id===jobId);
+  if(!j) return '';
+  const hasBom=Array.isArray(j.bom)&&j.bom.length>0;
+  const pending=(j.bom||[]).filter(i=>!i.state||i.state==='pending').length;
+  const ordered=(j.bom||[]).filter(i=>i.state==='ordered').length;
+  const delivered=(j.bom||[]).filter(i=>i.state==='delivered').length;
+  if(hasBom){
+    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--green-light);border:1px solid var(--green-border);border-radius:var(--radius-sm);flex-wrap:wrap">
+      <span style="font-size:18px">📋</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600;color:var(--green-dark)">${esc(j.bomFilename||'Scope of work.xlsx')}</div>
+        <div style="font-size:11px;color:var(--green);margin-top:2px">${j.bom.length} materials · ${delivered} delivered · ${ordered} ordered · ${pending} to order</div>
+      </div>
+      <label style="cursor:pointer;flex-shrink:0">
+        <input type="file" accept=".xlsx,.xls" style="display:none" onchange="if(this.files[0])bomReadExcel(this.files[0],'${jobId}')"/>
+        <span style="font-size:11px;color:var(--muted);padding:4px 10px;border:1px solid var(--border);border-radius:4px;background:var(--white)">Replace file</span>
+      </label>
+    </div>`;
+  } else {
+    return `<div class="bom-upload-area" style="padding:12px 14px"
+      ondragover="event.preventDefault();this.classList.add('drag-hover')"
+      ondragleave="this.classList.remove('drag-hover')"
+      ondrop="event.preventDefault();this.classList.remove('drag-hover');if(event.dataTransfer.files[0])bomReadExcel(event.dataTransfer.files[0],'${jobId}')">
+      <input type="file" accept=".xlsx,.xls" onchange="if(this.files[0])bomReadExcel(this.files[0],'${jobId}')"/>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:20px">📋</span>
+        <div style="text-align:left">
+          <div class="bom-upload-txt">Attach scope of work Excel</div>
+          <div class="bom-upload-sub">Upload the Claude-generated .xlsx to enable materials tracking</div>
+        </div>
+      </div>
+    </div>`;
+  }
+}
 
 function buildBomSection(jobId, isNew){
   if(isNew) return '';
