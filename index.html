@@ -1095,7 +1095,7 @@ const SMONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','No
 const CHASE_DAYS = 7;
 
 let jobs = [], saving = false, _durUnit = 'days', _gcalAdded = false, _depositReceived = false;
-let currentStage = 0, calYear, calMonth;
+let currentStage = 0;
 let _pricingJobId = null, _ppSections = [];
 
 let syncQueue = []; // offline queue
@@ -1131,7 +1131,6 @@ if(sessionStorage.getItem('dtv')==='1'){
 //  INIT
 // ══════════════════════════════════════════════════════════════════════════
 function init(){
-  const n=new Date(); calYear=n.getFullYear(); calMonth=n.getMonth();
   populateStageFilter();
   loadJobs();
   setInterval(loadJobs,120000);
@@ -1143,7 +1142,7 @@ function init(){
 
   document.addEventListener('click',e=>{
     const pop=document.getElementById('popover');
-    if(pop.style.display!=='none'&&!pop.contains(e.target)&&!e.target.closest('.cal-cell')) closePopover();
+    if(pop.style.display!=='none'&&!pop.contains(e.target)) closePopover();
   });
   schedInit();
   schedRender();
@@ -1416,41 +1415,6 @@ function renderDashboard(){
 // ══════════════════════════════════════════════════════════════════════════
 //  CALENDAR
 // ══════════════════════════════════════════════════════════════════════════
-function calPrev(){ calMonth--; if(calMonth<0){calMonth=11;calYear--;} renderCalendar(); }
-function calNext(){ calMonth++; if(calMonth>11){calMonth=0;calYear++;} renderCalendar(); }
-function calGoToday(){ const n=new Date(); calYear=n.getFullYear(); calMonth=n.getMonth(); renderCalendar(); }
-
-function renderCalendar(){
-  document.getElementById('cal-month-title').textContent=MONTHS[calMonth]+' '+calYear;
-  const today=new Date(); today.setHours(0,0,0,0); const todayStr=toDateStr(today);
-  const dateMap={};
-  jobs.forEach(j=>{ if(!j.startDate) return; jobWorkingDays(j).forEach((ds,idx)=>{ if(!dateMap[ds]) dateMap[ds]=[]; dateMap[ds].push({job:j,isFirst:idx===0}); }); });
-
-  const firstOfMonth=new Date(calYear,calMonth,1); let startMon=new Date(firstOfMonth);
-  const dow=startMon.getDay(); const diff=dow===0?-6:1-dow; startMon.setDate(startMon.getDate()+diff);
-  const lastOfMonth=new Date(calYear,calMonth+1,0); let endSun=new Date(lastOfMonth);
-  const ldow=endSun.getDay(); if(ldow!==0) endSun.setDate(endSun.getDate()+(7-ldow));
-
-  const weeks=[]; const cur=new Date(startMon);
-  while(cur<=endSun){ const week=[]; for(let d=0;d<7;d++){week.push(new Date(cur));cur.setDate(cur.getDate()+1);} weeks.push(week); }
-
-  let html='';
-  weeks.forEach(week=>{
-    html+='<div class="cal-week-row">';
-    week.forEach(date=>{
-      const ds=toDateStr(date),isOther=date.getMonth()!==calMonth,isToday=ds===todayStr;
-      const entries=dateMap[ds]||[];
-      const cls=['cal-cell',isOther?'other-month':'',isToday?'is-today':''].filter(Boolean).join(' ');
-      const clickAttr=entries.length?`onclick="showPopover('${ds}',event)"`:'';
-      const bars=entries.slice(0,2).map(({job:j,isFirst})=>`<div class="cal-event ${evClass(j)}" onclick="event.stopPropagation();closePopover();openJob('${j.id}')" title="${esc(j.name||'Untitled')} — ${esc(j.client||'')}">${isFirst?esc(j.name||'Untitled'):''}</div>`).join('');
-      const more=entries.length>2?`<div class="cal-more" onclick="event.stopPropagation();showPopover('${ds}',event)">+${entries.length-2} more</div>`:'';
-      html+=`<div class="${cls}" ${clickAttr}><div class="cal-day-num">${date.getDate()}</div>${bars}${more}</div>`;
-    });
-    html+='</div>';
-  });
-  document.getElementById('cal-weeks').innerHTML=html;
-}
-
 function showPopover(ds,e){
   const entries=[]; jobs.forEach(j=>{ if(jobWorkingDays(j).includes(ds)) entries.push(j); }); if(!entries.length) return;
   const d=new Date(ds+'T12:00:00');
