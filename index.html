@@ -495,6 +495,196 @@ textarea.pp-input{resize:vertical;min-height:80px}
   .dash-row{grid-template-columns:1fr}
   .topbar-brand{display:none}
 }
+
+/* ── SCHEDULE TAB ── */
+#tab-schedule{display:none;flex-direction:column;min-height:0;overflow:hidden}
+.sched-outer{display:flex;flex-direction:column;flex:1;overflow:hidden;min-height:0}
+.sched-controls{
+  display:flex;align-items:center;gap:8px;padding:10px 16px;
+  background:var(--charcoal);border-bottom:1px solid rgba(255,255,255,0.07);
+  flex-wrap:wrap;flex-shrink:0;
+}
+.sched-wn-btn{width:26px;height:26px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);border-radius:var(--radius-xs);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;color:rgba(255,255,255,0.6);user-select:none;transition:all 0.12s}
+.sched-wn-btn:hover{background:rgba(255,255,255,0.15);color:#fff}
+.sched-range-label{font-size:13px;font-weight:500;color:#fff;min-width:180px;text-align:center;letter-spacing:-0.2px}
+.sched-view-toggle{display:flex;border:1px solid rgba(255,255,255,0.1);border-radius:var(--radius-xs);overflow:hidden}
+.svt-opt{padding:5px 10px;font-size:12px;font-family:'Inter',sans-serif;color:rgba(255,255,255,0.45);background:transparent;border:none;cursor:pointer;transition:all 0.12s}
+.svt-opt.active{background:rgba(255,255,255,0.13);color:#fff}
+.sched-today-btn{padding:5px 11px;background:transparent;border:1px solid rgba(255,255,255,0.1);border-radius:var(--radius-xs);font-size:12px;color:rgba(255,255,255,0.5);cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.12s}
+.sched-today-btn:hover{background:rgba(255,255,255,0.08);color:#fff}
+.sched-add-btn{padding:6px 12px;background:var(--green);color:#fff;border:none;border-radius:var(--radius-xs);font-size:12px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:background 0.12s;margin-left:auto}
+.sched-add-btn:hover{background:var(--green-mid)}
+/* column toggles */
+.sched-col-toggles{display:flex;gap:5px;flex-wrap:wrap;padding:8px 16px;background:var(--white);border-bottom:1px solid var(--border);flex-shrink:0;align-items:center}
+.sched-col-toggles-label{font-size:11px;font-weight:600;color:var(--hint);text-transform:uppercase;letter-spacing:0.06em;margin-right:4px}
+.col-toggle-btn{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:12px;border:1px solid var(--border);background:var(--white);font-size:11px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;color:var(--muted);transition:all 0.12s;white-space:nowrap}
+.col-toggle-btn.active{color:#fff;border-color:transparent}
+.col-toggle-btn .ctb-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+/* unscheduled tray */
+.unsched-tray{background:var(--amber-light);border-bottom:1px solid var(--amber-border);padding:6px 16px;display:none;flex-wrap:wrap;gap:6px;align-items:center;flex-shrink:0}
+.unsched-tray.has-items{display:flex}
+.unsched-tray-label{font-size:11px;font-weight:600;color:var(--amber);text-transform:uppercase;letter-spacing:0.05em;margin-right:4px;white-space:nowrap}
+.unsched-chip{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;background:var(--white);border:1px solid var(--amber-border);border-radius:10px;font-size:11px;font-weight:500;color:var(--amber);cursor:pointer;transition:all 0.12s}
+.unsched-chip:hover{background:var(--amber-light);border-color:var(--amber)}
+/* scroll wrapper */
+.sched-scroll{overflow:auto;flex:1;min-height:0;-webkit-overflow-scrolling:touch}
+/* grid */
+.sched-grid-wrap{min-width:max-content}
+.sched-col-header-row{display:flex;position:sticky;top:0;z-index:30;background:var(--white);border-bottom:2px solid var(--border)}
+.sch-day-spacer{width:72px;flex-shrink:0;border-right:1px solid var(--border);background:var(--white)}
+.sch-col-hd{
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  padding:10px 6px;font-size:11px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;
+  border-right:1px solid var(--border);gap:5px;
+}
+.sch-col-hd-avatar{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0}
+/* day rows */
+.sched-day-row{display:flex;border-bottom:1px solid var(--border);transition:background 0.1s;min-height:66px}
+.sched-day-row:hover{background:rgba(74,144,32,0.015)}
+.sched-day-row.is-today .sched-day-label{background:var(--green)}
+.sched-day-row.is-today .sched-day-label *{color:#fff !important}
+.sched-day-row.is-weekend{background:#FAFAFA}
+.sched-day-row.is-weekend .sched-day-label{opacity:0.55}
+.sched-day-label{
+  width:72px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:6px 4px;border-right:1px solid var(--border);
+  cursor:default;position:sticky;left:0;background:var(--white);z-index:10;
+}
+.sched-day-row.is-weekend .sched-day-label{background:#FAFAFA}
+.sched-dow{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;line-height:1}
+.sched-date{font-size:20px;font-weight:300;color:var(--text);line-height:1.1;font-family:'JetBrains Mono',monospace;margin-top:1px}
+.sched-mon{font-size:9px;color:var(--hint);text-transform:uppercase;letter-spacing:0.05em;margin-top:1px}
+.sched-month-marker{font-size:9px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:2px}
+/* cells */
+.sched-cell{
+  flex-shrink:0;padding:4px 5px;border-right:1px solid var(--border);
+  display:flex;flex-direction:column;gap:3px;min-height:var(--sched-row-h,66px);
+  cursor:pointer;transition:background 0.1s;position:relative;
+}
+.sched-cell:hover{background:rgba(74,144,32,0.04)}
+.sched-cell.drag-over{background:rgba(74,144,32,0.1);outline:2px dashed var(--green-mid);outline-offset:-2px}
+/* chips */
+.sched-chip{
+  border-radius:4px;padding:3px 7px;font-size:11px;font-weight:500;
+  display:flex;align-items:center;gap:4px;cursor:pointer;
+  border:1px solid transparent;transition:opacity 0.1s,box-shadow 0.1s;
+  overflow:hidden;line-height:1.4;
+}
+.sched-chip:hover{opacity:0.85}
+.sched-chip.dragging{opacity:0.35}
+.chip-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;background:currentColor;opacity:0.55}
+.chip-txt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip-rm{
+  width:13px;height:13px;border-radius:50%;background:rgba(0,0,0,0.12);
+  border:none;color:inherit;font-size:10px;cursor:pointer;
+  display:none;align-items:center;justify-content:center;flex-shrink:0;padding:0;
+}
+.sched-chip:hover .chip-rm{display:flex}
+/* placeholder chip (auto-populated from job start date) */
+.sched-chip.is-placeholder{border-style:dashed;opacity:0.7}
+.sched-chip.is-placeholder:hover{opacity:1}
+/* cell add btn */
+.sched-cell-add{
+  width:16px;height:16px;border-radius:3px;border:1px dashed var(--border-strong);
+  background:none;color:var(--hint);font-size:14px;line-height:1;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  flex-shrink:0;transition:all 0.12s;align-self:flex-start;
+}
+.sched-cell-add:hover{border-color:var(--green-mid);color:var(--green);background:var(--green-light)}
+/* summary footer */
+.sched-footer{
+  display:flex;gap:14px;padding:7px 16px;background:var(--white);
+  border-top:1px solid var(--border);flex-shrink:0;flex-wrap:wrap;font-size:12px;color:var(--muted);
+}
+.sf-item{display:flex;align-items:center;gap:5px}
+.sf-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+/* schedule entry modal */
+.sem-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:300;
+  align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)}
+.sem-bg.open{display:flex}
+.sem-box{background:var(--white);border-radius:var(--radius);width:100%;max-width:420px;overflow:hidden;box-shadow:var(--shadow-lg)}
+.sem-hd{display:flex;align-items:center;justify-content:space-between;padding:13px 17px;background:var(--charcoal)}
+.sem-title{font-size:13px;font-weight:600;color:#fff}
+.sem-close{background:none;border:none;color:rgba(255,255,255,0.45);font-size:20px;cursor:pointer;line-height:1}
+.sem-body{padding:16px;display:flex;flex-direction:column;gap:11px}
+.sem-ft{display:flex;gap:8px;justify-content:flex-end;padding:11px 16px;border-top:1px solid var(--border);background:var(--surface)}
+.sem-label{font-size:12px;font-weight:500;color:var(--muted);margin-bottom:4px;display:block}
+.sem-input{padding:8px 11px;border:1px solid var(--border);border-radius:var(--radius-sm);
+  font-size:13px;font-family:'Inter',sans-serif;color:var(--text);background:var(--white);outline:none;transition:border-color 0.15s;width:100%}
+.sem-input:focus{border-color:var(--green-mid)}
+select.sem-input{cursor:pointer}
+.sem-type-tabs{display:flex;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;margin-bottom:2px}
+.sem-tt{flex:1;padding:7px;font-size:12px;font-family:'Inter',sans-serif;cursor:pointer;border:none;background:var(--white);color:var(--muted);transition:all 0.12s;font-weight:500}
+.sem-tt.active{background:var(--charcoal);color:#fff}
+.sug-row{display:flex;flex-wrap:wrap;gap:4px;margin-top:3px}
+.sug-pill{padding:3px 9px;background:var(--surface);border:1px solid var(--border);border-radius:10px;font-size:11px;color:var(--muted);cursor:pointer;transition:all 0.12s}
+.sug-pill:hover{border-color:var(--green-mid);color:var(--green);background:var(--green-light)}
+/* colour swatches */
+.colour-swatches{display:flex;gap:5px;flex-wrap:wrap}
+.cs-dot{width:22px;height:22px;border-radius:4px;cursor:pointer;transition:all 0.12s;display:flex;align-items:center;justify-content:center;border:2px solid transparent}
+@media(max-width:600px){
+  .sch-day-spacer,.sched-day-label{width:54px}
+  .sched-controls{padding:8px 12px}
+}
+
+
+/* ── BILL OF MATERIALS ── */
+.bom-upload-area{border:2px dashed var(--green-border);border-radius:var(--radius-sm);padding:18px 14px;text-align:center;cursor:pointer;transition:all 0.15s;background:var(--green-light);position:relative}
+.bom-upload-area:hover,.bom-upload-area.drag-hover{border-color:var(--green-mid);background:#D4EDBA}
+.bom-upload-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.bom-upload-ico{font-size:22px;margin-bottom:6px}
+.bom-upload-txt{font-size:13px;font-weight:500;color:var(--green)}
+.bom-upload-sub{font-size:11px;color:var(--hint);margin-top:3px}
+.bom-loaded{background:var(--white);border:1px solid var(--green-border);border-radius:var(--radius-sm);padding:10px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.bom-loaded-name{font-size:13px;font-weight:500;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bom-loaded-count{font-size:11px;color:var(--hint);font-family:'JetBrains Mono',monospace}
+.bom-clear{background:none;border:1px solid var(--red-border);color:var(--red);border-radius:4px;padding:3px 9px;font-size:11px;cursor:pointer;font-family:'Inter',sans-serif;flex-shrink:0}
+.bom-clear:hover{background:var(--red-light)}
+.bom-checklist{display:flex;flex-direction:column;gap:6px;margin-top:4px}
+.bom-item{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;transition:border-color 0.12s}
+.bom-item.urgent{border-left:3px solid var(--red)}
+.bom-item.due-soon{border-left:3px solid var(--amber-border)}
+.bom-item.state-delivered{opacity:0.55;background:var(--surface)}
+.bom-item-top{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;cursor:pointer}
+.bom-item-top:hover{background:rgba(0,0,0,0.015)}
+.bom-state-track{display:flex;align-items:center;gap:3px;flex-shrink:0;margin-top:2px}
+.bom-state-dot{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--border-strong);background:var(--white);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.12s;font-size:9px;font-weight:700}
+.bom-state-dot.ordered{background:#FEF3C7;border-color:#F59E0B;color:#92400E}
+.bom-state-dot.delivered{background:var(--green);border-color:var(--green);color:#fff}
+.bom-state-line{width:8px;height:1.5px;background:var(--border);flex-shrink:0}
+.bom-state-line.active{background:var(--green)}
+.bom-item-info{flex:1;min-width:0}
+.bom-item-name{font-size:13px;color:var(--text);font-weight:500;line-height:1.3}
+.bom-item.state-delivered .bom-item-name{text-decoration:line-through;color:var(--hint)}
+.bom-item-qty{color:var(--hint);font-weight:400}
+.bom-item-meta{font-size:11px;color:var(--hint);margin-top:3px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.bom-lead-badge{font-size:10px;font-weight:600;padding:1px 7px;border-radius:8px;white-space:nowrap}
+.bom-lead-urgent{background:var(--red-light);color:var(--red)}
+.bom-lead-soon{background:var(--amber-light);color:var(--amber)}
+.bom-lead-ok{background:var(--green-light);color:var(--green)}
+.bom-detail{display:none;padding:0 12px 10px;border-top:1px solid var(--border);background:var(--surface)}
+.bom-item.expanded .bom-detail{display:block}
+.bom-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+@media(max-width:480px){.bom-detail-grid{grid-template-columns:1fr}}
+.bom-detail-field{display:flex;flex-direction:column;gap:4px}
+.bom-detail-label{font-size:10px;font-weight:600;color:var(--hint);text-transform:uppercase;letter-spacing:0.05em}
+.bom-detail-input{padding:6px 9px;border:1px solid var(--border);border-radius:var(--radius-xs);font-size:12px;font-family:'Inter',sans-serif;color:var(--text);background:var(--white);outline:none;transition:border-color 0.12s;width:100%}
+.bom-detail-input:focus{border-color:var(--green-mid)}
+.bom-detail-row{display:flex;gap:6px;align-items:center;margin-top:8px;flex-wrap:wrap}
+.bom-state-btn{padding:5px 12px;font-size:11px;font-weight:600;font-family:'Inter',sans-serif;border-radius:6px;cursor:pointer;border:1px solid;transition:all 0.12s;white-space:nowrap}
+.bom-state-btn.mark-ordered{background:#FEF3C7;color:#92400E;border-color:#F59E0B}
+.bom-state-btn.mark-ordered:hover{background:#FDE68A}
+.bom-state-btn.mark-delivered{background:var(--green-light);color:var(--green);border-color:var(--green-border)}
+.bom-state-btn.mark-delivered:hover{background:#D4EDBA}
+.bom-state-btn.mark-reset{background:var(--surface);color:var(--muted);border-color:var(--border)}
+.bom-state-btn.mark-reset:hover{background:var(--border)}
+.bom-sched-btn{padding:5px 10px;font-size:11px;background:var(--blue-light);color:var(--blue);border:1px solid var(--blue-border);border-radius:6px;cursor:pointer;font-family:'Inter',sans-serif;transition:background 0.12s}
+.bom-sched-btn:hover{background:#DBEAFE}
+.bom-prompt-banner{background:var(--amber-light);border:1px solid var(--amber-border);border-radius:var(--radius-sm);padding:9px 12px;margin-bottom:6px;font-size:12px;color:var(--amber);display:flex;align-items:flex-start;gap:7px}
+.bom-prompt-ico{flex-shrink:0;margin-top:1px}
+.bom-schedule-all{margin-top:10px;padding:9px 14px;background:var(--green);color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:background 0.12s;width:100%}
+.bom-schedule-all:hover{background:var(--green-mid)}
+
 </style>
 </head>
 <body>
@@ -553,6 +743,7 @@ textarea.pp-input{resize:vertical;min-height:80px}
     <div class="tab active" onclick="switchTab('dashboard',this)">Dashboard</div>
     <div class="tab" onclick="switchTab('jobs',this)">Jobs <span class="tab-badge" id="tb-jobs">0</span></div>
     <div class="tab" onclick="switchTab('pipeline',this)">Pipeline</div>
+    <div class="tab" onclick="switchTab('schedule',this)">Schedule</div>
   </div>
 
   <!-- DASHBOARD -->
@@ -628,6 +819,123 @@ textarea.pp-input{resize:vertical;min-height:80px}
   <div id="tab-pipeline" style="display:none">
     <div class="pipeline-scroll">
       <div class="pipeline" id="pipeline"></div>
+    </div>
+  </div>
+
+
+  <!-- SCHEDULE TAB -->
+  <div id="tab-schedule" style="display:none;flex-direction:column;flex:1;min-height:0;overflow:hidden">
+
+    <!-- Controls bar -->
+    <div class="sched-controls">
+      <button class="sched-wn-btn" onclick="schedShift(-1)">&#8249;</button>
+      <div class="sched-range-label" id="sched-range-label">Loading…</div>
+      <button class="sched-wn-btn" onclick="schedShift(1)">&#8250;</button>
+      <button class="sched-today-btn" onclick="schedGoToday()">Today</button>
+      <div class="sched-view-toggle">
+        <button class="svt-opt" onclick="schedSetView('4w',this)">4 wk</button>
+        <button class="svt-opt active" onclick="schedSetView('8w',this)">8 wk</button>
+        <button class="svt-opt" onclick="schedSetView('6m',this)">6 mo</button>
+        <button class="svt-opt" onclick="schedSetView('1yr',this)">1 yr</button>
+      </div>
+      <button class="sched-add-btn" onclick="schedOpenModal(null,null)">+ Add entry</button>
+    </div>
+
+    <!-- Column toggles -->
+    <div class="sched-col-toggles">
+      <span class="sched-col-toggles-label">Columns</span>
+      <button class="col-toggle-btn active" data-col="tom" onclick="schedToggleCol('tom',this)" style="background:#EFF6FF;border-color:#93C5FD;color:#1D4ED8"><span class="ctb-dot" style="background:#1D4ED8"></span>Tom</button>
+      <button class="col-toggle-btn active" data-col="fraser" onclick="schedToggleCol('fraser',this)" style="background:#F5F3FF;border-color:#C4B5FD;color:#6D28D9"><span class="ctb-dot" style="background:#6D28D9"></span>Fraser</button>
+      <span style="width:1px;height:14px;background:var(--border);margin:0 4px;flex-shrink:0"></span>
+      <span class="sched-col-toggles-label" style="margin-right:0">Contractors</span>
+      <button class="col-toggle-btn active" data-col="barnetts" onclick="schedToggleCol('barnetts',this)" style="background:#FFFBEB;border-color:#FDE68A;color:#92400E"><span class="ctb-dot" style="background:#92400E"></span>Barnetts (plumber)</button>
+      <button class="col-toggle-btn" data-col="sec" onclick="schedToggleCol('sec',this)"><span class="ctb-dot" style="background:#065F46"></span>SEC (electrician)</button>
+      <button class="col-toggle-btn" data-col="kbc" onclick="schedToggleCol('kbc',this)"><span class="ctb-dot" style="background:#1E40AF"></span>KBC (bricklayer)</button>
+      <button class="col-toggle-btn" data-col="roofer" onclick="schedToggleCol('roofer',this)"><span class="ctb-dot" style="background:#5B21B6"></span>Roofer</button>
+      <button class="col-toggle-btn" data-col="painter" onclick="schedToggleCol('painter',this)"><span class="ctb-dot" style="background:#9D174D"></span>Painter</button>
+      <button class="col-toggle-btn" data-col="flooring" onclick="schedToggleCol('flooring',this)"><span class="ctb-dot" style="background:#0F766E"></span>Carpets/flooring</button>
+      <span style="width:1px;height:14px;background:var(--border);margin:0 4px;flex-shrink:0"></span>
+      <button class="col-toggle-btn active" data-col="notes" onclick="schedToggleCol('notes',this)"><span class="ctb-dot" style="background:var(--hint)"></span>Notes/Orders</button>
+    </div>
+
+    <!-- Unscheduled jobs tray -->
+    <div class="unsched-tray" id="unsched-tray">
+      <span class="unsched-tray-label">⚠ Unscheduled</span>
+      <div id="unsched-chips"></div>
+    </div>
+
+    <!-- Scrollable grid -->
+    <div class="sched-scroll" id="sched-scroll">
+      <div class="sched-grid-wrap">
+        <div class="sched-col-header-row" id="sched-col-headers"></div>
+        <div id="sched-grid-body"></div>
+      </div>
+    </div>
+
+    <!-- Footer summary -->
+    <div class="sched-footer" id="sched-footer">
+      <span style="color:var(--hint);font-size:11px">Loading schedule…</span>
+    </div>
+
+  </div>
+
+  <!-- SCHEDULE ENTRY MODAL -->
+  <div class="sem-bg" id="sem-modal" onclick="semBgClick(event)">
+    <div class="sem-box">
+      <div class="sem-hd">
+        <span class="sem-title" id="sem-title">Add entry</span>
+        <button class="sem-close" onclick="semClose()">&#215;</button>
+      </div>
+      <div class="sem-body">
+        <div>
+          <div class="sem-type-tabs" id="sem-type-tabs">
+            <button class="sem-tt active" onclick="semSetType('job',this)">Job / crew</button>
+            <button class="sem-tt" onclick="semSetType('note',this)">Note / order</button>
+          </div>
+        </div>
+        <div id="sem-col-group">
+          <label class="sem-label">Who</label>
+          <select class="sem-input" id="sem-col">
+            <option value="tom">Tom</option>
+            <option value="fraser">Fraser</option>
+            <option value="barnetts">Barnetts (plumber)</option>
+            <option value="sec">SEC (electrician)</option>
+            <option value="kbc">KBC (bricklayer)</option>
+            <option value="roofer">Roofer</option>
+            <option value="painter">Painter</option>
+            <option value="flooring">Carpets / flooring</option>
+          </select>
+        </div>
+        <div id="sem-job-group">
+          <label class="sem-label">Job (from portal)</label>
+          <select class="sem-input" id="sem-job">
+            <option value="">— no job / free text —</option>
+          </select>
+        </div>
+        <div>
+          <label class="sem-label" id="sem-text-label">Label <span style="color:var(--hint);font-weight:400">(overrides job name)</span></label>
+          <input class="sem-input" id="sem-text" placeholder="e.g. Second fix joinery"/>
+          <div class="sug-row" id="sem-suggests"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div>
+            <label class="sem-label">Start date</label>
+            <input class="sem-input" type="date" id="sem-start"/>
+          </div>
+          <div>
+            <label class="sem-label">End date <span style="color:var(--hint);font-weight:400;font-size:10px">same = 1 day</span></label>
+            <input class="sem-input" type="date" id="sem-end"/>
+          </div>
+        </div>
+        <div id="sem-colour-group">
+          <label class="sem-label">Colour</label>
+          <div class="colour-swatches" id="sem-colours"></div>
+        </div>
+      </div>
+      <div class="sem-ft">
+        <button class="btn-cancel" onclick="semClose()">Cancel</button>
+        <button class="btn-save" onclick="semSave()">Save</button>
+      </div>
     </div>
   </div>
 
@@ -924,6 +1232,7 @@ function init(){
     const pop=document.getElementById('popover');
     if(pop.style.display!=='none'&&!pop.contains(e.target)&&!e.target.closest('.cal-cell')) closePopover();
   });
+  schedInit();
 }
 
 function updateOfflineBanner(){
@@ -1051,11 +1360,13 @@ function parseJob(j){
     activityLog:(()=>{ try{ const v=j.activityLog; if(!v||v==='') return []; return typeof v==='string'?JSON.parse(v):v; }catch(e){return [];} })(),
     siteLog:(()=>{ try{ const v=j.siteLog; if(!v||v==='') return []; return typeof v==='string'?JSON.parse(v):v; }catch(e){return [];} })(),
     promptHistory:(()=>{ try{ const v=j.promptHistory; if(!v||v==='') return []; return typeof v==='string'?JSON.parse(v):v; }catch(e){return [];} })(),
+    bom:(()=>{ try{ const v=j.bom; if(!v||v==='') return null; return typeof v==='string'?JSON.parse(v):v; }catch(e){return null;} })(),
+    bomFilename:safeStr(j.bomFilename||''),
   };
 }
 
 async function pushJob(job){
-  const payload={action:'saveJob',job:{...job,activityLog:JSON.stringify(job.activityLog||[]),siteLog:JSON.stringify(job.siteLog||[]),promptHistory:JSON.stringify(job.promptHistory||[])}};
+  const payload={action:'saveJob',job:{...job,activityLog:JSON.stringify(job.activityLog||[]),siteLog:JSON.stringify(job.siteLog||[]),promptHistory:JSON.stringify(job.promptHistory||[]),bom:job.bom?JSON.stringify(job.bom):'',bomFilename:job.bomFilename||''}};
   if(!isOnline){
     // queue for later
     syncQueue=syncQueue.filter(q=>q.job.id!==job.id);
@@ -1092,7 +1403,7 @@ async function deleteJobApi(id){
 // ══════════════════════════════════════════════════════════════════════════
 //  RENDER ALL
 // ══════════════════════════════════════════════════════════════════════════
-function renderAll(){ renderDashboard(); renderCalendar(); renderJobs(); renderPipeline(); document.getElementById('tb-jobs').textContent=jobs.length; }
+function renderAll(){ renderDashboard(); renderCalendar(); renderJobs(); renderPipeline(); document.getElementById('tb-jobs').textContent=jobs.length; if(document.getElementById('tab-schedule')&&document.getElementById('tab-schedule').style.display!=='none') schedRender(); }
 function populateStageFilter(){ const s=document.getElementById('stage-filter'); STAGES.forEach((st,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent=st; s.appendChild(o); }); }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -1469,6 +1780,12 @@ function openJob(id){
     </div>`:''}
   `;
 
+
+  // BOM section — injected dynamically
+  const bomSection = buildBomSection(d.id, isNew);
+
+  document.getElementById('modal-body').innerHTML += bomSection;
+
   document.getElementById('modal-ft').innerHTML=`
     <div class="modal-ft-left">
       ${!isNew?`<button class="btn-del" onclick="deleteJob('${d.id}')">Delete</button>`:''}
@@ -1592,6 +1909,8 @@ async function saveJob(id,isNew){
     gcalAdded:_gcalAdded,
     depositReceived:_depositReceived,
     siteLog:Array.isArray(existing.siteLog)?existing.siteLog:[],
+    bom:existing.bom||null,
+    bomFilename:existing.bomFilename||'',
     promptHistory:Array.isArray(existing.promptHistory)?existing.promptHistory:[],
     created:isNew==='true'?String(Date.now()):(safeStr(existing.created)||String(Date.now())),
     updated:String(Date.now())
@@ -1650,8 +1969,11 @@ async function addSiteLog(jobId){
 function switchTab(name,el){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); el.classList.add('active');
   ['dashboard','jobs','pipeline'].forEach(t=>{ document.getElementById('tab-'+t).style.display=t===name?'':'none'; });
+  const schedEl=document.getElementById('tab-schedule');
+  if(schedEl) schedEl.style.display=name==='schedule'?'flex':'none';
   if(name==='pipeline') renderPipeline();
   if(name==='dashboard'){ renderDashboard(); renderCalendar(); }
+  if(name==='schedule') schedRender();
 }
 
 function filterToStage(s){ document.getElementById('stage-filter').value=s; switchTab('jobs',document.querySelectorAll('.tab')[1]); renderJobs(); }
@@ -1888,6 +2210,801 @@ function ppCopyHistoryItem(idx){
   if(!hist[idx]) return;
   navigator.clipboard.writeText(hist[idx].prompt).then(()=>showToast('Copied to clipboard'));
 }
+
+
+// ══════════════════════════════════════════════════════════════════════════
+//  SCHEDULE MODULE
+// ══════════════════════════════════════════════════════════════════════════
+const SCHED_COLS = [
+  {id:'tom',     label:'Tom',              short:'T', bg:'#EFF6FF', border:'#93C5FD', text:'#1D4ED8', avatar:'#1D4ED8'},
+  {id:'fraser',  label:'Fraser',           short:'F', bg:'#F5F3FF', border:'#C4B5FD', text:'#6D28D9', avatar:'#6D28D9'},
+  {id:'barnetts',label:'Barnetts',         short:'B', bg:'#FFFBEB', border:'#FDE68A', text:'#92400E', avatar:'#B45309'},
+  {id:'sec',     label:'SEC',              short:'E', bg:'#ECFDF5', border:'#6EE7B7', text:'#065F46', avatar:'#065F46'},
+  {id:'kbc',     label:'KBC',              short:'K', bg:'#EFF6FF', border:'#BFDBFE', text:'#1E40AF', avatar:'#1E40AF'},
+  {id:'roofer',  label:'Roofer',           short:'R', bg:'#F5F3FF', border:'#DDD6FE', text:'#5B21B6', avatar:'#5B21B6'},
+  {id:'painter', label:'Painter',          short:'P', bg:'#FDF2F8', border:'#F9A8D4', text:'#9D174D', avatar:'#9D174D'},
+  {id:'flooring',label:'Carpets/flooring', short:'FL',bg:'#F0FDFA', border:'#99F6E4', text:'#0F766E', avatar:'#0F766E'},
+  {id:'notes',   label:'Notes/Orders',     short:'N', bg:'var(--surface)', border:'var(--border)', text:'var(--muted)', avatar:'#71717A'},
+];
+
+const JOB_COLOURS_S = [
+  {id:'blue',   bg:'#DBEAFE',border:'#93C5FD',text:'#1E40AF'},
+  {id:'green',  bg:'#D1FAE5',border:'#6EE7B7',text:'#065F46'},
+  {id:'purple', bg:'#EDE9FE',border:'#C4B5FD',text:'#5B21B6'},
+  {id:'amber',  bg:'#FEF3C7',border:'#FDE68A',text:'#92400E'},
+  {id:'red',    bg:'#FEE2E2',border:'#FCA5A5',text:'#B91C1C'},
+  {id:'teal',   bg:'#CCFBF1',border:'#5EEAD4',text:'#0F766E'},
+  {id:'pink',   bg:'#FCE7F3',border:'#F9A8D4',text:'#9D174D'},
+  {id:'slate',  bg:'#F1F5F9',border:'#CBD5E1',text:'#334155'},
+];
+
+const SUG_JOB  = ['On site all day','Prep work','First fix','Second fix','Finishing','Snags','Measure up','Site visit','Delivery AM'];
+const SUG_NOTE = ['Order timber','Order fixings','Skip delivery','Scaffold up','Scaffold down','Inspector visit','Payment due','Material delivery','Call client'];
+
+let schedEntries  = [];   // {id,col,jobId,text,colour,start,end,isPlaceholder}
+let schedViewStart= null;
+let schedViewWeeks= 8;
+let schedCols     = new Set(['tom','fraser','barnetts','notes']);
+let schedEditId   = null;
+let schedEntryType= 'job';
+let schedDragId   = null;
+let schedTouchDragId = null, schedTouchClone = null;
+
+function schedLoadLocal(){
+  try{ const r=localStorage.getItem('dtv_sched_v2'); if(r) schedEntries=JSON.parse(r); }catch(e){ schedEntries=[]; }
+}
+function schedSaveLocal(){
+  try{ localStorage.setItem('dtv_sched_v2',JSON.stringify(schedEntries)); }catch(e){}
+}
+
+function schedGetMonday(d){
+  const c=new Date(d); const dow=c.getDay();
+  c.setDate(c.getDate()+(dow===0?-6:1-dow)); c.setHours(0,0,0,0); return c;
+}
+function schedDateStr(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function schedParseDate(s){ return new Date(s+'T12:00:00'); }
+
+function schedGetDates(){
+  const dates=[], cur=new Date(schedViewStart), total=schedViewWeeks*7;
+  for(let i=0;i<total;i++){
+    dates.push(new Date(cur)); cur.setDate(cur.getDate()+1);
+  }
+  return dates; // include weekends — show lighter
+}
+
+function schedShift(dir){ schedViewStart.setDate(schedViewStart.getDate()+dir*schedViewWeeks*7); schedRender(); }
+function schedGoToday(){ schedViewStart=schedGetMonday(new Date()); schedRender(); }
+function schedSetView(v,btn){  document.querySelectorAll('.svt-opt').forEach(b=>b.classList.remove('active')); btn.classList.add('active');  schedViewWeeks=v==='4w'?4:v==='6m'?26:v==='1yr'?52:8; schedRender();}
+function schedToggleCol(id,btn){
+  if(schedCols.has(id)){
+    if(schedCols.size<=1){ showToast('At least one column must be visible'); return; }
+    schedCols.delete(id); btn.style.background=''; btn.style.borderColor=''; btn.style.color='var(--muted)'; btn.classList.remove('active');
+  } else {
+    schedCols.add(id);
+    const c=SCHED_COLS.find(x=>x.id===id);
+    if(c){ btn.style.background=c.bg; btn.style.borderColor=c.border; btn.style.color=c.text; }
+    btn.classList.add('active');
+  }
+  schedRender();
+}
+
+function schedActiveCols(){ return SCHED_COLS.filter(c=>schedCols.has(c.id)); }
+
+function schedColWidth(){
+  const n=schedCols.size;
+  if(n<=3) return 200; if(n<=5) return 170; return 140;
+}
+
+function schedEntriesFor(col,ds){
+  return schedEntries.filter(e=>{
+    if(e.col!==col) return false;
+    const s=e.start,en=e.end||e.start;
+    return ds>=s&&ds<=en;
+  });
+}
+
+function schedChipLabel(e){
+  if(e.text) return e.text;
+  if(e.jobId){
+    const j=jobs.find(x=>x.id===e.jobId);
+    if(j) return (j.ref?j.ref+' · ':'')+((j.name||'Untitled'));
+  }
+  return '—';
+}
+
+function schedChipStyle(e){
+  if(e.colour){
+    const cl=JOB_COLOURS_S.find(c=>c.id===e.colour);
+    if(cl) return `background:${cl.bg};color:${cl.text};border-color:${cl.border}`;
+  }
+  const col=SCHED_COLS.find(c=>c.id===e.col);
+  if(col) return `background:${col.bg};color:${col.text};border-color:${col.border}`;
+  return '';
+}
+
+// Auto-populate placeholders from jobs with start dates not yet on schedule
+function schedSyncPlaceholders(){
+  const jobsWithDates=jobs.filter(j=>j.startDate&&j.stage<9);
+  // Remove stale placeholders for jobs that now have real entries or no date
+  schedEntries=schedEntries.filter(e=>{
+    if(!e.isPlaceholder) return true;
+    const j=jobs.find(x=>x.id===e.jobId);
+    if(!j||!j.startDate) return false; // job gone or date removed
+    // if there's already a non-placeholder entry for this job, remove placeholder
+    const hasReal=schedEntries.some(r=>r.jobId===e.jobId&&!r.isPlaceholder&&r.id!==e.id);
+    return !hasReal;
+  });
+  // Add new placeholders for jobs with start dates not yet represented
+  jobsWithDates.forEach(j=>{
+    const already=schedEntries.some(e=>e.jobId===j.id);
+    if(!already){
+      schedEntries.push({
+        id:'ph_'+j.id, col:'tom', jobId:j.id, text:'', colour:'slate',
+        start:j.startDate, end:j.startDate, isPlaceholder:true
+      });
+    }
+  });
+  schedSaveLocal();
+}
+
+function schedRenderUnscheduled(dates){
+  const dateSet=new Set(dates.map(d=>schedDateStr(d)));
+  const tray=document.getElementById('unsched-tray');
+  const chips=document.getElementById('unsched-chips');
+  // Jobs with a start date that's outside current view OR no schedule entry at all
+  const unscheduled=jobs.filter(j=>{
+    if(!j.startDate||j.stage>=9) return false;
+    const hasEntry=schedEntries.some(e=>e.jobId===j.id&&!e.isPlaceholder);
+    if(hasEntry) return false;
+    const inView=dateSet.has(j.startDate);
+    const placeholder=schedEntries.some(e=>e.jobId===j.id&&e.isPlaceholder);
+    return !inView&&!placeholder;
+  });
+  if(unscheduled.length){
+    tray.classList.add('has-items');
+    chips.innerHTML=unscheduled.map(j=>`
+      <div class="unsched-chip" onclick="schedOpenModal(null,'${j.startDate}',null,'${j.id}')" title="Click to schedule">
+        ${esc(j.ref||'')} ${esc(j.name||'Untitled')} — ${esc(j.client||'—')} · Start: ${j.startDate}
+      </div>`).join('');
+  } else {
+    tray.classList.remove('has-items');
+    chips.innerHTML='';
+  }
+}
+
+function schedRender(){
+  if(!schedViewStart) return;
+  // Shrink row height for long views so the year stays manageable
+  const rowH=schedViewWeeks>=26?44:schedViewWeeks>=12?54:66;
+  document.documentElement.style.setProperty('--sched-row-h', rowH+'px');
+  const dates=schedGetDates();
+  const today=schedDateStr(new Date());
+  const SMONTHS_S=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const SDOW_S=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+  schedSyncPlaceholders();
+
+  // Range label
+  const first=dates[0], last=dates[dates.length-1];
+  document.getElementById('sched-range-label').textContent=
+    first.getDate()+' '+SMONTHS_S[first.getMonth()]+(first.getFullYear()!==last.getFullYear()?' '+first.getFullYear():'')+
+    ' — '+last.getDate()+' '+SMONTHS_S[last.getMonth()]+' '+last.getFullYear();
+
+  const activeCols=schedActiveCols();
+  const colW=schedColWidth();
+
+  // Column headers
+  const hdEl=document.getElementById('sched-col-headers');
+  hdEl.innerHTML=`<div class="sch-day-spacer"></div>`+activeCols.map(c=>`
+    <div class="sch-col-hd" style="width:${colW}px;background:${c.bg};color:${c.text}">
+      <div class="sch-col-hd-avatar" style="background:${c.avatar}">${c.short}</div>
+      ${c.label}
+    </div>`).join('');
+
+  // Grid body
+  let html='';
+  dates.forEach(d=>{
+    const ds=schedDateStr(d);
+    const dow=d.getDay();
+    const isWE=dow===0||dow===6;
+    const isToday=ds===today;
+    const isMonthStart=d.getDate()===1;
+    html+=`<div class="sched-day-row${isWE?' is-weekend':''}${isToday?' is-today':''}">`;
+    html+=`<div class="sched-day-label">
+      ${isMonthStart?`<div class="sched-month-marker">${SMONTHS_S[d.getMonth()].toUpperCase()}</div>`:''}
+      <div class="sched-dow">${SDOW_S[dow]}</div>
+      <div class="sched-date">${d.getDate()}</div>
+      ${!isMonthStart?`<div class="sched-mon">${SMONTHS_S[d.getMonth()]}</div>`:''}
+    </div>`;
+    activeCols.forEach(col=>{
+      const cellEntries=schedEntriesFor(col.id,ds);
+      html+=`<div class="sched-cell" style="width:${colW}px" data-col="${col.id}" data-date="${ds}"
+        onclick="schedCellClick(event,'${col.id}','${ds}')"
+        ondragover="schedDragOver(event,'${col.id}','${ds}')"
+        ondragleave="schedDragLeave(event)"
+        ondrop="schedDrop(event,'${col.id}','${ds}')">`;
+      cellEntries.forEach(e=>{
+        const isFirst=ds===e.start;
+        const isLast=ds===(e.end||e.start);
+        const isSpan=e.end&&e.end!==e.start;
+        const st=schedChipStyle(e);
+        const lbl=schedChipLabel(e);
+        html+=`<div class="sched-chip${e.isPlaceholder?' is-placeholder':''}" style="${st}"
+          draggable="true" data-id="${e.id}"
+          onclick="event.stopPropagation();schedOpenEdit('${e.id}')"
+          ondragstart="schedDragStart(event,'${e.id}')">
+          <div class="chip-dot"></div>
+          <span class="chip-txt">${esc(lbl)}${isSpan&&isFirst?' →':''}</span>
+          <button class="chip-rm" onclick="event.stopPropagation();schedDeleteEntry('${e.id}')">×</button>
+        </div>`;
+      });
+      html+=`<button class="sched-cell-add" onclick="event.stopPropagation();schedOpenModal('${col.id}','${ds}')" title="Add">+</button>`;
+      html+='</div>';
+    });
+    html+='</div>';
+  });
+  document.getElementById('sched-grid-body').innerHTML=html;
+
+  schedRenderUnscheduled(dates);
+  schedRenderFooter(dates);
+}
+
+function schedRenderFooter(dates){
+  const dateSet=new Set(dates.map(d=>schedDateStr(d)));
+  const counts={};
+  schedEntries.forEach(e=>{
+    if(e.col==='notes') return;
+    const c=new Date(e.start+'T12:00:00');
+    const en=e.end||e.start;
+    while(schedDateStr(c)<=en){
+      if(dateSet.has(schedDateStr(c))){
+        counts[e.col]=(counts[e.col]||0)+1;
+      }
+      c.setDate(c.getDate()+1);
+    }
+  });
+  const activeCols=SCHED_COLS.filter(c=>schedCols.has(c.id)&&c.id!=='notes');
+  document.getElementById('sched-footer').innerHTML=activeCols.map(c=>`
+    <div class="sf-item">
+      <div class="sf-dot" style="background:${c.avatar}"></div>
+      <span>${c.label}: ${counts[c.id]||0} day${(counts[c.id]||0)!==1?'s':''}</span>
+    </div>`).join('')+
+    `<span style="margin-left:auto;color:var(--hint);font-size:11px">${schedEntries.filter(e=>!e.isPlaceholder).length} entries · Drag to reschedule</span>`;
+}
+
+// ─── DRAG & DROP ───
+function schedDragStart(ev,id){ schedDragId=id; ev.dataTransfer.effectAllowed='move'; ev.target.classList.add('dragging'); setTimeout(()=>ev.target.classList.remove('dragging'),50); }
+function schedDragOver(ev,col,date){ ev.preventDefault(); ev.dataTransfer.dropEffect='move'; document.querySelectorAll('.sched-cell.drag-over').forEach(c=>c.classList.remove('drag-over')); ev.currentTarget.classList.add('drag-over'); }
+function schedDragLeave(ev){ ev.currentTarget.classList.remove('drag-over'); }
+function schedDrop(ev,col,date){
+  ev.preventDefault();
+  document.querySelectorAll('.sched-cell.drag-over').forEach(c=>c.classList.remove('drag-over'));
+  if(!schedDragId) return;
+  const idx=schedEntries.findIndex(x=>x.id===schedDragId); if(idx<0) return;
+  const e=schedEntries[idx];
+  const oldStart=schedParseDate(e.start), oldEnd=e.end?schedParseDate(e.end):oldStart;
+  const span=Math.round((oldEnd-oldStart)/86400000);
+  const newEnd=new Date(schedParseDate(date)); newEnd.setDate(newEnd.getDate()+span);
+  schedEntries[idx]={...e,col,start:date,end:span>0?schedDateStr(newEnd):date,isPlaceholder:false};
+  schedSaveLocal(); schedRender(); showToast('Moved'); schedDragId=null;
+}
+
+// Touch drag
+function schedInitTouchDrag(){
+  document.addEventListener('touchstart',ev=>{
+    const chip=ev.target.closest('.sched-chip'); if(!chip) return;
+    schedTouchDragId=chip.dataset.id;
+    schedTouchClone=chip.cloneNode(true);
+    schedTouchClone.style.cssText='position:fixed;opacity:0.75;pointer-events:none;z-index:9999;transform:scale(1.05);width:'+chip.offsetWidth+'px';
+    document.body.appendChild(schedTouchClone);
+  },{passive:true});
+  document.addEventListener('touchmove',ev=>{
+    if(!schedTouchClone) return;
+    const t=ev.touches[0];
+    schedTouchClone.style.left=(t.clientX-60)+'px'; schedTouchClone.style.top=(t.clientY-15)+'px';
+  },{passive:true});
+  document.addEventListener('touchend',ev=>{
+    if(!schedTouchDragId||!schedTouchClone){ schedTouchDragId=null; if(schedTouchClone){schedTouchClone.remove();schedTouchClone=null;} return; }
+    const t=ev.changedTouches[0]; schedTouchClone.remove(); schedTouchClone=null;
+    const el=document.elementFromPoint(t.clientX,t.clientY);
+    const cell=el?.closest('.sched-cell');
+    if(cell){ const col=cell.dataset.col,date=cell.dataset.date;
+      if(col&&date){ schedDrop({preventDefault:()=>{}},col,date); schedDragId=schedTouchDragId; }
+    }
+    schedTouchDragId=null;
+  },{passive:true});
+}
+
+function schedCellClick(ev,col,date){ if(ev.target.classList.contains('sched-cell-add')) return; schedOpenModal(col,date); }
+
+function schedDeleteEntry(id){ schedEntries=schedEntries.filter(x=>x.id!==id); schedSaveLocal(); schedRender(); }
+
+// ─── MODAL ───
+function schedBuildJobOptions(){
+  const sel=document.getElementById('sem-job'); if(!sel) return;
+  sel.innerHTML='<option value="">— no job / free text —</option>';
+  jobs.filter(j=>j.stage<9).forEach(j=>{
+    const o=document.createElement('option');
+    o.value=j.id;
+    o.textContent=(j.ref?j.ref+' · ':'')+((j.name||'Untitled'))+(j.client?' ('+j.client+')':'')+(j.startDate?' · Start:'+j.startDate:'');
+    sel.appendChild(o);
+  });
+}
+
+function schedBuildColours(selected){
+  const el=document.getElementById('sem-colours'); if(!el) return;
+  el.innerHTML=JOB_COLOURS_S.map(c=>`
+    <div class="cs-dot" data-colour="${c.id}" onclick="schedSelectColour('${c.id}',this)"
+      style="background:${c.bg};border-color:${selected===c.id?c.text:c.border}"
+      title="${c.id}">
+      ${selected===c.id?`<svg width="10" height="8" fill="none" stroke="${c.text}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 3.5 6.5 9 1"/></svg>`:''}
+    </div>`).join('');
+}
+
+function schedSelectColour(id,el){
+  document.querySelectorAll('#sem-colours .cs-dot').forEach(s=>{
+    const c=JOB_COLOURS_S.find(x=>x.id===s.dataset.colour); if(!c) return;
+    if(s.dataset.colour===id){ s.style.borderColor=c.text; s.innerHTML=`<svg width="10" height="8" fill="none" stroke="${c.text}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 3.5 6.5 9 1"/></svg>`; }
+    else { s.style.borderColor=c.border; s.innerHTML=''; }
+  });
+}
+
+function semSetType(type,btn){
+  schedEntryType=type;
+  document.querySelectorAll('.sem-tt').forEach(b=>b.classList.remove('active')); btn.classList.add('active');
+  const isNote=type==='note';
+  document.getElementById('sem-col-group').style.display=isNote?'none':'';
+  document.getElementById('sem-job-group').style.display=isNote?'none':'';
+  document.getElementById('sem-text-label').firstChild.textContent=isNote?'Note / order text':'Label ';
+  document.getElementById('sem-text').placeholder=isNote?'e.g. Order roof tiles':'e.g. Second fix joinery';
+  const sug=document.getElementById('sem-suggests');
+  sug.innerHTML=(isNote?SUG_NOTE:SUG_JOB).map(s=>`<div class="sug-pill" onclick="document.getElementById('sem-text').value='${s}'">${s}</div>`).join('');
+}
+
+function schedOpenModal(col,date,editId,preJobId){
+  schedEditId=editId||null;
+  const isEdit=!!editId;
+  document.getElementById('sem-title').textContent=isEdit?'Edit entry':'Add entry';
+  schedEntryType='job';
+  document.querySelectorAll('.sem-tt').forEach((b,i)=>b.classList.toggle('active',i===0));
+  schedBuildJobOptions();
+  const today=schedDateStr(new Date());
+  document.getElementById('sem-start').value=date||today;
+  document.getElementById('sem-end').value=date||today;
+  document.getElementById('sem-text').value='';
+  document.getElementById('sem-job').value=preJobId||'';
+  document.getElementById('sem-col-group').style.display='';
+  document.getElementById('sem-job-group').style.display='';
+  if(col&&col!=='notes') document.getElementById('sem-col').value=col;
+  semSetType(col==='notes'?'note':'job', document.querySelectorAll('.sem-tt')[col==='notes'?1:0]);
+  schedBuildColours(JOB_COLOURS_S[0].id);
+  const sug=document.getElementById('sem-suggests');
+  sug.innerHTML=SUG_JOB.map(s=>`<div class="sug-pill" onclick="document.getElementById('sem-text').value='${s}'">${s}</div>`).join('');
+  document.getElementById('sem-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('sem-text').focus(),80);
+}
+
+function schedOpenEdit(id){
+  const e=schedEntries.find(x=>x.id===id); if(!e) return;
+  schedEditId=id;
+  const isNote=e.col==='notes'||e.type==='note';
+  schedEntryType=isNote?'note':'job';
+  schedBuildJobOptions();
+  document.getElementById('sem-title').textContent='Edit entry';
+  document.querySelectorAll('.sem-tt').forEach((b,i)=>b.classList.toggle('active',i===(isNote?1:0)));
+  document.getElementById('sem-col').value=isNote?'tom':e.col;
+  document.getElementById('sem-job').value=e.jobId||'';
+  document.getElementById('sem-text').value=e.text||'';
+  document.getElementById('sem-start').value=e.start||'';
+  document.getElementById('sem-end').value=e.end||e.start||'';
+  document.getElementById('sem-col-group').style.display=isNote?'none':'';
+  document.getElementById('sem-job-group').style.display=isNote?'none':'';
+  schedBuildColours(e.colour||JOB_COLOURS_S[0].id);
+  const sug=document.getElementById('sem-suggests');
+  sug.innerHTML=(isNote?SUG_NOTE:SUG_JOB).map(s=>`<div class="sug-pill" onclick="document.getElementById('sem-text').value='${s}'">${s}</div>`).join('');
+  document.getElementById('sem-modal').classList.add('open');
+}
+
+function semSave(){
+  const isNote=schedEntryType==='note';
+  const col=isNote?'notes':document.getElementById('sem-col').value;
+  const jobId=isNote?'':document.getElementById('sem-job').value;
+  const text=document.getElementById('sem-text').value.trim();
+  const start=document.getElementById('sem-start').value;
+  let end=document.getElementById('sem-end').value;
+  if(!start){ showToast('Please set a start date'); return; }
+  if(!end||end<start) end=start;
+  const selSwatch=document.querySelector('#sem-colours .cs-dot svg')?.closest('.cs-dot');
+  const colour=selSwatch?selSwatch.dataset.colour:JOB_COLOURS_S[0].id;
+  if(schedEditId){
+    const idx=schedEntries.findIndex(x=>x.id===schedEditId);
+    if(idx>=0) schedEntries[idx]={...schedEntries[idx],col,jobId,text,start,end,colour,type:schedEntryType,isPlaceholder:false};
+  } else {
+    schedEntries.push({id:genId(),col,jobId,text,start,end,colour,type:schedEntryType,isPlaceholder:false});
+  }
+  schedSaveLocal(); semClose(); schedRender(); showToast(schedEditId?'Updated':'Entry added');
+}
+
+function semClose(){ document.getElementById('sem-modal').classList.remove('open'); schedEditId=null; }
+function semBgClick(ev){ if(ev.target===document.getElementById('sem-modal')) semClose(); }
+
+// ─── INIT ───
+function schedInit(){
+  schedLoadLocal();
+  schedViewStart=schedGetMonday(new Date());
+  schedInitTouchDrag();
+}
+
+
+
+
+// ══════════════════════════════════════════════════════════════════════════
+//  BILL OF MATERIALS MODULE
+// ══════════════════════════════════════════════════════════════════════════
+
+// item.state: 'pending' | 'ordered' | 'delivered'
+
+const BOM_LEAD_DEFAULTS = [
+  {keys:['window','door','glazing','bifold','bi-fold','skylight','rooflight'],days:35,label:'Bespoke — 7wk lead'},
+  {keys:['steel','rsj','beam','lintel','structural'],days:14,label:'Structural — 2wk lead'},
+  {keys:['brick','block','masonry','stone'],days:10,label:'Brickwork — 2wk lead'},
+  {keys:['roof tile','slate','batten','felt','truss','rafter'],days:10,label:'Roofing — 2wk lead'},
+  {keys:['timber','joist','stud','carcassing','softwood','hardwood','engineered'],days:5,label:'Timber — 1wk lead'},
+  {keys:['insulation','celotex','kingspan','rockwool','urethane','pir'],days:5,label:'Insulation — 1wk lead'},
+  {keys:['plasterboard','plaster','render','board','drywall'],days:3,label:'Dry lining — 3d lead'},
+  {keys:['pipe','copper','soil','waste','drain','duct'],days:5,label:'Plumbing — 1wk lead'},
+  {keys:['cable','conduit','socket','consumer','isolator'],days:5,label:'Electrical — 1wk lead'},
+  {keys:['tile','ceramic','porcelain','grout','adhesive'],days:7,label:'Tiling — 1wk lead'},
+  {keys:['kitchen','unit','worktop','cabinet','vanity','bathroom'],days:21,label:'Joinery units — 3wk lead'},
+  {keys:['carpet','flooring','vinyl','laminate','hardwood floor'],days:10,label:'Floor coverings — 2wk lead'},
+  {keys:['skip','waste','disposal'],days:2,label:'Skip — 2d lead'},
+  {keys:['scaffold'],days:5,label:'Scaffold — 1wk lead'},
+  {keys:['paint','primer','undercoat','eggshell','emulsion'],days:2,label:'Decoration — 2d lead'},
+  {keys:['sand','cement','aggregate','concrete','mortar','screed'],days:3,label:'Site materials — 3d lead'},
+  {keys:['fixing','screw','bolt','nail','bracket','joist hanger'],days:2,label:'Fixings — 2d lead'},
+];
+
+function bomGetLeadDays(name, overrides, ref){
+  const key=(ref||'')+'|'+(name||'');
+  if(overrides&&overrides[key]!==undefined) return parseInt(overrides[key])||2;
+  const lower=(name||'').toLowerCase();
+  for(const rule of BOM_LEAD_DEFAULTS){ if(rule.keys.some(k=>lower.includes(k))) return rule.days; }
+  return 3;
+}
+
+function bomAddWorkingDays(startStr, days){
+  if(!startStr) return null;
+  const d=new Date(startStr+'T12:00:00');
+  let added=0;
+  while(added<days){ d.setDate(d.getDate()-1); const dow=d.getDay(); if(dow!==0&&dow!==6) added++; }
+  return toDateStr(d);
+}
+
+function bomUrgency(orderDate){
+  if(!orderDate) return 'none';
+  const today=toDateStr(new Date());
+  if(orderDate<=today) return 'urgent';
+  const diff=Math.round((new Date(orderDate+'T12:00:00')-new Date())/86400000);
+  return diff<=5?'soon':'ok';
+}
+
+function bomGetOverrides(bom){ const o={}; (bom||[]).forEach(i=>{ if(i.leadOverride!=null) o[(i.ref||'')+'|'+(i.name||'')]=i.leadOverride; }); return o; }
+
+function buildBomSection(jobId, isNew){
+  if(isNew) return '';
+  const j=jobs.find(x=>x.id===jobId); if(!j) return '';
+  const bom=Array.isArray(j.bom)?j.bom:[];
+  const startDate=j.startDate;
+  let html=`<div class="modal-section" id="bom-section"><div class="sec-hd">Bill of materials &amp; ordering</div>`;
+
+  if(!bom.length){
+    html+=`<div class="bom-upload-area" id="bom-drop-${jobId}"
+      ondragover="event.preventDefault();this.classList.add('drag-hover')"
+      ondragleave="this.classList.remove('drag-hover')"
+      ondrop="event.preventDefault();this.classList.remove('drag-hover');if(event.dataTransfer.files[0])bomReadExcel(event.dataTransfer.files[0],'${jobId}')">
+      <input type="file" accept=".xlsx,.xls" onchange="if(this.files[0])bomReadExcel(this.files[0],'${jobId}')"/>
+      <div class="bom-upload-ico">📋</div>
+      <div class="bom-upload-txt">Upload scope of work Excel</div>
+      <div class="bom-upload-sub">Drop the completed Claude-generated .xlsx here — reads the Bill of Materials tab automatically</div>
+    </div>`;
+  } else {
+    const overrides=bomGetOverrides(bom);
+    html+=`<div class="bom-loaded" style="margin-bottom:10px">
+      <div class="bom-loaded-ico">📋</div>
+      <div style="flex:1;min-width:0">
+        <div class="bom-loaded-name">${esc(j.bomFilename||'Scope of work.xlsx')}</div>
+        <div class="bom-loaded-count">${bom.length} items · ${bom.filter(i=>i.state==='delivered').length} delivered · ${bom.filter(i=>i.state==='ordered').length} ordered</div>
+      </div>
+      <label style="cursor:pointer;flex-shrink:0"><input type="file" accept=".xlsx,.xls" style="display:none" onchange="if(this.files[0])bomReadExcel(this.files[0],'${jobId}')"/><span style="font-size:11px;color:var(--blue);padding:3px 8px;border:1px solid var(--blue-border);border-radius:4px;background:var(--blue-light)">Replace</span></label>
+      <button class="bom-clear" onclick="bomClear('${jobId}')">Clear</button>
+    </div>`;
+
+    // prompt banners
+    bomGetPrompts(j,bom,overrides).forEach(p=>{
+      html+=`<div class="bom-prompt-banner"><div class="bom-prompt-ico">${p.icon}</div><div><strong>${p.title}</strong> — ${p.body}</div></div>`;
+    });
+
+    // items
+    html+=`<div class="bom-checklist">`;
+    // Group by section with headers
+    let lastSection='';
+    bom.forEach((item,idx)=>{
+      if(item.section && item.section!==lastSection){
+        lastSection=item.section;
+        html+=`<div style="font-size:10px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:0.07em;padding:8px 0 3px;border-top:1px solid var(--border);margin-top:4px">${esc(item.section)}</div>`;
+      }
+      const key=(item.ref||'')+'|'+(item.name||'');
+      const leadDays=bomGetLeadDays(item.name,overrides,item.ref);
+      const orderDate=startDate?bomAddWorkingDays(startDate,leadDays):null;
+      const urg=bomUrgency(orderDate);
+      const state=item.state||'pending';
+      const urgClass=state==='pending'?(urg==='urgent'?'urgent':urg==='soon'?'due-soon':''):'';
+      const badgeClass=urg==='urgent'?'bom-lead-urgent':urg==='soon'?'bom-lead-soon':'bom-lead-ok';
+      const badgeText=urg==='urgent'?'🚨 Order now':urg==='soon'?'⚠ Order this week':(orderDate?'Order by '+orderDate:'No start date');
+
+      // state track dots
+      const d1=state==='ordered'||state==='delivered';
+      const d2=state==='delivered';
+      const stateDots=`<div class="bom-state-track" title="Tap to expand">
+        <div class="bom-state-dot${d1?' ordered':''}" title="Ordered">${d1?'✓':''}</div>
+        <div class="bom-state-line${d1?' active':''}"></div>
+        <div class="bom-state-dot${d2?' delivered':''}" title="Delivered">${d2?'✓':''}</div>
+      </div>`;
+
+      html+=`<div class="bom-item${urgClass?' '+urgClass:''}${state==='delivered'?' state-delivered':''}" id="bom-item-${jobId}-${idx}">
+        <div class="bom-item-top" onclick="bomToggleExpand('${jobId}',${idx})">
+          ${stateDots}
+          <div class="bom-item-info">
+            <div class="bom-item-name">${esc(item.name)}${item.qty?` <span class="bom-item-qty">· ${esc(item.qty)} ${esc(item.unit)}</span>`:''}</div>
+            <div class="bom-item-meta">
+              ${item.ref?`<span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--hint)">${esc(item.ref)}</span>`:''}
+              ${state==='pending'&&orderDate?`<span class="bom-lead-badge ${badgeClass}">${badgeText}</span>`:''}
+              ${state==='ordered'?`<span class="bom-lead-badge bom-lead-soon">Ordered${item.orderedDate?' '+item.orderedDate:''}</span>`:''}
+              ${state==='ordered'&&item.deliveryDate?`<span style="color:var(--muted)">Due: ${item.deliveryDate}</span>`:''}
+              ${state==='delivered'?`<span class="bom-lead-badge bom-lead-ok">✓ Delivered${item.deliveryDate?' '+item.deliveryDate:''}</span>`:''}
+            </div>
+          </div>
+          <div style="flex-shrink:0;font-size:13px;color:var(--hint);margin-top:2px">›</div>
+        </div>
+        <div class="bom-detail" id="bom-detail-${jobId}-${idx}">
+          <div class="bom-detail-grid">
+            <div class="bom-detail-field">
+              <div class="bom-detail-label">Order date</div>
+              <input class="bom-detail-input" type="date" placeholder="Date ordered"
+                value="${item.orderedDate||''}"
+                onchange="bomSetField('${jobId}',${idx},'orderedDate',this.value)"/>
+            </div>
+            <div class="bom-detail-field">
+              <div class="bom-detail-label">Expected delivery to site</div>
+              <input class="bom-detail-input" type="date" placeholder="Delivery date"
+                value="${item.deliveryDate||''}"
+                onchange="bomSetField('${jobId}',${idx},'deliveryDate',this.value)"/>
+            </div>
+            <div class="bom-detail-field">
+              <div class="bom-detail-label">Supplier / notes</div>
+              <input class="bom-detail-input" type="text" placeholder="e.g. Travis Perkins"
+                value="${item.supplier||''}"
+                onchange="bomSetField('${jobId}',${idx},'supplier',this.value)"/>
+            </div>
+            <div class="bom-detail-field">
+              <div class="bom-detail-label">Lead time (working days)</div>
+              <input class="bom-lt-input bom-detail-input" type="number" min="0" max="999"
+                value="${leadDays}"
+                onchange="bomSetLeadOverride('${jobId}',${idx},this.value)"/>
+            </div>
+          </div>
+          <div class="bom-detail-row">
+            ${state==='pending'?`<button class="bom-state-btn mark-ordered" onclick="bomSetState('${jobId}',${idx},'ordered')">✓ Mark ordered</button>`:''}
+            ${state==='ordered'?`<button class="bom-state-btn mark-delivered" onclick="bomSetState('${jobId}',${idx},'delivered')">✓ Mark delivered to site</button>`:''}
+            ${state!=='pending'?`<button class="bom-state-btn mark-reset" onclick="bomSetState('${jobId}',${idx},'pending')">↩ Reset</button>`:''}
+            ${startDate&&state==='pending'?`<button class="bom-sched-btn" onclick="bomAddToSchedule('${jobId}',${idx})">+ Add to Schedule</button>`:''}
+          </div>
+        </div>
+      </div>`;
+    });
+    html+=`</div>`;
+
+    // schedule all button
+    const pending=bom.filter(i=>!i.state||i.state==='pending');
+    if(startDate&&pending.length){
+      html+=`<button class="bom-schedule-all" onclick="bomScheduleAll('${jobId}')">📅 Add all ${pending.length} ordering reminders to Schedule</button>`;
+    }
+  }
+  html+=`</div>`;
+  return html;
+}
+
+function bomGetPrompts(j,bom,overrides){
+  const prompts=[];
+  const startDate=j.startDate;
+  if(!startDate){prompts.push({icon:'📅',title:'No start date set',body:'Add a start date to calculate ordering deadlines.'}); return prompts;}
+  const today=new Date(); today.setHours(0,0,0,0);
+  const pending=bom.filter(i=>!i.state||i.state==='pending');
+  const overdue=pending.filter(i=>{const od=bomAddWorkingDays(startDate,bomGetLeadDays(i.name,overrides,i.ref));return od&&od<=toDateStr(today);});
+  const soon=pending.filter(i=>{const od=bomAddWorkingDays(startDate,bomGetLeadDays(i.name,overrides,i.ref));if(!od)return false;const diff=Math.round((new Date(od+'T12:00:00')-today)/86400000);return diff>0&&diff<=5;});
+  const longLead=pending.filter(i=>bomGetLeadDays(i.name,overrides,i.ref)>=21);
+  // delivery due soon but not confirmed
+  const deliveryDue=bom.filter(i=>i.state==='ordered'&&i.deliveryDate).filter(i=>{const diff=Math.round((new Date(i.deliveryDate+'T12:00:00')-today)/86400000);return diff>=0&&diff<=3;});
+  if(overdue.length) prompts.push({icon:'🚨',title:overdue.length+' item'+(overdue.length!==1?'s':'')+' overdue to order',body:overdue.map(i=>i.name).slice(0,3).join(', ')+(overdue.length>3?' +more':'')});
+  if(soon.length) prompts.push({icon:'⚠️',title:soon.length+' item'+(soon.length!==1?'s':'')+' need ordering this week',body:soon.map(i=>i.name).slice(0,3).join(', ')+(soon.length>3?' +more':'')});
+  if(deliveryDue.length) prompts.push({icon:'🚚',title:'Delivery expected soon',body:deliveryDue.map(i=>i.name+' ('+i.deliveryDate+')').slice(0,2).join(', ')});
+  if(longLead.length) prompts.push({icon:'🏭',title:'Long-lead items — order early',body:longLead.map(i=>i.name).slice(0,2).join(', ')+(longLead.length>2?' and '+(longLead.length-2)+' more':'')});
+  return prompts;
+}
+
+function bomToggleExpand(jobId,idx){
+  const item=document.getElementById('bom-item-'+jobId+'-'+idx);
+  const detail=document.getElementById('bom-detail-'+jobId+'-'+idx);
+  if(!item||!detail) return;
+  item.classList.toggle('expanded');
+}
+
+async function bomSetState(jobId,idx,state){
+  const jIdx=jobs.findIndex(x=>x.id===jobId); if(jIdx<0) return;
+  const bom=[...(jobs[jIdx].bom||[])]; if(!bom[idx]) return;
+  const update={...bom[idx],state};
+  if(state==='ordered'&&!update.orderedDate) update.orderedDate=toDateStr(new Date());
+  if(state==='delivered'&&!update.deliveryDate) update.deliveryDate=toDateStr(new Date());
+  bom[idx]=update;
+  jobs[jIdx]={...jobs[jIdx],bom,updated:String(Date.now())};
+  await pushJob(jobs[jIdx]);
+  openJob(jobId);
+  showToast(state==='ordered'?'Marked as ordered':state==='delivered'?'Marked as delivered':'Reset to pending');
+}
+
+async function bomSetField(jobId,idx,field,value){
+  const jIdx=jobs.findIndex(x=>x.id===jobId); if(jIdx<0) return;
+  const bom=[...(jobs[jIdx].bom||[])]; if(!bom[idx]) return;
+  bom[idx]={...bom[idx],[field]:value};
+  jobs[jIdx]={...jobs[jIdx],bom,updated:String(Date.now())};
+  await pushJob(jobs[jIdx]);
+}
+
+async function bomSetLeadOverride(jobId,idx,days){
+  const jIdx=jobs.findIndex(x=>x.id===jobId); if(jIdx<0) return;
+  const bom=[...(jobs[jIdx].bom||[])]; if(!bom[idx]) return;
+  bom[idx]={...bom[idx],leadOverride:parseInt(days)||0};
+  jobs[jIdx]={...jobs[jIdx],bom,updated:String(Date.now())};
+  await pushJob(jobs[jIdx]);
+  showToast('Lead time updated');
+}
+
+async function bomClear(jobId){
+  if(!confirm('Remove the Bill of Materials from this job?')) return;
+  const jIdx=jobs.findIndex(x=>x.id===jobId); if(jIdx<0) return;
+  jobs[jIdx]={...jobs[jIdx],bom:null,bomFilename:'',updated:String(Date.now())};
+  await pushJob(jobs[jIdx]); openJob(jobId);
+}
+
+async function bomAddToSchedule(jobId,itemIdx){
+  const j=jobs.find(x=>x.id===jobId); if(!j) return;
+  const item=(j.bom||[])[itemIdx]; if(!item) return;
+  const overrides=bomGetOverrides(j.bom||[]);
+  const leadDays=bomGetLeadDays(item.name,overrides,item.ref);
+  const orderDate=j.startDate?bomAddWorkingDays(j.startDate,leadDays):toDateStr(new Date());
+  const label='Order: '+item.name+(item.qty?' ('+item.qty+' '+item.unit+')':'')+(j.ref?' — '+j.ref:'');
+  const alreadyOn=schedEntries.some(e=>e.text===label&&e.start===orderDate);
+  if(alreadyOn){showToast('Already on Schedule'); return;}
+  schedEntries.push({id:genId(),col:'notes',jobId:j.id,text:label,colour:'amber',start:orderDate,end:orderDate,type:'note',isBomOrder:true});
+  schedSaveLocal();
+  // Also add delivery date reminder if set
+  if(item.deliveryDate){
+    const delivLabel='Delivery: '+item.name+(j.ref?' — '+j.ref:'');
+    schedEntries.push({id:genId(),col:'notes',jobId:j.id,text:delivLabel,colour:'green',start:item.deliveryDate,end:item.deliveryDate,type:'note',isBomOrder:true});
+  }
+  schedSaveLocal();
+  showToast('Added to Schedule: '+orderDate);
+}
+
+async function bomScheduleAll(jobId){
+  const j=jobs.find(x=>x.id===jobId); if(!j||!j.bom||!j.startDate) return;
+  const overrides=bomGetOverrides(j.bom);
+  const pending=j.bom.filter(i=>!i.state||i.state==='pending');
+  let added=0;
+  pending.forEach(item=>{
+    const leadDays=bomGetLeadDays(item.name,overrides,item.ref);
+    const orderDate=bomAddWorkingDays(j.startDate,leadDays);
+    const label='Order: '+item.name+(item.qty?' ('+item.qty+' '+item.unit+')':'')+(j.ref?' — '+j.ref:'');
+    if(!schedEntries.some(e=>e.text===label&&e.start===orderDate)){
+      schedEntries.push({id:genId(),col:'notes',jobId:j.id,text:label,colour:'amber',start:orderDate,end:orderDate,type:'note',isBomOrder:true});
+      added++;
+    }
+  });
+  schedSaveLocal();
+  showToast(added+' ordering reminders added to Schedule');
+  if(added) openJob(jobId);
+}
+
+async function bomReadExcel(file,jobId){
+  const reader=new FileReader();
+  reader.onload=async function(e){
+    try{
+      const data=new Uint8Array(e.target.result);
+      if(!window.XLSX){
+        const script=document.createElement('script');
+        script.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+        document.head.appendChild(script);
+        await new Promise(res=>{script.onload=res;script.onerror=()=>res();});
+      }
+      if(!window.XLSX){showToast('Could not load Excel reader'); return;}
+      const wb=window.XLSX.read(data,{type:'array'});
+
+      // Prefer "Bill of Materials" tab, else first sheet
+      const sheetName=wb.SheetNames.find(n=>/material|bom/i.test(n))||wb.SheetNames[0];
+      const ws=wb.Sheets[sheetName];
+      const rows=window.XLSX.utils.sheet_to_json(ws,{header:1,defval:null});
+
+      const items=[];
+      let currentSection='';
+
+      // Skip meta rows
+      const SKIP_COL_A=/^(document|client:|date:|prepared by:|ref$|quantities include)/i;
+
+      for(let i=0;i<rows.length;i++){
+        const row=rows[i];
+        if(!row||row.every(c=>!c)) continue;
+
+        const colA=String(row[0]||'').trim();
+        const colB=String(row[1]||'').trim();
+        const colC=row[2];
+        const colD=String(row[3]||'').trim();
+        const colE=String(row[4]||'').trim();
+
+        // Skip known meta rows
+        if(SKIP_COL_A.test(colA)) continue;
+        // Skip column header rows like "Ref | Item / Material | Qty"
+        if(colA==='Ref'&&/item|material|description/i.test(colB)) continue;
+
+        // Section header: colA has content that looks like "  1.   Section Name"
+        // OR colA has section-like text and colB is empty
+        if(colA && !colB && /\d+\.\s/.test(colA)){
+          currentSection=colA.replace(/^\s*\d+\.\s+/,'').trim();
+          continue;
+        }
+
+        // Item row: colA looks like "1.01", colB has item name
+        if(colA && colB && /^\d+\.\d+$/.test(colA)){
+          items.push({
+            ref:colA,
+            section:currentSection,
+            name:colB,
+            qty:colC!=null?String(colC):'',
+            unit:colD,
+            notes:colE,
+            state:'pending',
+            orderedDate:'',
+            deliveryDate:'',
+            supplier:'',
+            leadOverride:null
+          });
+        }
+      }
+
+      if(!items.length){showToast('No materials found — check the correct file was uploaded'); return;}
+
+      const jIdx=jobs.findIndex(x=>x.id===jobId); if(jIdx<0) return;
+      // Preserve existing ordering state when replacing file
+      const existing=jobs[jIdx].bom||[];
+      items.forEach(item=>{
+        const prev=existing.find(e=>e.ref===item.ref||e.name===item.name);
+        if(prev){
+          item.state=prev.state||'pending';
+          item.orderedDate=prev.orderedDate||'';
+          item.deliveryDate=prev.deliveryDate||'';
+          item.supplier=prev.supplier||'';
+          item.leadOverride=prev.leadOverride??null;
+        }
+      });
+
+      jobs[jIdx]={...jobs[jIdx],bom:items,bomFilename:file.name,updated:String(Date.now())};
+      await pushJob(jobs[jIdx]);
+      showToast(items.length+' materials loaded from '+file.name);
+      openJob(jobId);
+    }catch(err){showToast('Error reading file: '+err.message);console.error(err);}
+  };
+  reader.readAsArrayBuffer(file);
+}
+
 </script>
 </body>
 </html>
