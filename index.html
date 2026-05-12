@@ -2212,9 +2212,15 @@ function schedEntriesFor(col,ds){
     if(e.col!==col) return false;
     const s=e.start,en=e.end||e.start;
     if(ds<s||ds>en) return false;
-    // Don't show chips on weekends — they span over them silently
+    // For multi-day spanning entries, skip weekends — they bridge over silently
+    // But if the entry was deliberately placed ON this weekend day (start===ds or single day), show it
     const dow=schedParseDate(ds).getDay();
-    if(dow===0||dow===6) return false;
+    if(dow===0||dow===6){
+      // Only show if this entry was explicitly set to include this exact weekend day
+      // i.e. it starts on this day, or it's a single-day entry on this day
+      const isDeliberate = s===ds || (s===ds&&en===ds);
+      if(!isDeliberate) return false;
+    }
     return true;
   });
 }
