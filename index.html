@@ -493,7 +493,15 @@ textarea.pp-input{resize:vertical;min-height:80px}
 .sched-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
 /* grid */
 .sched-grid-wrap{min-width:max-content}
-.sched-col-header-row{display:flex;position:sticky;top:186px;z-index:29;background:var(--white);border-bottom:2px solid var(--border)}
+.sched-col-header-outer{
+  position:sticky;top:186px;z-index:29;
+  background:var(--white);
+  overflow-x:auto;overflow-y:visible;
+  scrollbar-width:none;border-bottom:2px solid var(--border);
+  flex-shrink:0;
+}
+.sched-col-header-outer::-webkit-scrollbar{display:none}
+.sched-col-header-row{display:flex;min-width:max-content}
 .sch-day-spacer{width:72px;flex-shrink:0;border-right:1px solid var(--border);background:var(--white)}
 .sch-col-hd{
   flex-shrink:0;display:flex;align-items:center;justify-content:center;
@@ -775,9 +783,12 @@ select.sem-input{cursor:pointer}
     </div>
 
     <!-- Scrollable crew grid -->
+    <!-- Column headers: outside scroll so sticky works properly -->
+    <div class="sched-col-header-outer" id="sched-col-header-outer">
+      <div class="sched-col-header-row" id="sched-col-headers"></div>
+    </div>
     <div class="sched-scroll" id="sched-scroll">
       <div class="sched-grid-wrap">
-        <div class="sched-col-header-row" id="sched-col-headers"></div>
         <div id="sched-grid-body"></div>
       </div>
     </div>
@@ -2353,6 +2364,18 @@ function schedRender(){
 
   schedRenderUnscheduled(dates);
   schedRenderFooter(dates);
+  // Sync horizontal scroll between header and body
+  setTimeout(schedSyncHeaderScroll, 0);
+}
+
+function schedSyncHeaderScroll(){
+  const header = document.getElementById('sched-col-header-outer');
+  const body   = document.getElementById('sched-scroll');
+  if(!header||!body) return;
+  // Sync body → header
+  body.onscroll = function(){ header.scrollLeft = body.scrollLeft; };
+  // Sync header → body (in case user touches header)
+  header.onscroll = function(){ body.scrollLeft = header.scrollLeft; };
 }
 
 function schedRenderFooter(dates){
