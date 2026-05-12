@@ -2091,10 +2091,39 @@ let schedDragId   = null;
 let schedTouchDragId = null, schedTouchClone = null;
 
 function schedLoadLocal(){
+  // Fallback: load from localStorage while API fetch is in progress
   try{ const r=localStorage.getItem('dtv_sched_v2'); if(r) schedEntries=JSON.parse(r); }catch(e){ schedEntries=[]; }
 }
 function schedSaveLocal(){
+  // Always mirror to localStorage as offline backup
   try{ localStorage.setItem('dtv_sched_v2',JSON.stringify(schedEntries)); }catch(e){}
+}
+
+async function schedLoadFromAPI(){
+  try{
+    const d=await apiCall({action:'getSchedule'});
+    if(d&&Array.isArray(d.entries)){
+      schedEntries=d.entries;
+      schedSaveLocal(); // update local backup
+      schedRender();
+    }
+  }catch(e){
+    console.warn('Schedule API load failed, using local cache',e);
+  }
+}
+
+async function schedSaveToAPI(){
+  schedSaveLocal(); // always save locally first
+  if(!isOnline){
+    showToast('Saved locally — will sync when back online');
+    return;
+  }
+  try{
+    await apiCall({action:'saveSchedule',entries:schedEntries});
+  }catch(e){
+    console.warn('Schedule save to API failed',e);
+    showToast('Schedule save failed — stored locally');
+  }
 }
 
 function schedGetMonday(d){
@@ -2184,7 +2213,7 @@ function schedSyncPlaceholders(){
       });
     }
   });
-  schedSaveLocal();
+  schedSaveLocal(); // placeholders — local only, API save happens on user action
 }
 
 function schedRenderUnscheduled(dates){
@@ -2326,7 +2355,7 @@ function schedDrop(ev,col,date){
   const span=Math.round((oldEnd-oldStart)/86400000);
   const newEnd=new Date(schedParseDate(date)); newEnd.setDate(newEnd.getDate()+span);
   schedEntries[idx]={...e,col,start:date,end:span>0?schedDateStr(newEnd):date,isPlaceholder:false};
-  schedSaveLocal(); schedRender(); showToast('Moved'); schedDragId=null;
+  schedSaveToAPI(); schedRender(); showToast('Moved'); schedDragId=null;
 }
 
 // Touch drag
@@ -2357,7 +2386,7 @@ function schedInitTouchDrag(){
 
 function schedCellClick(ev,col,date){ if(ev.target.classList.contains('sched-cell-add')) return; schedOpenModal(col,date); }
 
-function schedDeleteEntry(id){ schedEntries=schedEntries.filter(x=>x.id!==id); schedSaveLocal(); schedRender(); }
+function schedDeleteEntry(id){ schedEntries=schedEntries.filter(x=>x.id!==id); schedSaveToAPI(); schedRender(); }
 
 // ─── MODAL ───
 function schedBuildJobOptions(){
@@ -2466,7 +2495,7 @@ function semSave(){
       schedEntries.push({id:genId(),col:c,jobId,text,start,end,colour,type:schedEntryType,isPlaceholder:false});
     });
   }
-  schedSaveLocal(); semClose(); schedRender();
+  schedSaveToAPI(); semClose(); schedRender();
   showToast(schedEditId?'Updated':colVal==='both'?'Added for Tom & Fraser':'Entry added');
 }
 
@@ -2475,9 +2504,10 @@ function semBgClick(ev){ if(ev.target===document.getElementById('sem-modal')) se
 
 // ─── INIT ───
 function schedInit(){
-  schedLoadLocal();
+  schedLoadLocal(); // load local cache immediately for instant display
   schedViewStart=schedGetMonday(new Date());
   schedInitTouchDrag();
+  schedLoadFromAPI(); // then fetch fresh from Sheets in background
 }
 
 
@@ -2750,13 +2780,12 @@ async function bomAddToSchedule(jobId,itemIdx){
   const alreadyOn=schedEntries.some(e=>e.text===label&&e.start===orderDate);
   if(alreadyOn){showToast('Already on Schedule'); return;}
   schedEntries.push({id:genId(),col:'notes',jobId:j.id,text:label,colour:'amber',start:orderDate,end:orderDate,type:'note',isBomOrder:true});
-  schedSaveLocal();
   // Also add delivery date reminder if set
   if(item.deliveryDate){
     const delivLabel='Delivery: '+item.name+(j.ref?' — '+j.ref:'');
     schedEntries.push({id:genId(),col:'notes',jobId:j.id,text:delivLabel,colour:'green',start:item.deliveryDate,end:item.deliveryDate,type:'note',isBomOrder:true});
   }
-  schedSaveLocal();
+  schedSaveToAPI();
   showToast('Added to Schedule: '+orderDate);
 }
 
@@ -2774,7 +2803,7 @@ async function bomScheduleAll(jobId){
       added++;
     }
   });
-  schedSaveLocal();
+  schedSaveToAPI();
   showToast(added+' ordering reminders added to Schedule');
   if(added) openJob(jobId);
 }
