@@ -540,6 +540,23 @@ textarea.pp-input{resize:vertical;min-height:80px}
   display:none;align-items:center;justify-content:center;flex-shrink:0;padding:0;
 }
 .sched-chip:hover .chip-rm{display:flex}
+/* Resize handle — shown on last day of a multi-day entry */
+.chip-resize-wrap{position:relative;display:flex;flex-direction:column}
+.chip-resize-handle{
+  width:100%;height:8px;cursor:ns-resize;
+  display:none;align-items:center;justify-content:center;
+  background:transparent;border:none;padding:0;margin-top:1px;flex-shrink:0;
+  opacity:0.6;transition:opacity 0.12s;
+}
+.chip-resize-wrap:hover .chip-resize-handle{display:flex}
+.chip-resize-handle:hover{opacity:1}
+.chip-resize-handle-bar{
+  width:20px;height:3px;border-radius:2px;
+  background:currentColor;opacity:0.5;
+  pointer-events:none;
+}
+/* highlight cells during resize */
+.sched-cell.resize-over{background:rgba(74,144,32,0.12);outline:2px dashed var(--green-mid);outline-offset:-2px}
 /* placeholder chip (auto-populated from job start date) */
 .sched-chip.is-placeholder{border-style:dashed;opacity:0.7}
 .sched-chip.is-placeholder:hover{opacity:1}
@@ -2089,6 +2106,7 @@ let schedEditId   = null;
 let schedEntryType= 'job';
 let schedDragId   = null;
 let schedTouchDragId = null, schedTouchClone = null;
+let schedResizeId = null, schedResizeOrigEnd = null; // for bottom-handle resize
 
 function schedLoadLocal(){
   // Fallback: load from localStorage while API fetch is in progress
@@ -2298,13 +2316,21 @@ function schedRender(){
         const isSpan=e.end&&e.end!==e.start;
         const st=schedChipStyle(e);
         const lbl=schedChipLabel(e);
-        html+=`<div class="sched-chip${e.isPlaceholder?' is-placeholder':''}" style="${st}"
-          draggable="true" data-id="${e.id}"
-          onclick="event.stopPropagation();schedOpenEdit('${e.id}')"
-          ondragstart="schedDragStart(event,'${e.id}')">
-          <div class="chip-dot"></div>
-          <span class="chip-txt">${esc(lbl)}${isSpan&&isFirst?' →':''}</span>
-          <button class="chip-rm" onclick="event.stopPropagation();schedDeleteEntry('${e.id}')">×</button>
+        html+=`<div class="chip-resize-wrap" data-id="${e.id}">
+          <div class="sched-chip${e.isPlaceholder?' is-placeholder':''}" style="${st}"
+            draggable="true" data-id="${e.id}"
+            onclick="event.stopPropagation();schedOpenEdit('${e.id}')"
+            ondragstart="schedDragStart(event,'${e.id}')">
+            <div class="chip-dot"></div>
+            <span class="chip-txt">${esc(lbl)}${isSpan&&isFirst?' →':''}</span>
+            <button class="chip-rm" onclick="event.stopPropagation();schedDeleteEntry('${e.id}')">×</button>
+          </div>
+          ${isLast?`<button class="chip-resize-handle" style="color:${st.match(/color:([^;]+)/)?.[1]||'currentColor'}"
+            title="Drag to extend"
+            onmousedown="event.stopPropagation();schedResizeStart(event,'${e.id}','${ds}')"
+            ontouchstart="event.stopPropagation();schedResizeTouchStart(event,'${e.id}','${ds}')">
+            <div class="chip-resize-handle-bar"></div>
+          </button>`:''}
         </div>`;
       });
       html+=`<button class="sched-cell-add" onclick="event.stopPropagation();schedOpenModal('${col.id}','${ds}')" title="Add">+</button>`;
@@ -2342,6 +2368,108 @@ function schedRenderFooter(dates){
 }
 
 // ─── DRAG & DROP ───
+
+// ─── RESIZE HANDLE (stretch entry end date) ───────────────────────────────
+function schedResizeStart(ev, id, currentDate){
+  ev.preventDefault();
+  schedResizeId = id;
+  const entry = schedEntries.find(x=>x.id===id);
+  schedResizeOrigEnd = entry ? (entry.end||entry.start) : currentDate;
+  document.addEventListener('mousemove', schedResizeMouseMove);
+  document.addEventListener('mouseup',   schedResizeMouseUp);
+  document.body.style.cursor = 'ns-resize';
+  document.body.style.userSelect = 'none';
+}
+
+function schedResizeMouseMove(ev){
+  if(!schedResizeId) return;
+  // Find the cell under the cursor
+  const el = document.elementFromPoint(ev.clientX, ev.clientY);
+  const cell = el?.closest('.sched-cell');
+  if(!cell||!cell.dataset.date) return;
+  const newEnd = cell.dataset.date;
+  const entry = schedEntries.find(x=>x.id===schedResizeId);
+  if(!entry||newEnd < entry.start) return;
+  // Highlight
+  document.querySelectorAll('.sched-cell.resize-over').forEach(c=>c.classList.remove('resize-over'));
+  cell.classList.add('resize-over');
+  // Live preview — update entry end temporarily
+  if(newEnd !== (entry.end||entry.start)){
+    entry.end = newEnd;
+    schedRender();
+  }
+}
+
+function schedResizeMouseUp(ev){
+  document.removeEventListener('mousemove', schedResizeMouseMove);
+  document.removeEventListener('mouseup',   schedResizeMouseUp);
+  document.body.style.cursor = '';
+  document.body.style.userSelect = '';
+  document.querySelectorAll('.sched-cell.resize-over').forEach(c=>c.classList.remove('resize-over'));
+  if(!schedResizeId){ schedResizeId=null; return; }
+  const el = document.elementFromPoint(ev.clientX, ev.clientY);
+  const cell = el?.closest('.sched-cell');
+  const newEnd = cell?.dataset?.date;
+  const idx = schedEntries.findIndex(x=>x.id===schedResizeId);
+  if(idx>=0 && newEnd && newEnd >= schedEntries[idx].start){
+    schedEntries[idx] = {...schedEntries[idx], end: newEnd, isPlaceholder: false};
+    schedSaveToAPI();
+    showToast('Duration updated');
+  } else if(idx>=0){
+    // revert if dropped outside grid
+    schedEntries[idx] = {...schedEntries[idx], end: schedResizeOrigEnd};
+  }
+  schedResizeId = null; schedResizeOrigEnd = null;
+  schedRender();
+}
+
+// Touch version of resize
+let schedResizeTouchId = null;
+function schedResizeTouchStart(ev, id, currentDate){
+  schedResizeTouchId = id;
+  schedResizeId = id;
+  const entry = schedEntries.find(x=>x.id===id);
+  schedResizeOrigEnd = entry ? (entry.end||entry.start) : currentDate;
+  document.addEventListener('touchmove',  schedResizeTouchMove, {passive:false});
+  document.addEventListener('touchend',   schedResizeTouchEnd);
+}
+function schedResizeTouchMove(ev){
+  if(!schedResizeTouchId) return;
+  ev.preventDefault();
+  const t = ev.touches[0];
+  const el = document.elementFromPoint(t.clientX, t.clientY);
+  const cell = el?.closest('.sched-cell');
+  if(!cell||!cell.dataset.date) return;
+  const newEnd = cell.dataset.date;
+  const entry = schedEntries.find(x=>x.id===schedResizeTouchId);
+  if(!entry||newEnd < entry.start) return;
+  document.querySelectorAll('.sched-cell.resize-over').forEach(c=>c.classList.remove('resize-over'));
+  cell.classList.add('resize-over');
+  if(newEnd !== (entry.end||entry.start)){
+    entry.end = newEnd;
+    schedRender();
+  }
+}
+function schedResizeTouchEnd(ev){
+  document.removeEventListener('touchmove', schedResizeTouchMove);
+  document.removeEventListener('touchend',  schedResizeTouchEnd);
+  document.querySelectorAll('.sched-cell.resize-over').forEach(c=>c.classList.remove('resize-over'));
+  const t = ev.changedTouches[0];
+  const el = document.elementFromPoint(t.clientX, t.clientY);
+  const cell = el?.closest('.sched-cell');
+  const newEnd = cell?.dataset?.date;
+  const idx = schedEntries.findIndex(x=>x.id===schedResizeTouchId);
+  if(idx>=0 && newEnd && newEnd >= schedEntries[idx].start){
+    schedEntries[idx] = {...schedEntries[idx], end: newEnd, isPlaceholder: false};
+    schedSaveToAPI();
+    showToast('Duration updated');
+  } else if(idx>=0){
+    schedEntries[idx] = {...schedEntries[idx], end: schedResizeOrigEnd};
+  }
+  schedResizeTouchId = null; schedResizeId = null; schedResizeOrigEnd = null;
+  schedRender();
+}
+
 function schedDragStart(ev,id){ schedDragId=id; ev.dataTransfer.effectAllowed='move'; ev.target.classList.add('dragging'); setTimeout(()=>ev.target.classList.remove('dragging'),50); }
 function schedDragOver(ev,col,date){ ev.preventDefault(); ev.dataTransfer.dropEffect='move'; document.querySelectorAll('.sched-cell.drag-over').forEach(c=>c.classList.remove('drag-over')); ev.currentTarget.classList.add('drag-over'); }
 function schedDragLeave(ev){ ev.currentTarget.classList.remove('drag-over'); }
