@@ -514,8 +514,12 @@ textarea.pp-input{resize:vertical;min-height:80px}
 .sched-day-row:hover{background:rgba(74,144,32,0.015)}
 .sched-day-row.is-today .sched-day-label{background:var(--green)}
 .sched-day-row.is-today .sched-day-label *{color:#fff !important}
-/* weekends hidden from main grid — manually added entries show normally */
-.sched-day-row.is-weekend .sched-day-label{opacity:0.55}
+.sched-day-row.is-weekend{background:#FAFAFA}
+.sched-day-row.is-weekend .sched-day-label{opacity:0.45}
+.sched-day-row.is-weekend .sched-cell{background:#FAFAFA;cursor:default}
+.sched-day-row.is-weekend .sched-cell:hover{background:#F5F5F3}
+.sched-day-row.is-weekend{min-height:32px}
+.sched-day-row.is-weekend .sched-date{font-size:14px}
 .sched-day-label{
   width:72px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;
   justify-content:center;padding:6px 4px;border-right:1px solid var(--border);
@@ -2168,8 +2172,7 @@ function schedParseDate(s){ return new Date(s+'T12:00:00'); }
 function schedGetDates(){
   const dates=[], cur=new Date(schedViewStart), total=schedViewWeeks*7;
   for(let i=0;i<total;i++){
-    const dow=cur.getDay();
-    if(dow!==0&&dow!==6) dates.push(new Date(cur)); // Mon-Fri only
+    dates.push(new Date(cur)); // all 7 days — weekends shown lighter
     cur.setDate(cur.getDate()+1);
   }
   return dates;
@@ -2315,7 +2318,7 @@ function schedRender(){
   dates.forEach(d=>{
     const ds=schedDateStr(d);
     const dow=d.getDay();
-    const isWE=false; // weekends hidden from grid
+    const isWE=dow===0||dow===6;
     const isToday=ds===today;
     const isMonthStart=d.getDate()===1;
     html+=`<div class="sched-day-row${isWE?' is-weekend':''}${isToday?' is-today':''}">`;
