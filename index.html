@@ -463,7 +463,9 @@ textarea.pp-input{resize:vertical;min-height:80px}
   display:flex;align-items:center;gap:8px;padding:10px 16px;
   background:var(--charcoal);border-bottom:1px solid rgba(255,255,255,0.07);
   flex-wrap:wrap;flex-shrink:0;
+  position:sticky;top:100px;z-index:35;
 }
+@media not all and (display-mode:standalone){.sched-controls{top:100px}}
 .sched-wn-btn{width:26px;height:26px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);border-radius:var(--radius-xs);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;color:rgba(255,255,255,0.6);user-select:none;transition:all 0.12s}
 .sched-wn-btn:hover{background:rgba(255,255,255,0.15);color:#fff}
 .sched-range-label{font-size:13px;font-weight:500;color:#fff;min-width:180px;text-align:center;letter-spacing:-0.2px}
@@ -475,7 +477,8 @@ textarea.pp-input{resize:vertical;min-height:80px}
 .sched-add-btn{padding:6px 12px;background:var(--green);color:#fff;border:none;border-radius:var(--radius-xs);font-size:12px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:background 0.12s;margin-left:auto}
 .sched-add-btn:hover{background:var(--green-mid)}
 /* column toggles */
-.sched-col-toggles{display:flex;gap:5px;flex-wrap:wrap;padding:8px 16px;background:var(--white);border-bottom:1px solid var(--border);flex-shrink:0;align-items:center}
+.sched-col-toggles{display:flex;gap:5px;flex-wrap:wrap;padding:8px 16px;background:var(--white);border-bottom:1px solid var(--border);flex-shrink:0;align-items:center;position:sticky;top:148px;z-index:34;}
+@media not all and (display-mode:standalone){.sched-col-toggles{top:148px}}
 .sched-col-toggles-label{font-size:11px;font-weight:600;color:var(--hint);text-transform:uppercase;letter-spacing:0.06em;margin-right:4px}
 .col-toggle-btn{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:12px;border:1px solid var(--border);background:var(--white);font-size:11px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;color:var(--muted);transition:all 0.12s;white-space:nowrap}
 .col-toggle-btn.active{color:#fff;border-color:transparent}
@@ -487,10 +490,10 @@ textarea.pp-input{resize:vertical;min-height:80px}
 .unsched-chip{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;background:var(--white);border:1px solid var(--amber-border);border-radius:10px;font-size:11px;font-weight:500;color:var(--amber);cursor:pointer;transition:all 0.12s}
 .unsched-chip:hover{background:var(--amber-light);border-color:var(--amber)}
 /* scroll wrapper */
-.sched-scroll{overflow:auto;flex:1;min-height:0;-webkit-overflow-scrolling:touch}
+.sched-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
 /* grid */
 .sched-grid-wrap{min-width:max-content}
-.sched-col-header-row{display:flex;position:sticky;top:0;z-index:30;background:var(--white);border-bottom:2px solid var(--border)}
+.sched-col-header-row{display:flex;position:sticky;top:186px;z-index:29;background:var(--white);border-bottom:2px solid var(--border)}
 .sch-day-spacer{width:72px;flex-shrink:0;border-right:1px solid var(--border);background:var(--white)}
 .sch-col-hd{
   flex-shrink:0;display:flex;align-items:center;justify-content:center;
@@ -503,7 +506,7 @@ textarea.pp-input{resize:vertical;min-height:80px}
 .sched-day-row:hover{background:rgba(74,144,32,0.015)}
 .sched-day-row.is-today .sched-day-label{background:var(--green)}
 .sched-day-row.is-today .sched-day-label *{color:#fff !important}
-.sched-day-row.is-weekend{background:#FAFAFA}
+/* weekends hidden from main grid — manually added entries show normally */
 .sched-day-row.is-weekend .sched-day-label{opacity:0.55}
 .sched-day-label{
   width:72px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;
@@ -715,7 +718,7 @@ select.sem-input{cursor:pointer}
   </div>
 
   <!-- DASHBOARD -->
-  <div id="tab-dashboard" style="display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden">
+  <div id="tab-dashboard" style="display:flex;flex-direction:column;min-height:0">
 
     <!-- KPIs + action panels -->
     <div class="content" style="padding-bottom:10px;flex-shrink:0">
@@ -772,7 +775,7 @@ select.sem-input{cursor:pointer}
     </div>
 
     <!-- Scrollable crew grid -->
-    <div class="sched-scroll" id="sched-scroll" style="flex:1;min-height:0">
+    <div class="sched-scroll" id="sched-scroll">
       <div class="sched-grid-wrap">
         <div class="sched-col-header-row" id="sched-col-headers"></div>
         <div id="sched-grid-body"></div>
@@ -2154,12 +2157,20 @@ function schedParseDate(s){ return new Date(s+'T12:00:00'); }
 function schedGetDates(){
   const dates=[], cur=new Date(schedViewStart), total=schedViewWeeks*7;
   for(let i=0;i<total;i++){
-    dates.push(new Date(cur)); cur.setDate(cur.getDate()+1);
+    const dow=cur.getDay();
+    if(dow!==0&&dow!==6) dates.push(new Date(cur)); // Mon-Fri only
+    cur.setDate(cur.getDate()+1);
   }
-  return dates; // include weekends — show lighter
+  return dates;
 }
 
-function schedShift(dir){ schedViewStart.setDate(schedViewStart.getDate()+dir*schedViewWeeks*7); schedRender(); }
+function schedShift(dir){ 
+  schedViewStart.setDate(schedViewStart.getDate()+dir*schedViewWeeks*7);
+  // Snap to Monday
+  const dow=schedViewStart.getDay();
+  if(dow!==1) schedViewStart.setDate(schedViewStart.getDate()+(dow===0?1:8-dow));
+  schedRender(); 
+}
 function schedGoToday(){ schedViewStart=schedGetMonday(new Date()); schedRender(); }
 function schedSetView(v,btn){  document.querySelectorAll('.svt-opt').forEach(b=>b.classList.remove('active')); btn.classList.add('active');  schedViewWeeks=v==='4w'?4:v==='6m'?26:v==='1yr'?52:8; schedRender();}
 function schedToggleCol(id,btn){
@@ -2293,7 +2304,7 @@ function schedRender(){
   dates.forEach(d=>{
     const ds=schedDateStr(d);
     const dow=d.getDay();
-    const isWE=dow===0||dow===6;
+    const isWE=false; // weekends hidden from grid
     const isToday=ds===today;
     const isMonthStart=d.getDate()===1;
     html+=`<div class="sched-day-row${isWE?' is-weekend':''}${isToday?' is-today':''}">`;
