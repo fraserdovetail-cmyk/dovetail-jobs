@@ -502,7 +502,7 @@ textarea.pp-input{resize:vertical;min-height:80px}
 }
 .sched-col-header-outer::-webkit-scrollbar{display:none}
 .sched-col-header-row{display:flex;min-width:max-content}
-.sch-day-spacer{width:72px;flex-shrink:0;border-right:1px solid var(--border);background:var(--white)}
+.sch-day-spacer{width:56px;flex-shrink:0;border-right:1px solid var(--border);background:var(--white)}
 .sch-col-hd{
   flex-shrink:0;display:flex;align-items:center;justify-content:center;
   padding:10px 6px;font-size:11px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;
@@ -521,13 +521,13 @@ textarea.pp-input{resize:vertical;min-height:80px}
 .sched-day-row.is-weekend{min-height:32px}
 .sched-day-row.is-weekend .sched-date{font-size:14px}
 .sched-day-label{
-  width:72px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;
-  justify-content:center;padding:6px 4px;border-right:1px solid var(--border);
+  width:56px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:4px 3px;border-right:1px solid var(--border);
   cursor:default;position:sticky;left:0;background:var(--white);z-index:10;
 }
 .sched-day-row.is-weekend .sched-day-label{background:#FAFAFA}
 .sched-dow{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;line-height:1}
-.sched-date{font-size:20px;font-weight:300;color:var(--text);line-height:1.1;font-family:'JetBrains Mono',monospace;margin-top:1px}
+.sched-date{font-size:15px;font-weight:400;color:var(--text);line-height:1.1;font-family:'JetBrains Mono',monospace;margin-top:1px}
 .sched-mon{font-size:9px;color:var(--hint);text-transform:uppercase;letter-spacing:0.05em;margin-top:1px}
 .sched-month-marker{font-size:9px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:2px}
 /* cells */
@@ -540,8 +540,8 @@ textarea.pp-input{resize:vertical;min-height:80px}
 .sched-cell.drag-over{background:rgba(74,144,32,0.1);outline:2px dashed var(--green-mid);outline-offset:-2px}
 /* chips */
 .sched-chip{
-  border-radius:4px;padding:3px 7px;font-size:11px;font-weight:500;
-  display:flex;align-items:center;gap:4px;cursor:pointer;
+  border-radius:4px;padding:2px 6px;font-size:10px;font-weight:500;
+  display:flex;align-items:center;gap:3px;cursor:pointer;
   border:1px solid transparent;transition:opacity 0.1s,box-shadow 0.1s;
   overflow:hidden;line-height:1.4;
 }
@@ -615,7 +615,7 @@ select.sem-input{cursor:pointer}
 .colour-swatches{display:flex;gap:5px;flex-wrap:wrap}
 .cs-dot{width:22px;height:22px;border-radius:4px;cursor:pointer;transition:all 0.12s;display:flex;align-items:center;justify-content:center;border:2px solid transparent}
 @media(max-width:600px){
-  .sch-day-spacer,.sched-day-label{width:54px}
+  .sch-day-spacer,.sched-day-label{width:44px}
   .sched-controls{padding:8px 12px}
 }
 
@@ -2204,7 +2204,7 @@ function schedActiveCols(){ return SCHED_COLS.filter(c=>schedCols.has(c.id)); }
 
 function schedColWidth(){
   const n=schedCols.size;
-  if(n<=3) return 200; if(n<=5) return 170; return 140;
+  if(n<=2) return 160; if(n<=3) return 140; if(n<=5) return 120; return 100;
 }
 
 function schedEntriesFor(col,ds){
@@ -2297,7 +2297,7 @@ function schedRenderUnscheduled(dates){
 function schedRender(){
   if(!schedViewStart) return;
   // Shrink row height for long views so the year stays manageable
-  const rowH=schedViewWeeks>=26?44:schedViewWeeks>=12?54:66;
+  const rowH=schedViewWeeks>=26?32:schedViewWeeks>=12?40:52;
   document.documentElement.style.setProperty('--sched-row-h', rowH+'px');
   const dates=schedGetDates();
   const today=schedDateStr(new Date());
@@ -2342,9 +2342,7 @@ function schedRender(){
       const cellEntries=schedEntriesFor(col.id,ds);
       html+=`<div class="sched-cell" style="width:${colW}px" data-col="${col.id}" data-date="${ds}"
         onclick="schedCellClick(event,'${col.id}','${ds}')"
-        ondragover="schedDragOver(event,'${col.id}','${ds}')"
-        ondragleave="schedDragLeave(event)"
-        ondrop="schedDrop(event,'${col.id}','${ds}')">`;
+        >`;
       cellEntries.forEach(e=>{
         const isFirst=ds===e.start;
         const isLast=ds===(e.end||e.start);
@@ -2353,9 +2351,8 @@ function schedRender(){
         const lbl=schedChipLabel(e);
         html+=`<div class="chip-resize-wrap" data-id="${e.id}">
           <div class="sched-chip${e.isPlaceholder?' is-placeholder':''}" style="${st}"
-            draggable="true" data-id="${e.id}"
-            onclick="event.stopPropagation();schedOpenEdit('${e.id}')"
-            ondragstart="schedDragStart(event,'${e.id}')">
+            data-id="${e.id}"
+            onclick="event.stopPropagation();schedOpenEdit('${e.id}')">
             <div class="chip-dot"></div>
             <span class="chip-txt">${esc(lbl)}${isSpan&&isFirst?' →':''}</span>
             <button class="chip-rm" onclick="event.stopPropagation();schedDeleteEntry('${e.id}','${ds}')">×</button>
@@ -2712,7 +2709,21 @@ function semSave(){
   const colour=selSwatch?selSwatch.dataset.colour:JOB_COLOURS_S[0].id;
   if(schedEditId){
     const idx=schedEntries.findIndex(x=>x.id===schedEditId);
-    if(idx>=0) schedEntries[idx]={...schedEntries[idx],col,jobId,text,start,end,colour,type:schedEntryType,isPlaceholder:false};
+    if(idx>=0){
+      if(colVal==='both'){
+        // Changing to Both — update the current entry to Tom, add Fraser if not already there
+        const existing=schedEntries[idx];
+        schedEntries[idx]={...existing,col:'tom',jobId,text,start,end,colour,type:schedEntryType,isPlaceholder:false};
+        // Check if a Fraser entry already exists for same job+dates
+        const fraserExists=schedEntries.some((e,i)=>i!==idx&&e.col==='fraser'&&e.jobId===jobId&&e.start===start&&e.end===end);
+        if(!fraserExists){
+          schedEntries.splice(idx+1,0,{id:genId(),col:'fraser',jobId,text,start,end,colour,type:schedEntryType,isPlaceholder:false});
+        }
+      } else {
+        // Normal single-person edit
+        schedEntries[idx]={...schedEntries[idx],col,jobId,text,start,end,colour,type:schedEntryType,isPlaceholder:false};
+      }
+    }
   } else {
     cols.forEach(c=>{
       schedEntries.push({id:genId(),col:c,jobId,text,start,end,colour,type:schedEntryType,isPlaceholder:false});
