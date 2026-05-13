@@ -2090,6 +2090,9 @@ function ppCopyHistoryItem(idx){
 // ══════════════════════════════════════════════════════════════════════════
 //  SCHEDULE MODULE
 // ══════════════════════════════════════════════════════════════════════════
+// Detect non-touch device — drag enabled on desktop only
+function schedIsDesktop(){ return window.matchMedia('(hover:hover) and (pointer:fine)').matches; }
+
 const SCHED_COLS = [
   {id:'tom',     label:'Tom',              short:'T', bg:'#EFF6FF', border:'#93C5FD', text:'#1D4ED8', avatar:'#1D4ED8'},
   {id:'fraser',  label:'Fraser',           short:'F', bg:'#F5F3FF', border:'#C4B5FD', text:'#6D28D9', avatar:'#6D28D9'},
@@ -2342,7 +2345,9 @@ function schedRender(){
       const cellEntries=schedEntriesFor(col.id,ds);
       html+=`<div class="sched-cell" style="width:${colW}px" data-col="${col.id}" data-date="${ds}"
         onclick="schedCellClick(event,'${col.id}','${ds}')"
-        >`;
+        ondragover="schedIsDesktop()&&schedDragOver(event,'${col.id}','${ds}')"
+        ondragleave="schedIsDesktop()&&schedDragLeave(event)"
+        ondrop="schedIsDesktop()&&schedDrop(event,'${col.id}','${ds}')">`;
       cellEntries.forEach(e=>{
         const isFirst=ds===e.start;
         const isLast=ds===(e.end||e.start);
@@ -2352,7 +2357,9 @@ function schedRender(){
         html+=`<div class="chip-resize-wrap" data-id="${e.id}">
           <div class="sched-chip${e.isPlaceholder?' is-placeholder':''}" style="${st}"
             data-id="${e.id}"
-            onclick="event.stopPropagation();schedOpenEdit('${e.id}')">
+            draggable="${schedIsDesktop()}"
+            onclick="event.stopPropagation();schedOpenEdit('${e.id}')"
+            ondragstart="schedIsDesktop()&&schedDragStart(event,'${e.id}')">
             <div class="chip-dot"></div>
             <span class="chip-txt">${esc(lbl)}${isSpan&&isFirst?' →':''}</span>
             <button class="chip-rm" onclick="event.stopPropagation();schedDeleteEntry('${e.id}','${ds}')">×</button>
