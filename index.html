@@ -2232,7 +2232,7 @@ function schedChipLabel(e){
   if(e.text) return e.text;
   if(e.jobId){
     const j=jobs.find(x=>x.id===e.jobId);
-    if(j) return (j.ref?j.ref+' · ':'')+((j.name||'Untitled'));
+    if(j) return (j.client||'Untitled')+(j.name?' — '+j.name:'');
   }
   return '—';
 }
