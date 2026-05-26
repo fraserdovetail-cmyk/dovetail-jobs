@@ -540,15 +540,17 @@ textarea.pp-input{resize:vertical;min-height:80px}
 .sched-cell.drag-over{background:rgba(74,144,32,0.1);outline:2px dashed var(--green-mid);outline-offset:-2px}
 /* chips */
 .sched-chip{
-  border-radius:4px;padding:2px 6px;font-size:10px;font-weight:500;
-  display:flex;align-items:center;gap:3px;cursor:pointer;
+  border-radius:4px;padding:3px 6px;font-size:10px;font-weight:500;
+  display:flex;align-items:flex-start;gap:3px;cursor:pointer;
   border:1px solid transparent;transition:opacity 0.1s,box-shadow 0.1s;
-  overflow:hidden;line-height:1.4;
+  overflow:hidden;line-height:1.3;
 }
 .sched-chip:hover{opacity:0.85}
 .sched-chip.dragging{opacity:0.35}
-.chip-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;background:currentColor;opacity:0.55}
-.chip-txt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;background:currentColor;opacity:0.55;margin-top:3px}
+.chip-txt{flex:1;min-width:0;overflow:hidden;display:flex;flex-direction:column;gap:1px}
+.chip-line-1{font-size:10px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.3}
+.chip-line-2{font-size:9px;font-weight:400;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;opacity:0.75;line-height:1.3}
 .chip-rm{
   width:13px;height:13px;border-radius:50%;background:rgba(0,0,0,0.12);
   border:none;color:inherit;font-size:10px;cursor:pointer;
@@ -776,6 +778,9 @@ select.sem-input{cursor:pointer}
       <button class="col-toggle-btn" data-col="roofer" onclick="schedToggleCol('roofer',this)"><span class="ctb-dot" style="background:#5B21B6"></span>Roofer</button>
       <button class="col-toggle-btn" data-col="painter" onclick="schedToggleCol('painter',this)"><span class="ctb-dot" style="background:#9D174D"></span>Painter</button>
       <button class="col-toggle-btn" data-col="flooring" onclick="schedToggleCol('flooring',this)"><span class="ctb-dot" style="background:#0F766E"></span>Carpets/flooring</button>
+      <button class="col-toggle-btn" data-col="flowscreed" onclick="schedToggleCol('flowscreed',this)"><span class="ctb-dot" style="background:#C2410C"></span>Flowscreed</button>
+      <button class="col-toggle-btn" data-col="plasterer" onclick="schedToggleCol('plasterer',this)"><span class="ctb-dot" style="background:#0284C7"></span>Plasterer</button>
+      <button class="col-toggle-btn" data-col="tonino" onclick="schedToggleCol('tonino',this)"><span class="ctb-dot" style="background:#9333EA"></span>Tonino</button>
       <span style="width:1px;height:14px;background:var(--border);margin:0 4px;flex-shrink:0"></span>
       <button class="col-toggle-btn active" data-col="notes" onclick="schedToggleCol('notes',this)"><span class="ctb-dot" style="background:var(--hint)"></span>Notes/Orders</button>
     </div>
@@ -857,6 +862,9 @@ select.sem-input{cursor:pointer}
             <option value="roofer">Roofer</option>
             <option value="painter">Painter</option>
             <option value="flooring">Carpets / flooring</option>
+            <option value="flowscreed">Flowscreed</option>
+            <option value="plasterer">Plasterer</option>
+            <option value="tonino">Tonino</option>
           </select>
         </div>
         <div id="sem-job-group">
@@ -2101,8 +2109,11 @@ const SCHED_COLS = [
   {id:'kbc',     label:'KBC',              short:'K', bg:'#EFF6FF', border:'#BFDBFE', text:'#1E40AF', avatar:'#1E40AF'},
   {id:'roofer',  label:'Roofer',           short:'R', bg:'#F5F3FF', border:'#DDD6FE', text:'#5B21B6', avatar:'#5B21B6'},
   {id:'painter', label:'Painter',          short:'P', bg:'#FDF2F8', border:'#F9A8D4', text:'#9D174D', avatar:'#9D174D'},
-  {id:'flooring',label:'Carpets/flooring', short:'FL',bg:'#F0FDFA', border:'#99F6E4', text:'#0F766E', avatar:'#0F766E'},
-  {id:'notes',   label:'Notes/Orders',     short:'N', bg:'var(--surface)', border:'var(--border)', text:'var(--muted)', avatar:'#71717A'},
+  {id:'flooring',  label:'Carpets/flooring', short:'FL',bg:'#F0FDFA', border:'#99F6E4', text:'#0F766E', avatar:'#0F766E'},
+  {id:'flowscreed',label:'Flowscreed',       short:'FS',bg:'#FFF7ED', border:'#FED7AA', text:'#9A3412', avatar:'#C2410C'},
+  {id:'plasterer', label:'Plasterer',         short:'PL',bg:'#F0F9FF', border:'#BAE6FD', text:'#0369A1', avatar:'#0284C7'},
+  {id:'tonino',    label:'Tonino',            short:'TN',bg:'#FDF4FF', border:'#E9D5FF', text:'#7E22CE', avatar:'#9333EA'},
+  {id:'notes',     label:'Notes/Orders',      short:'N', bg:'var(--surface)', border:'var(--border)', text:'var(--muted)', avatar:'#71717A'},
 ];
 
 const JOB_COLOURS_S = [
@@ -2228,13 +2239,30 @@ function schedEntriesFor(col,ds){
   });
 }
 
-function schedChipLabel(e){
-  if(e.text) return e.text;
+function schedChipLines(e){
+  // Returns {line1: surname/title, line2: note/order text or job name}
+  const isNote = e.col==='notes' || e.type==='note';
   if(e.jobId){
     const j=jobs.find(x=>x.id===e.jobId);
-    if(j) return (j.client||'Untitled')+(j.name?' — '+j.name:'');
+    if(j){
+      // Extract surname: last word of client name
+      const clientName = j.client||'';
+      const surname = clientName.trim().split(/\s+/).pop()||clientName||'Untitled';
+      // Line 2: the free-text label if set, otherwise job name
+      const line2 = e.text || j.name || '';
+      return {line1: surname, line2: line2};
+    }
   }
-  return '—';
+  // No job linked — just show the text (note/order or free label)
+  if(e.text){
+    return {line1: e.text, line2:''};
+  }
+  return {line1:'—', line2:''};
+}
+
+function schedChipLabel(e){
+  const {line1,line2}=schedChipLines(e);
+  return line1+(line2?' — '+line2:'');
 }
 
 function schedChipStyle(e){
@@ -2354,6 +2382,7 @@ function schedRender(){
         const isSpan=e.end&&e.end!==e.start;
         const st=schedChipStyle(e);
         const lbl=schedChipLabel(e);
+        const {line1,line2}=schedChipLines(e);
         html+=`<div class="chip-resize-wrap" data-id="${e.id}">
           <div class="sched-chip${e.isPlaceholder?' is-placeholder':''}" style="${st}"
             data-id="${e.id}"
@@ -2361,7 +2390,10 @@ function schedRender(){
             onclick="event.stopPropagation();schedOpenEdit('${e.id}')"
             ondragstart="schedIsDesktop()&&schedDragStart(event,'${e.id}')">
             <div class="chip-dot"></div>
-            <span class="chip-txt">${esc(lbl)}${isSpan&&isFirst?' →':''}</span>
+            <div class="chip-txt">
+              <span class="chip-line-1">${esc(line1)}${isSpan&&isFirst?' →':''}</span>
+              ${line2?`<span class="chip-line-2">${esc(line2)}</span>`:''}
+            </div>
             <button class="chip-rm" onclick="event.stopPropagation();schedDeleteEntry('${e.id}','${ds}')">×</button>
           </div>
           ${isLast?`<button class="chip-resize-handle" style="color:${st.match(/color:([^;]+)/)?.[1]||'currentColor'}"
