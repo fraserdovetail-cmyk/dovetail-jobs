@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Dovetail Job Portal</title>
 <meta name="apple-mobile-web-app-title" content="Dovetail">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 
@@ -30,21 +30,79 @@ html{font-family:'Inter',sans-serif;font-size:15px;color:var(--text);background:
 body{min-height:100vh;overflow-x:hidden}
 
 /* ── LOGIN ── */
-#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:env(safe-area-inset-top) 1.25rem 1.25rem;background:var(--charcoal)}
-.login-wrap{width:100%;max-width:360px}
-.login-brand{text-align:center;margin-bottom:2rem}
-.login-logo-mark{width:52px;height:52px;background:var(--green);border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
-.login-logo-mark svg{width:26px;height:26px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.login-brand-name{font-size:22px;font-weight:600;color:#fff;letter-spacing:-0.4px}
-.login-brand-sub{font-size:13px;color:rgba(255,255,255,0.4);margin-top:3px}
-.login-card{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:var(--radius);padding:1.75rem}
-.login-card label{display:block;font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:6px;font-weight:500;letter-spacing:0.03em;text-transform:uppercase}
-.login-card input{width:100%;padding:11px 14px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);border-radius:var(--radius-sm);font-size:15px;font-family:'Inter',sans-serif;color:#fff;outline:none;transition:border-color 0.15s}
-.login-card input::placeholder{color:rgba(255,255,255,0.25)}
-.login-card input:focus{border-color:var(--green-mid)}
-.btn-login{width:100%;margin-top:12px;padding:12px;background:var(--green);color:#fff;border:none;border-radius:var(--radius-sm);font-size:15px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:background 0.15s;letter-spacing:-0.1px}
-.btn-login:hover{background:var(--green-mid)}
-.login-error{font-size:13px;color:#FCA5A5;text-align:center;margin-top:10px;min-height:20px}
+#login-screen{
+  display:flex;align-items:center;justify-content:center;
+  min-height:100vh;padding:env(safe-area-inset-top) 1.5rem 2rem;
+  background:#6B7F5A;
+}
+.login-wrap{width:100%;max-width:400px;text-align:center}
+.login-brand{margin-bottom:2.5rem}
+.login-wordmark-dovetail{
+  font-family:'Playfair Display',Georgia,serif;
+  font-size:clamp(52px,14vw,86px);
+  font-weight:700;
+  color:#fff;
+  letter-spacing:0.04em;
+  line-height:1;
+  margin:0;
+}
+.login-wordmark-sub{
+  font-family:'Playfair Display',Georgia,serif;
+  font-size:clamp(13px,3.5vw,20px);
+  font-weight:400;
+  color:#fff;
+  letter-spacing:0.22em;
+  text-transform:uppercase;
+  margin-top:4px;
+  line-height:1.2;
+}
+.login-stamford-row{
+  display:flex;align-items:center;justify-content:center;
+  gap:10px;margin-top:14px;
+}
+.login-stamford-rule{flex:1;height:1px;background:rgba(255,255,255,0.55);max-width:60px}
+.login-stamford-text{
+  font-family:'Inter',sans-serif;
+  font-size:12px;font-weight:400;
+  color:#fff;letter-spacing:0.28em;
+  text-transform:uppercase;
+  opacity:0.9;
+}
+.login-card{
+  background:rgba(0,0,0,0.15);
+  border:1px solid rgba(255,255,255,0.2);
+  border-radius:10px;
+  padding:1.75rem;
+  margin-top:0;
+  backdrop-filter:blur(4px);
+}
+.login-card label{
+  display:block;font-size:11px;color:rgba(255,255,255,0.65);
+  margin-bottom:7px;font-weight:500;letter-spacing:0.1em;
+  text-transform:uppercase;font-family:'Inter',sans-serif;text-align:left;
+}
+.login-card input{
+  width:100%;padding:12px 14px;
+  background:rgba(255,255,255,0.12);
+  border:1px solid rgba(255,255,255,0.25);
+  border-radius:7px;font-size:15px;
+  font-family:'Inter',sans-serif;color:#fff;outline:none;
+  transition:border-color 0.15s;
+}
+.login-card input::placeholder{color:rgba(255,255,255,0.35)}
+.login-card input:focus{border-color:rgba(255,255,255,0.7);background:rgba(255,255,255,0.16)}
+.btn-login{
+  width:100%;margin-top:14px;padding:13px;
+  background:rgba(255,255,255,0.18);
+  border:1px solid rgba(255,255,255,0.4);
+  color:#fff;border-radius:7px;
+  font-size:13px;font-weight:600;
+  font-family:'Inter',sans-serif;cursor:pointer;
+  transition:all 0.15s;letter-spacing:0.12em;text-transform:uppercase;
+}
+.btn-login:hover{background:rgba(255,255,255,0.28);border-color:rgba(255,255,255,0.6)}
+.login-error{font-size:13px;color:#FFD4D4;text-align:center;margin-top:10px;min-height:20px;font-family:'Inter',sans-serif}
+.login-stamp{text-align:center;margin-top:20px;font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:0.14em;text-transform:uppercase;font-family:'Inter',sans-serif}
 
 /* ── TOPBAR ── */
 #main-screen{display:none;flex-direction:column;min-height:100vh}
@@ -490,7 +548,7 @@ textarea.pp-input{resize:vertical;min-height:80px}
 .unsched-chip{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;background:var(--white);border:1px solid var(--amber-border);border-radius:10px;font-size:11px;font-weight:500;color:var(--amber);cursor:pointer;transition:all 0.12s}
 .unsched-chip:hover{background:var(--amber-light);border-color:var(--amber)}
 /* scroll wrapper */
-.sched-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sched-scroll{overflow-x:auto;overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;min-height:0}
 /* grid */
 .sched-grid-wrap{min-width:max-content}
 .sched-col-header-outer{
@@ -592,6 +650,43 @@ textarea.pp-input{resize:vertical;min-height:80px}
 }
 .sf-item{display:flex;align-items:center;gap:5px}
 .sf-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+/* manage contractors button */
+.sched-manage-trades-btn{
+  display:flex;align-items:center;justify-content:center;
+  width:24px;height:24px;border-radius:50%;
+  border:1px dashed var(--border-strong);background:none;
+  color:var(--hint);font-size:16px;line-height:1;cursor:pointer;
+  transition:all 0.15s;flex-shrink:0;margin-left:2px;
+}
+.sched-manage-trades-btn:hover{border-color:var(--green-mid);color:var(--green);background:var(--green-light)}
+/* manage contractors modal */
+.mcm-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:400;
+  align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)}
+.mcm-bg.open{display:flex}
+.mcm-box{background:var(--white);border-radius:var(--radius);width:100%;max-width:440px;overflow:hidden;box-shadow:var(--shadow-lg);max-height:90vh;display:flex;flex-direction:column}
+.mcm-hd{display:flex;align-items:center;justify-content:space-between;padding:13px 17px;background:var(--charcoal);flex-shrink:0}
+.mcm-title{font-size:13px;font-weight:600;color:#fff}
+.mcm-close{background:none;border:none;color:rgba(255,255,255,0.45);font-size:20px;cursor:pointer;line-height:1}
+.mcm-body{padding:16px;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
+.mcm-section-label{font-size:11px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px}
+.mcm-row{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:var(--radius-sm);background:var(--surface)}
+.mcm-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.mcm-name-input{flex:1;border:none;background:transparent;font-size:13px;font-family:'Inter',sans-serif;color:var(--text);outline:none;min-width:0}
+.mcm-name-input:read-only{color:var(--muted)}
+.mcm-edit-btn{background:none;border:none;cursor:pointer;color:var(--hint);font-size:12px;padding:2px 6px;border-radius:4px;transition:all 0.12s;white-space:nowrap}
+.mcm-edit-btn:hover{color:var(--green);background:var(--green-light)}
+.mcm-del-btn{background:none;border:none;cursor:pointer;color:var(--hint);font-size:16px;line-height:1;padding:2px 5px;border-radius:4px;transition:all 0.12s;flex-shrink:0}
+.mcm-del-btn:hover{color:var(--red);background:var(--red-light)}
+.mcm-add-row{display:flex;gap:8px;padding-top:4px}
+.mcm-add-input{flex:1;padding:8px 11px;border:1px solid var(--border);border-radius:var(--radius-sm);
+  font-size:13px;font-family:'Inter',sans-serif;color:var(--text);background:var(--white);outline:none;transition:border-color 0.15s}
+.mcm-add-input:focus{border-color:var(--green-mid)}
+.mcm-colour-row{display:flex;gap:5px;flex-wrap:wrap;padding:4px 0}
+.mcm-swatch{width:22px;height:22px;border-radius:4px;cursor:pointer;border:2px solid transparent;transition:all 0.12s;flex-shrink:0}
+.mcm-swatch.selected{border-color:var(--text);transform:scale(1.1)}
+.mcm-add-btn{padding:8px 14px;background:var(--green);color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;white-space:nowrap;transition:background 0.12s}
+.mcm-add-btn:hover{background:var(--green-mid)}
+.mcm-ft{padding:11px 16px;border-top:1px solid var(--border);background:var(--surface);flex-shrink:0;display:flex;justify-content:flex-end}
 /* schedule entry modal */
 .sem-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:300;
   align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)}
@@ -687,18 +782,21 @@ select.sem-input{cursor:pointer}
 <div id="login-screen">
   <div class="login-wrap">
     <div class="login-brand">
-      <div class="login-logo-mark">
-        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <div class="login-wordmark-dovetail">DOVETAIL</div>
+      <div class="login-wordmark-sub">Carpentry &amp; Building Ltd</div>
+      <div class="login-stamford-row">
+        <div class="login-stamford-rule"></div>
+        <div class="login-stamford-text">Stamford</div>
+        <div class="login-stamford-rule"></div>
       </div>
-      <div class="login-brand-name">Dovetail Job Portal</div>
-      <div class="login-brand-sub">Dovetail Carpentry &amp; Building Ltd</div>
     </div>
     <div class="login-card">
       <label for="pwd">Access code</label>
-      <input type="password" id="pwd" placeholder="Enter access code" autocomplete="current-password"/>
-      <button class="btn-login" onclick="doLogin()">Continue →</button>
+      <input type="password" id="pwd" placeholder="Enter access code" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/>
+      <button class="btn-login" onclick="doLogin()">Enter Portal</button>
       <div class="login-error" id="login-err"></div>
     </div>
+    <div class="login-stamp">Job Management Portal</div>
   </div>
 </div>
 
@@ -719,7 +817,7 @@ select.sem-input{cursor:pointer}
         <div class="sync-dot" id="sync-dot"></div>
         <span id="sync-label">Loading</span>
       </div>
-      <button class="btn-full-job" onclick="openNew()" style="font-size:12px;border-color:rgba(255,255,255,0.12);color:rgba(255,255,255,0.6)">Full job form</button>
+      <button class="sched-add-btn" onclick="openNew()" style="font-size:12px">+ New job</button>
     </div>
   </div>
 
@@ -756,12 +854,6 @@ select.sem-input{cursor:pointer}
       <div class="sched-range-label" id="sched-range-label">Loading…</div>
       <button class="sched-wn-btn" onclick="schedShift(1)">&#8250;</button>
       <button class="sched-today-btn" onclick="schedGoToday()">Today</button>
-      <div class="sched-view-toggle">
-        <button class="svt-opt" onclick="schedSetView('4w',this)">4 wk</button>
-        <button class="svt-opt active" onclick="schedSetView('8w',this)">8 wk</button>
-        <button class="svt-opt" onclick="schedSetView('6m',this)">6 mo</button>
-        <button class="svt-opt" onclick="schedSetView('1yr',this)">1 yr</button>
-      </div>
       <button class="sched-add-btn" onclick="schedOpenModal(null,null)">+ Add entry</button>
     </div>
 
@@ -772,17 +864,10 @@ select.sem-input{cursor:pointer}
       <button class="col-toggle-btn active" data-col="fraser" onclick="schedToggleCol('fraser',this)" style="background:#F5F3FF;border-color:#C4B5FD;color:#6D28D9"><span class="ctb-dot" style="background:#6D28D9"></span>Fraser</button>
       <span style="width:1px;height:14px;background:var(--border);margin:0 4px;flex-shrink:0"></span>
       <span class="sched-col-toggles-label" style="margin-right:0">Contractors</span>
-      <button class="col-toggle-btn active" data-col="barnetts" onclick="schedToggleCol('barnetts',this)" style="background:#FFFBEB;border-color:#FDE68A;color:#92400E"><span class="ctb-dot" style="background:#92400E"></span>Barnetts (plumber)</button>
-      <button class="col-toggle-btn" data-col="sec" onclick="schedToggleCol('sec',this)"><span class="ctb-dot" style="background:#065F46"></span>SEC (electrician)</button>
-      <button class="col-toggle-btn" data-col="kbc" onclick="schedToggleCol('kbc',this)"><span class="ctb-dot" style="background:#1E40AF"></span>KBC (bricklayer)</button>
-      <button class="col-toggle-btn" data-col="roofer" onclick="schedToggleCol('roofer',this)"><span class="ctb-dot" style="background:#5B21B6"></span>Roofer</button>
-      <button class="col-toggle-btn" data-col="painter" onclick="schedToggleCol('painter',this)"><span class="ctb-dot" style="background:#9D174D"></span>Painter</button>
-      <button class="col-toggle-btn" data-col="flooring" onclick="schedToggleCol('flooring',this)"><span class="ctb-dot" style="background:#0F766E"></span>Carpets/flooring</button>
-      <button class="col-toggle-btn" data-col="flowscreed" onclick="schedToggleCol('flowscreed',this)"><span class="ctb-dot" style="background:#C2410C"></span>Flowscreed</button>
-      <button class="col-toggle-btn" data-col="plasterer" onclick="schedToggleCol('plasterer',this)"><span class="ctb-dot" style="background:#0284C7"></span>Plasterer</button>
-      <button class="col-toggle-btn" data-col="tonino" onclick="schedToggleCol('tonino',this)"><span class="ctb-dot" style="background:#9333EA"></span>Tonino</button>
+      <span id="sched-col-toggles-dynamic" style="display:contents"></span>
       <span style="width:1px;height:14px;background:var(--border);margin:0 4px;flex-shrink:0"></span>
       <button class="col-toggle-btn active" data-col="notes" onclick="schedToggleCol('notes',this)"><span class="ctb-dot" style="background:var(--hint)"></span>Notes/Orders</button>
+      <button class="sched-manage-trades-btn" onclick="mcmOpen()" title="Add / edit contractors">+</button>
     </div>
 
     <!-- Unscheduled tray -->
@@ -835,6 +920,22 @@ select.sem-input{cursor:pointer}
     </div>
   </div>
 
+
+  <!-- MANAGE CONTRACTORS MODAL -->
+  <div class="mcm-bg" id="mcm-modal" onclick="mcmBgClick(event)">
+    <div class="mcm-box">
+      <div class="mcm-hd">
+        <span class="mcm-title">Manage Contractors</span>
+        <button class="mcm-close" onclick="mcmClose()">&#215;</button>
+      </div>
+      <div class="mcm-body" id="mcm-body">
+        <!-- rendered by JS -->
+      </div>
+      <div class="mcm-ft">
+        <button class="sem-btn-sec" onclick="mcmClose()">Done</button>
+      </div>
+    </div>
+  </div>
 
   <!-- SCHEDULE ENTRY MODAL -->
   <div class="sem-bg" id="sem-modal" onclick="semBgClick(event)">
@@ -2132,15 +2233,239 @@ const SUG_NOTE = ['Order timber','Order fixings','Skip delivery','Scaffold up','
 
 let schedEntries  = [];   // {id,col,jobId,text,colour,start,end,isPlaceholder}
 let schedViewStart= null;
-let schedViewWeeks= 8;
-let schedCols     = new Set(['tom','fraser','barnetts','notes']);
+let schedViewWeeks= 16;  // chunk size rendered at a time (not user-selectable)
+let schedInfiniteStart = null; // earliest date currently rendered
+let schedInfiniteEnd = null;   // latest date currently rendered
+const SCHED_CHUNK = 16; // weeks per chunk
+let schedCols     = new Set(['tom','fraser','barnetts','sec','kbc','roofer','painter','flooring','flowscreed','plasterer','tonino','notes']);
 let schedEditId   = null;
 let schedEntryType= 'job';
 let schedDragId   = null;
 let schedTouchDragId = null, schedTouchClone = null;
 let schedResizeId = null, schedResizeOrigEnd = null; // for bottom-handle resize
 
-function schedLoadLocal(){
+// ─── CUSTOM CONTRACTORS ───────────────────────────────────────────────────
+// Colour palette available when adding a custom contractor
+const CUSTOM_COL_PALETTE = [
+  {bg:'#FEE2E2',border:'#FCA5A5',text:'#B91C1C',avatar:'#DC2626'},
+  {bg:'#FEF3C7',border:'#FDE68A',text:'#92400E',avatar:'#D97706'},
+  {bg:'#ECFDF5',border:'#6EE7B7',text:'#065F46',avatar:'#059669'},
+  {bg:'#EFF6FF',border:'#93C5FD',text:'#1D4ED8',avatar:'#2563EB'},
+  {bg:'#F5F3FF',border:'#C4B5FD',text:'#6D28D9',avatar:'#7C3AED'},
+  {bg:'#FDF4FF',border:'#E9D5FF',text:'#7E22CE',avatar:'#9333EA'},
+  {bg:'#FDF2F8',border:'#F9A8D4',text:'#9D174D',avatar:'#DB2777'},
+  {bg:'#F0FDFA',border:'#99F6E4',text:'#0F766E',avatar:'#0D9488'},
+  {bg:'#FFF7ED',border:'#FED7AA',text:'#9A3412',avatar:'#EA580C'},
+  {bg:'#F0F9FF',border:'#BAE6FD',text:'#0369A1',avatar:'#0284C7'},
+  {bg:'#F1F5F9',border:'#CBD5E1',text:'#334155',avatar:'#475569'},
+  {bg:'#FFFBEB',border:'#FDE68A',text:'#92400E',avatar:'#B45309'},
+];
+
+let customContractors = []; // [{id,label,short,bg,border,text,avatar}]
+let mcmNewColIdx = 0; // selected colour index in add-new form
+
+function contractorsAllCols(){
+  // Merge built-in SCHED_COLS with custom contractors (before 'notes' entry)
+  const base = SCHED_COLS.filter(c=>c.id!=='notes');
+  const notes = SCHED_COLS.find(c=>c.id==='notes');
+  const custom = customContractors.map(c=>({...c}));
+  return [...base, ...custom, notes];
+}
+
+function contractorsSaveLocal(){
+  try{ localStorage.setItem('dtv_contractors_v1',JSON.stringify(customContractors)); }catch(e){}
+}
+function contractorsLoadLocal(){
+  try{ const r=localStorage.getItem('dtv_contractors_v1'); if(r) customContractors=JSON.parse(r); }catch(e){}
+}
+async function contractorsLoadFromAPI(){
+  try{
+    const d=await apiCall({action:'getContractors'});
+    if(d&&Array.isArray(d.contractors)){
+      customContractors=d.contractors;
+      contractorsSaveLocal();
+      schedRenderToggles();
+      schedRenderDropdown();
+    }
+  }catch(e){ console.warn('Contractors load failed, using local',e); }
+}
+async function contractorsSaveToAPI(){
+  contractorsSaveLocal();
+  try{ await apiCall({action:'saveContractors',contractors:customContractors}); }
+  catch(e){ console.warn('Contractors save failed',e); showToast('Saved locally — will sync when online'); }
+}
+
+// Re-render the column toggle bar from current SCHED_COLS + customContractors
+function schedRenderToggles(){
+  const bar = document.getElementById('sched-col-toggles-dynamic');
+  if(!bar) return;
+  const allCols = contractorsAllCols();
+  // Built-in contractor cols (fixed, no delete)
+  const builtinIds = SCHED_COLS.filter(c=>c.id!=='notes').map(c=>c.id);
+  bar.innerHTML = allCols.filter(c=>c.id!=='notes').map(c=>{
+    const active = schedCols.has(c.id);
+    const activeStyle = active ? `background:${c.bg};border-color:${c.border};color:${c.text}` : '';
+    return `<button class="col-toggle-btn${active?' active':''}" data-col="${c.id}"
+      onclick="schedToggleCol('${c.id}',this)"
+      style="${activeStyle}">
+      <span class="ctb-dot" style="background:${c.avatar}"></span>${esc(c.label)}
+    </button>`;
+  }).join('');
+}
+
+// Re-render the "Who" dropdown in the entry modal
+function schedRenderDropdown(){
+  const sel = document.getElementById('sem-col');
+  if(!sel) return;
+  const allCols = contractorsAllCols();
+  const fixed = ['tom','fraser','both'];
+  let html = `<option value="tom">Tom</option><option value="fraser">Fraser</option><option value="both">Tom &amp; Fraser</option>`;
+  allCols.filter(c=>!fixed.includes(c.id)&&c.id!=='notes').forEach(c=>{
+    html+=`<option value="${c.id}">${esc(c.label)}</option>`;
+  });
+  sel.innerHTML = html;
+}
+
+// ─── MCM MODAL ────────────────────────────────────────────────────────────
+function mcmOpen(){
+  mcmRender();
+  document.getElementById('mcm-modal').classList.add('open');
+}
+function mcmClose(){ document.getElementById('mcm-modal').classList.remove('open'); }
+function mcmBgClick(ev){ if(ev.target===document.getElementById('mcm-modal')) mcmClose(); }
+
+function mcmRender(){
+  const body = document.getElementById('mcm-body');
+  const builtinIds = new Set(SCHED_COLS.map(c=>c.id));
+
+  // Built-in contractors — editable names only
+  const builtinRows = SCHED_COLS.filter(c=>c.id!=='notes'&&c.id!=='tom'&&c.id!=='fraser').map(c=>`
+    <div class="mcm-row" id="mcm-row-${c.id}">
+      <div class="mcm-dot" style="background:${c.avatar}"></div>
+      <input class="mcm-name-input" id="mcm-inp-${c.id}" value="${esc(c.label)}" 
+        onblur="mcmSaveBuiltinName('${c.id}',this.value)"
+        onkeydown="if(event.key==='Enter')this.blur()"
+        placeholder="Contractor name">
+      <span style="font-size:10px;color:var(--hint);white-space:nowrap">tap to rename</span>
+    </div>`).join('');
+
+  // Custom contractors — editable names + delete
+  const customRows = customContractors.map((c,i)=>`
+    <div class="mcm-row" id="mcm-row-${c.id}">
+      <div class="mcm-dot" style="background:${c.avatar}"></div>
+      <input class="mcm-name-input" id="mcm-inp-${c.id}" value="${esc(c.label)}"
+        onblur="mcmSaveCustomName(${i},this.value)"
+        onkeydown="if(event.key==='Enter')this.blur()"
+        placeholder="Contractor name">
+      <button class="mcm-del-btn" onclick="mcmDelete(${i})" title="Remove">×</button>
+    </div>`).join('');
+
+  // Colour swatches for new entry
+  const swatches = CUSTOM_COL_PALETTE.map((p,i)=>`
+    <div class="mcm-swatch${i===mcmNewColIdx?' selected':''}" 
+      style="background:${p.bg};border-color:${i===mcmNewColIdx?p.text:'transparent'}"
+      onclick="mcmSelectCol(${i})" title="Choose colour"></div>`).join('');
+
+  body.innerHTML = `
+    <div>
+      <div class="mcm-section-label">Built-in contractors</div>
+      ${builtinRows}
+    </div>
+    ${customContractors.length?`<div>
+      <div class="mcm-section-label">Custom contractors</div>
+      ${customRows}
+    </div>`:''}
+    <div>
+      <div class="mcm-section-label">Add new contractor</div>
+      <div class="mcm-colour-row">${swatches}</div>
+      <div class="mcm-add-row">
+        <input class="mcm-add-input" id="mcm-new-name" placeholder="e.g. Tiler" 
+          onkeydown="if(event.key==='Enter')mcmAddNew()">
+        <button class="mcm-add-btn" onclick="mcmAddNew()">Add</button>
+      </div>
+    </div>`;
+}
+
+function mcmSelectCol(i){
+  mcmNewColIdx = i;
+  // Re-render just the swatches
+  const swatches = CUSTOM_COL_PALETTE.map((p,idx)=>`
+    <div class="mcm-swatch${idx===mcmNewColIdx?' selected':''}" 
+      style="background:${p.bg};border-color:${idx===mcmNewColIdx?p.text:'transparent'}"
+      onclick="mcmSelectCol(${idx})"></div>`).join('');
+  const row = document.querySelector('.mcm-colour-row');
+  if(row) row.innerHTML = swatches;
+}
+
+function mcmSaveBuiltinName(id, val){
+  val = val.trim();
+  if(!val) return;
+  const col = SCHED_COLS.find(c=>c.id===id);
+  if(col && col.label !== val){
+    col.label = val;
+    schedRenderToggles();
+    schedRenderDropdown();
+    schedRender();
+    // No separate save needed — built-in names stored in customContractors overrides if we want,
+    // but simplest: store as a name-override blob alongside customContractors
+    contractorsSaveToAPI();
+    showToast('Name updated');
+  }
+}
+
+function mcmSaveCustomName(idx, val){
+  val = val.trim();
+  if(!val) return;
+  if(customContractors[idx] && customContractors[idx].label !== val){
+    customContractors[idx].label = val;
+    // Update SCHED_COLS entry too if present
+    const col = SCHED_COLS.find(c=>c.id===customContractors[idx].id);
+    if(col) col.label = val;
+    schedRenderToggles();
+    schedRenderDropdown();
+    schedRender();
+    contractorsSaveToAPI();
+    showToast('Name updated');
+  }
+}
+
+function mcmDelete(idx){
+  const c = customContractors[idx];
+  if(!c) return;
+  // Remove from SCHED_COLS
+  const si = SCHED_COLS.findIndex(x=>x.id===c.id);
+  if(si>-1) SCHED_COLS.splice(si,1);
+  schedCols.delete(c.id);
+  customContractors.splice(idx,1);
+  schedRenderToggles();
+  schedRenderDropdown();
+  contractorsSaveToAPI();
+  schedRender();
+  mcmRender();
+  showToast('Contractor removed');
+}
+
+function mcmAddNew(){
+  const inp = document.getElementById('mcm-new-name');
+  const name = (inp?.value||'').trim();
+  if(!name){ showToast('Enter a name first'); return; }
+  const pal = CUSTOM_COL_PALETTE[mcmNewColIdx] || CUSTOM_COL_PALETTE[0];
+  const id = 'custom_'+Date.now();
+  const short = name.replace(/[^A-Z]/g,'').substring(0,2) || name.substring(0,2).toUpperCase();
+  const entry = {id, label:name, short, bg:pal.bg, border:pal.border, text:pal.text, avatar:pal.avatar};
+  customContractors.push(entry);
+  // Insert into SCHED_COLS before 'notes'
+  const ni = SCHED_COLS.findIndex(c=>c.id==='notes');
+  SCHED_COLS.splice(ni,0,{...entry});
+  inp.value='';
+  schedRenderToggles();
+  schedRenderDropdown();
+  contractorsSaveToAPI();
+  mcmRender();
+  showToast('Contractor added — toggle it on in the bar');
+}
+
+
   // Fallback: load from localStorage while API fetch is in progress
   try{ const r=localStorage.getItem('dtv_sched_v2'); if(r) schedEntries=JSON.parse(r); }catch(e){ schedEntries=[]; }
 }
@@ -2186,21 +2511,24 @@ function schedParseDate(s){ return new Date(s+'T12:00:00'); }
 function schedGetDates(){
   const dates=[], cur=new Date(schedViewStart), total=schedViewWeeks*7;
   for(let i=0;i<total;i++){
-    dates.push(new Date(cur)); // all 7 days — weekends shown lighter
+    dates.push(new Date(cur));
     cur.setDate(cur.getDate()+1);
   }
   return dates;
 }
 
 function schedShift(dir){ 
-  schedViewStart.setDate(schedViewStart.getDate()+dir*schedViewWeeks*7);
-  // Snap to Monday
+  // Jump 4 weeks at a time with the nav arrows
+  schedViewStart.setDate(schedViewStart.getDate()+dir*4*7);
   const dow=schedViewStart.getDay();
   if(dow!==1) schedViewStart.setDate(schedViewStart.getDate()+(dow===0?1:8-dow));
-  schedRender(); 
+  schedRender();
+  // Scroll to top of new view
+  const sc=document.getElementById('sched-scroll');
+  if(sc) sc.scrollTop=0;
 }
-function schedGoToday(){ schedViewStart=schedGetMonday(new Date()); schedRender(); }
-function schedSetView(v,btn){  document.querySelectorAll('.svt-opt').forEach(b=>b.classList.remove('active')); btn.classList.add('active');  schedViewWeeks=v==='4w'?4:v==='6m'?26:v==='1yr'?52:8; schedRender();}
+function schedGoToday(){ schedViewStart=schedGetMonday(new Date()); schedRender(); setTimeout(()=>{const sc=document.getElementById('sched-scroll');if(sc)sc.scrollTop=0;},50); }
+// schedSetView removed — no longer used (continuous scroll replaces view toggle)
 function schedToggleCol(id,btn){
   if(schedCols.has(id)){
     if(schedCols.size<=1){ showToast('At least one column must be visible'); return; }
@@ -2327,9 +2655,7 @@ function schedRenderUnscheduled(dates){
 
 function schedRender(){
   if(!schedViewStart) return;
-  // Shrink row height for long views so the year stays manageable
-  const rowH=schedViewWeeks>=26?32:schedViewWeeks>=12?40:52;
-  document.documentElement.style.setProperty('--sched-row-h', rowH+'px');
+  document.documentElement.style.setProperty('--sched-row-h', '52px');
   const dates=schedGetDates();
   const today=schedDateStr(new Date());
   const SMONTHS_S=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -2777,10 +3103,39 @@ function semBgClick(ev){ if(ev.target===document.getElementById('sem-modal')) se
 
 // ─── INIT ───
 function schedInit(){
-  schedLoadLocal(); // load local cache immediately for instant display
+  schedLoadLocal();
+  contractorsLoadLocal();
   schedViewStart=schedGetMonday(new Date());
   schedInitTouchDrag();
-  schedLoadFromAPI(); // then fetch fresh from Sheets in background
+  schedRenderToggles();
+  schedRenderDropdown();
+  schedLoadFromAPI();
+  contractorsLoadFromAPI();
+  // Infinite scroll: load more weeks when near bottom or top
+  const sc=document.getElementById('sched-scroll');
+  if(sc){
+    sc.addEventListener('scroll',()=>{
+      const nearBottom=sc.scrollTop+sc.clientHeight>=sc.scrollHeight-200;
+      const nearTop=sc.scrollTop<=200;
+      if(nearBottom){
+        // Append more weeks below
+        const newStart=new Date(schedViewStart);
+        newStart.setDate(newStart.getDate()+schedViewWeeks*7);
+        schedViewWeeks+=8;
+        schedRender();
+      } else if(nearTop && sc.scrollTop<80){
+        // Prepend more weeks above — shift start back
+        const prevHeight=sc.scrollHeight;
+        schedViewStart.setDate(schedViewStart.getDate()-8*7);
+        const dow=schedViewStart.getDay();
+        if(dow!==1) schedViewStart.setDate(schedViewStart.getDate()+(dow===0?1:8-dow));
+        schedViewWeeks+=8;
+        schedRender();
+        // Restore scroll position so user doesn't jump
+        requestAnimationFrame(()=>{ sc.scrollTop=sc.scrollHeight-prevHeight+sc.scrollTop; });
+      }
+    },{passive:true});
+  }
 }
 
 
