@@ -171,6 +171,7 @@ body{min-height:100vh;overflow-x:hidden}
 .kpi-card.clickable:hover{border-color:var(--border-strong);box-shadow:var(--shadow)}
 .kpi-card.accent-green{border-color:var(--green-border);background:var(--green-light)}
 .kpi-card.accent-amber{border-color:var(--amber-border);background:var(--amber-light)}
+.kpi-card.accent-blue{border-color:var(--blue-border);background:var(--blue-light)}
 .kpi-label{font-size:11px;font-weight:600;color:var(--hint);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px}
 .kpi-val{font-size:30px;font-weight:300;color:var(--text);letter-spacing:-1px;line-height:1}
 .kpi-sub{font-size:12px;color:var(--hint);margin-top:5px}
@@ -201,6 +202,21 @@ body{min-height:100vh;overflow-x:hidden}
 .chase-name{font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .chase-meta{font-size:12px;color:var(--amber)}
 .dash-empty{padding:16px;font-size:13px;color:var(--hint);font-style:italic}
+.declined-item{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;border-bottom:1px solid var(--border);transition:background 0.12s}
+.declined-item:last-child{border-bottom:none}
+.declined-item:hover{background:var(--surface)}
+.declined-dot{width:8px;height:8px;border-radius:50%;background:var(--border-strong);flex-shrink:0}
+.declined-info{flex:1;min-width:0}
+.declined-name{font-size:13px;font-weight:500;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.declined-meta{font-size:12px;color:var(--hint)}
+.s-declined{background:#F4F4F5;color:#52525B}
+.needs-quote-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.nq-item{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;border-bottom:1px solid var(--border);transition:background 0.12s}
+.nq-item:last-child{border-bottom:none}
+.nq-item:hover{background:var(--surface)}
+.nq-info{flex:1;min-width:0}
+.nq-name{font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nq-meta{font-size:12px;color:var(--muted)}
 
 /* ── CALENDAR (dashboard) ── */
 .cal-wrap{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:4px}
@@ -415,6 +431,10 @@ textarea.finput{resize:vertical;min-height:68px;line-height:1.5}
 .modal-ft-right{display:flex;gap:8px}
 .btn-del{padding:8px 14px;background:transparent;color:var(--red);border:1px solid var(--red-border);border-radius:var(--radius-sm);font-size:13px;font-family:'Inter',sans-serif;cursor:pointer;transition:all 0.12s;font-weight:500}
 .btn-del:hover{background:var(--red-light)}
+.btn-decline{padding:7px 12px;background:none;border:1px solid var(--border-strong);color:var(--muted);border-radius:var(--radius-sm);font-size:12px;font-weight:500;font-family:'Inter',sans-serif;cursor:pointer;transition:all 0.15s}
+.btn-decline:hover{border-color:#DC2626;color:#DC2626;background:#FEF2F2}
+.btn-decline.btn-decline-active{border-color:var(--green-border);color:var(--green);background:var(--green-light)}
+.btn-decline.btn-decline-active:hover{border-color:var(--green-mid)}
 .btn-dup{padding:8px 12px;background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:'Inter',sans-serif;cursor:pointer;transition:all 0.12s;display:flex;align-items:center;gap:5px}
 .btn-dup:hover{background:var(--surface);color:var(--text)}
 .btn-whatsapp{padding:8px 12px;background:#DCF8C6;color:#075E54;border:1px solid #B7EBA1;border-radius:var(--radius-sm);font-size:13px;font-family:'Inter',sans-serif;cursor:pointer;transition:all 0.12s;display:flex;align-items:center;gap:5px;text-decoration:none;font-weight:500}
@@ -849,13 +869,23 @@ select.sem-input{cursor:pointer}
       <div class="offline-queue-bar" id="offline-queue-bar">⚡ <span id="offline-queue-count">0</span> job(s) queued to sync when back online. <button onclick="retrySyncQueue()" style="background:none;border:none;color:var(--amber);font-weight:600;cursor:pointer;font-size:12px;margin-left:4px">Retry now</button></div>
       <div class="dash-kpi-row" id="dash-kpis"></div>
       <div class="dash-row">
-        <div class="dash-panel" id="dash-starts-panel">
-          <div class="dash-panel-hd"><span class="dash-panel-title">Upcoming starts · 14 days</span></div>
-          <div class="dash-panel-body" id="dash-starts-body"><div class="dash-empty">No starts scheduled</div></div>
+        <div class="dash-panel" id="dash-quotes-panel">
+          <div class="dash-panel-hd"><span class="dash-panel-title">Needs quoting</span></div>
+          <div class="dash-panel-body" id="dash-quotes-body"><div class="dash-empty">No jobs awaiting quote</div></div>
         </div>
         <div class="dash-panel" id="dash-chase-panel">
           <div class="dash-panel-hd"><span class="dash-panel-title">Chase up · quotes 7+ days old</span></div>
           <div class="dash-panel-body" id="dash-chase-body"><div class="dash-empty">All quotes up to date</div></div>
+        </div>
+      </div>
+      <div class="dash-row" style="margin-top:0">
+        <div class="dash-panel" id="dash-starts-panel">
+          <div class="dash-panel-hd"><span class="dash-panel-title">Upcoming starts · 14 days</span></div>
+          <div class="dash-panel-body" id="dash-starts-body"><div class="dash-empty">No starts scheduled</div></div>
+        </div>
+        <div class="dash-panel" id="dash-declined-panel" style="border-color:var(--border-strong)">
+          <div class="dash-panel-hd" style="background:#F4F4F5"><span class="dash-panel-title" style="color:var(--hint)">Declined jobs</span><span id="dash-declined-count" style="font-size:11px;color:var(--hint)"></span></div>
+          <div class="dash-panel-body" id="dash-declined-body"><div class="dash-empty">None</div></div>
         </div>
       </div>
     </div>
@@ -1427,6 +1457,7 @@ function parseJob(j){
     prestartDate:parseDate(j.prestartDate||''),prestartTime:safeStr(j.prestartTime||''),
     durationNum:safeStr(j.durationNum),durationUnit:safeStr(j.durationUnit)||'days',
     notes:safeStr(j.notes),stage:parseInt(safeStr(j.stage))||0,
+    declined:safeBool(j.declined),
     created:safeStr(j.created),updated:safeStr(j.updated),
     gcalAdded:safeBool(j.gcalAdded),depositReceived:safeBool(j.depositReceived),
     activityLog:(()=>{ try{ const v=j.activityLog; if(!v||v==='') return []; return typeof v==='string'?JSON.parse(v):v; }catch(e){return [];} })(),
@@ -1484,33 +1515,32 @@ function populateStageFilter(){ const s=document.getElementById('stage-filter');
 function renderDashboard(){
   const today=new Date(); today.setHours(0,0,0,0);
   const todayStr=toDateStr(today);
-  const active=jobs.filter(j=>j.stage>0&&j.stage<9);
-  const activeVal=active.reduce((a,j)=>a+safeNum(j.value),0);
-  const quotesOut=jobs.filter(j=>j.stage===2).length;
-  const overdueList=jobs.filter(j=>isOverdue(j));
 
-  const dayOfWeek=today.getDay();
-  const weekStart=new Date(today); weekStart.setDate(today.getDate()+(dayOfWeek===0?-6:1-dayOfWeek));
-  const weekEnd=new Date(weekStart); weekEnd.setDate(weekStart.getDate()+6);
-  const startsThisWeek=jobs.filter(j=>{
-    if(!j.startDate) return false;
-    const d=new Date(j.startDate+'T12:00:00');
-    return d>=weekStart&&d<=weekEnd;
-  });
+  const activeJobs=jobs.filter(j=>!j.declined&&j.stage>0&&j.stage<9);
+  const activeVal=activeJobs.reduce((a,j)=>a+safeNum(j.value),0);
+  const quotesOut=jobs.filter(j=>!j.declined&&j.stage===2).length;
+  const overdueList=jobs.filter(j=>!j.declined&&isOverdue(j));
 
+  // Needs quoting: stages 0 (Initial contact) and 1 (Viewed job), newest first
+  const needsQuoting=jobs.filter(j=>!j.declined&&(j.stage===0||j.stage===1))
+    .sort((a,b)=>safeNum(b.created)-safeNum(a.created));
+
+  // Upcoming starts
   const soon=new Date(today); soon.setDate(today.getDate()+14);
   const upcomingStarts=jobs.filter(j=>{
-    if(!j.startDate) return false;
+    if(!j.startDate||j.declined) return false;
     const d=new Date(j.startDate+'T12:00:00');
     return d>=today&&d<=soon;
   }).sort((a,b)=>a.startDate.localeCompare(b.startDate));
 
-  const chaseList=jobs.filter(j=>isChaseNeeded(j));
+  const chaseList=jobs.filter(j=>!j.declined&&isChaseNeeded(j));
+  const declinedList=jobs.filter(j=>j.declined).sort((a,b)=>safeNum(b.updated)-safeNum(a.updated));
 
+  // KPI tiles — replace "starts this week" with "needs quoting"
   document.getElementById('dash-kpis').innerHTML=`
-    <div class="kpi-card${active.length?' accent-green':''}">
+    <div class="kpi-card${activeJobs.length?' accent-green':''}">
       <div class="kpi-label">Active jobs</div>
-      <div class="kpi-val">${active.length}</div>
+      <div class="kpi-val">${activeJobs.length}</div>
       <div class="kpi-sub">£${activeVal>=1000?Math.round(activeVal/1000)+'k':activeVal.toLocaleString()} in progress</div>
     </div>
     <div class="kpi-card clickable" onclick="filterToStage(2)">
@@ -1518,10 +1548,10 @@ function renderDashboard(){
       <div class="kpi-val">${quotesOut}</div>
       <div class="kpi-sub">awaiting approval</div>
     </div>
-    <div class="kpi-card">
-      <div class="kpi-label">Starts this week</div>
-      <div class="kpi-val">${startsThisWeek.length}</div>
-      <div class="kpi-sub">${startsThisWeek.map(j=>esc(j.name||'Untitled')).slice(0,2).join(', ')||'none scheduled'}</div>
+    <div class="kpi-card clickable${needsQuoting.length?' accent-blue':''}" onclick="filterToStage(0)" style="${needsQuoting.length?'border-color:var(--blue-border);background:var(--blue-light)':''}">
+      <div class="kpi-label" style="${needsQuoting.length?'color:var(--blue)':''}">Needs quoting</div>
+      <div class="kpi-val" style="${needsQuoting.length?'color:var(--blue)':''}">${needsQuoting.length}</div>
+      <div class="kpi-sub">${needsQuoting.length?'quote required':'all quoted'}</div>
     </div>
     ${overdueList.length?`<div class="kpi-card accent-amber clickable" onclick="filterToSort('overdue')">
       <div class="kpi-label">Overdue starts</div>
@@ -1529,11 +1559,33 @@ function renderDashboard(){
       <div class="kpi-sub">start date passed</div>
     </div>`:`<div class="kpi-card">
       <div class="kpi-label">Total jobs</div>
-      <div class="kpi-val">${jobs.length}</div>
+      <div class="kpi-val">${jobs.filter(j=>!j.declined).length}</div>
       <div class="kpi-sub">${jobs.filter(j=>j.stage===9).length} completed</div>
     </div>`}
   `;
 
+  // Needs quoting panel
+  const quotesBody=document.getElementById('dash-quotes-body');
+  if(needsQuoting.length){
+    quotesBody.innerHTML=needsQuoting.map(j=>{
+      const stageCol=j.stage===0?'#1E40AF':'#5B21B6';
+      const stageBg=j.stage===0?'#DBEAFE':'#EDE9FE';
+      const created=j.created?new Date(safeNum(j.created)):null;
+      const daysAgo=created?Math.floor((today-created)/86400000):null;
+      const ageStr=daysAgo===0?'Today':daysAgo===1?'Yesterday':(daysAgo!=null?daysAgo+'d ago':'');
+      return `<div class="nq-item" onclick="openJob('${j.id}')">
+        <div class="needs-quote-dot" style="background:${stageCol}"></div>
+        <div class="nq-info">
+          <div class="nq-name">${esc(j.name||'Untitled')} — ${esc(j.client||'—')}</div>
+          <div class="nq-meta"><span style="background:${stageBg};color:${stageCol};padding:1px 7px;border-radius:10px;font-size:10px;font-weight:600">${STAGES[j.stage]}</span>${ageStr?' · '+ageStr:''}${j.value?' · '+fmtVal(j.value):''}</div>
+        </div>
+      </div>`;
+    }).join('');
+  } else {
+    quotesBody.innerHTML='<div class="dash-empty">No jobs awaiting quote</div>';
+  }
+
+  // Upcoming starts panel
   const startsBody=document.getElementById('dash-starts-body');
   if(upcomingStarts.length){
     startsBody.innerHTML=upcomingStarts.map(j=>{
@@ -1554,6 +1606,7 @@ function renderDashboard(){
     startsBody.innerHTML='<div class="dash-empty">No starts in next 14 days</div>';
   }
 
+  // Chase up panel
   const chaseBody=document.getElementById('dash-chase-body');
   if(chaseList.length){
     chaseBody.innerHTML=chaseList.map(j=>{
@@ -1568,6 +1621,23 @@ function renderDashboard(){
     }).join('');
   } else {
     chaseBody.innerHTML='<div class="dash-empty">All quotes up to date</div>';
+  }
+
+  // Declined panel
+  const decBody=document.getElementById('dash-declined-body');
+  const decCount=document.getElementById('dash-declined-count');
+  if(declinedList.length){
+    if(decCount) decCount.textContent=declinedList.length+' job'+(declinedList.length!==1?'s':'');
+    decBody.innerHTML=declinedList.map(j=>`<div class="declined-item" onclick="openJob('${j.id}')">
+      <div class="declined-dot"></div>
+      <div class="declined-info">
+        <div class="declined-name">${esc(j.name||'Untitled')} — ${esc(j.client||'—')}</div>
+        <div class="declined-meta">${STAGES[j.stage]}${j.value?' · '+fmtVal(j.value):''}</div>
+      </div>
+    </div>`).join('');
+  } else {
+    if(decCount) decCount.textContent='';
+    decBody.innerHTML='<div class="dash-empty">None</div>';
   }
 }
 
@@ -1604,6 +1674,7 @@ function renderJobs(){
   const q=(document.getElementById('search').value||'').toLowerCase();
   const sf=document.getElementById('stage-filter').value;
   let list=getSorted(jobs.filter(j=>{
+    if(j.declined) return false;
     const ms=sf===''||j.stage==sf;
     const mq=!q||[j.name,j.client,j.ref,j.address,j.phone].some(f=>safeStr(f).toLowerCase().includes(q));
     return ms&&mq;
@@ -1662,7 +1733,7 @@ async function advance(e,id){
 // ══════════════════════════════════════════════════════════════════════════
 function renderPipeline(){
   document.getElementById('pipeline').innerHTML=STAGES.map((s,i)=>{
-    const cols=jobs.filter(j=>j.stage===i),val=cols.reduce((a,j)=>a+safeNum(j.value),0);
+    const cols=jobs.filter(j=>!j.declined&&j.stage===i),val=cols.reduce((a,j)=>a+safeNum(j.value),0);
     return `<div class="pipe-col">
       <div class="pipe-col-hd">${s}<span class="pipe-count">${cols.length}</span></div>
       <div class="pipe-val">${val>0?'£'+val.toLocaleString():''}</div>
@@ -1687,7 +1758,7 @@ function openJob(id){
   const d=j||{
     id:genId(),ref:genRef(),name:'',client:'',phone:'',email:'',address:'',value:'',
     startDate:'',startTime:'',prestartDate:'',prestartTime:'',
-    durationNum:'',durationUnit:'days',notes:'',stage:0,
+    durationNum:'',durationUnit:'days',notes:'',stage:0,declined:false,
     gcalAdded:false,depositReceived:false,
     activityLog:[],siteLog:[],promptHistory:[],
     created:String(Date.now()),updated:String(Date.now())
@@ -1796,8 +1867,7 @@ function openJob(id){
   document.getElementById('modal-ft').innerHTML=`
     <div class="modal-ft-left">
       ${!isNew?`<button class="btn-del" onclick="deleteJob('${d.id}')">Delete</button>`:''}
-
-
+      ${!isNew?`<button class="btn-decline${d.declined?' btn-decline-active':''}" onclick="toggleDecline('${d.id}')">${d.declined?'↩ Reinstate':'✕ Decline'}</button>`:''}
     </div>
     <div class="modal-ft-right">
       <button class="btn-cancel" onclick="closeModal()">Cancel</button>
@@ -1926,12 +1996,24 @@ async function deleteJob(id){
   jobs=jobs.filter(x=>x.id!==id); closeModal(); renderAll(); await deleteJobApi(id);
 }
 
+async function toggleDecline(id){
+  const idx=jobs.findIndex(x=>x.id===id); if(idx<0) return;
+  const job={...jobs[idx]};
+  job.declined=!job.declined;
+  job.updated=String(Date.now());
+  jobs[idx]=job;
+  closeModal();
+  renderAll();
+  await pushJob(job);
+  showToast(job.declined?'Job marked as declined':'Job reinstated');
+}
+
 async function duplicateJob(id){
   const orig=jobs.find(x=>x.id===id); if(!orig) return;
   const newId=genId(), newRef=genRef();
   const dup={...orig,id:newId,ref:newRef,
     name:(orig.name?orig.name+' (copy)':'Copy'),
-    stage:0,gcalAdded:false,depositReceived:false,
+    stage:0,gcalAdded:false,depositReceived:false,declined:false,
     activityLog:[{stage:0,stageName:STAGES[0],ts:Date.now()}],
     siteLog:[],promptHistory:[],
     created:String(Date.now()),updated:String(Date.now())
