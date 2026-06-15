@@ -647,6 +647,30 @@ textarea.pp-input{resize:vertical;min-height:80px}
   display:none;align-items:center;justify-content:center;flex-shrink:0;padding:0;
 }
 .sched-chip:hover .chip-rm{display:flex}
+  .chip-confirm {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  background: transparent;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  margin-top: 1px;
+  opacity: 0.45;
+  transition: opacity 0.15s, background 0.15s;
+}
+.chip-confirm:hover {
+  opacity: 1;
+}
+.chip-confirm.chip-confirm-on {
+  background: #16A34A;
+  border-color: #16A34A;
+  opacity: 1;
+}
 /* Resize handle — shown on last day of a multi-day entry */
 .chip-resize-wrap{position:relative;display:flex;flex-direction:column}
 .chip-resize-handle{
@@ -1112,7 +1136,7 @@ select.sem-input{cursor:pointer}
       </div>
       <div class="pp-section" id="pp-s2">
         <div class="pp-sec-hd"><div class="pp-sec-num">2</div><div class="pp-sec-title">Job brief &amp; specification</div></div>
-        <div class="pp-sec-desc">Paste spec, dimensions, drawings description, site visit notes. More detail = better output.</div>
+        <div class="pp-sec-desc">Paste spec, dimensions, drawings deion, site visit notes. More detail = better output.</div>
         <div class="pp-card"><div class="pp-card-inner">
           <div class="pp-field"><label class="pp-lbl">Full brief <span class="hint">— paste spec, notes, drawings</span></label><textarea class="pp-input" id="pp-brief" rows="8" placeholder="e.g. Single storey rear extension 4.0m × 3.5m..."></textarea></div>
           <div class="pp-field-row">
@@ -1349,6 +1373,13 @@ function updateQueueBar(){
   } else {
     bar.classList.remove('show');
   }
+  async function schedToggleConfirmed(id) {
+  const idx = schedEntries.findIndex(x => x.id === id);
+  if (idx < 0) return;
+  schedEntries[idx] = { ...schedEntries[idx], confirmed: !schedEntries[idx].confirmed };
+  schedSaveToAPI();
+  schedRender();
+}
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -2805,19 +2836,29 @@ function schedRender(){
         const st=schedChipStyle(e);
         const lbl=schedChipLabel(e);
         const {line1,line2}=schedChipLines(e);
-        html+=`<div class="chip-resize-wrap" data-id="${e.id}">
-          <div class="sched-chip${e.isPlaceholder?' is-placeholder':''}" style="${st}"
-            data-id="${e.id}"
-            draggable="${schedIsDesktop()}"
-            onclick="event.stopPropagation();schedOpenEdit('${e.id}')"
-            ondragstart="schedIsDesktop()&&schedDragStart(event,'${e.id}')">
-            <div class="chip-dot"></div>
-            <div class="chip-txt">
-              <span class="chip-line-1">${esc(line1)}${isSpan&&isFirst?' →':''}</span>
-              ${line2?`<span class="chip-line-2">${esc(line2)}</span>`:''}
-            </div>
-            <button class="chip-rm" onclick="event.stopPropagation();schedDeleteEntry('${e.id}','${ds}')">×</button>
-          </div>
+      const isContractor = col.id !== 'tom' && col.id !== 'fraser';
+const confirmed = !!e.confirmed;
+const confirmBtn = isContractor ? `<button
+  class="chip-confirm${confirmed ? ' chip-confirm-on' : ''}"
+  onclick="event.stopPropagation();schedToggleConfirmed('${e.id}')"
+  title="${confirmed ? 'Confirmed — click to unconfirm' : 'Click to confirm dates'}">
+  ${confirmed ? `<svg width="7" height="6" viewBox="0 0 7 6" fill="none"><polyline points="0.8 3 2.5 4.7 6.2 0.8" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>` : ''}
+</button>` : '';
+
+html+=`<div class="chip-resize-wrap" data-id="${e.id}">
+  <div class="sched-chip${e.isPlaceholder?' is-placeholder':''}" style="${st}"
+    data-id="${e.id}"
+    draggable="${schedIsDesktop()}"
+    onclick="event.stopPropagation();schedOpenEdit('${e.id}')"
+    ondragstart="schedIsDesktop()&&schedDragStart(event,'${e.id}')">
+    <div class="chip-dot"></div>
+    <div class="chip-txt">
+      <span class="chip-line-1">${esc(line1)}${isSpan&&isFirst?' →':''}</span>
+      ${line2?`<span class="chip-line-2">${esc(line2)}</span>`:''}
+    </div>
+    ${confirmBtn}
+    <button class="chip-rm" onclick="event.stopPropagation();schedDeleteEntry('${e.id}','${ds}')">×</button>
+  </div>
           ${isLast?`<button class="chip-resize-handle" style="color:${st.match(/color:([^;]+)/)?.[1]||'currentColor'}"
             title="Drag to extend"
             onmousedown="event.stopPropagation();schedResizeStart(event,'${e.id}','${ds}')"
