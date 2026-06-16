@@ -312,6 +312,17 @@ body{min-height:100vh;overflow-x:hidden}
 .s7{background:var(--green-light);color:var(--green-dark)}
 .s8{background:var(--green-light);color:var(--green-dark)}
 .s9{background:#F4F4F5;color:#52525B}
+.s10{background:var(--sage-light);color:var(--sage-dark)}
+
+/* ── ARCHIVE SECTION ── */
+.archive-toggle-row{display:flex;align-items:center;gap:10px;padding:12px 0 6px;cursor:pointer;user-select:none}
+.archive-toggle-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;color:var(--muted);font-family:'Inter',sans-serif;cursor:pointer;transition:all 0.12s}
+.archive-toggle-btn:hover{border-color:var(--border-strong);color:var(--text)}
+.archive-toggle-btn.active{background:var(--sage-light);border-color:var(--sage);color:var(--sage-dark)}
+.archive-count-badge{font-size:11px;font-family:'JetBrains Mono',monospace;background:var(--border);color:var(--muted);border-radius:8px;padding:1px 7px}
+.archive-toggle-btn.active .archive-count-badge{background:var(--sage);color:#fff}
+.btn-unarchive{padding:7px 12px;background:transparent;border:1px solid var(--sage);color:var(--sage-dark);border-radius:var(--radius-sm);font-size:12px;font-weight:500;font-family:'Inter',sans-serif;cursor:pointer;transition:all 0.12s}
+.btn-unarchive:hover{background:var(--sage-light)}
 
 /* ── PIPELINE ── */
 .pipeline-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;padding:18px}
@@ -1024,6 +1035,18 @@ select.sem-input{cursor:pointer}
       </select>
     </div>
     <div class="jobs-list" id="jobs-list"></div>
+
+    <!-- Archive section -->
+    <div id="jobs-archive-section" style="display:none">
+      <div class="archive-toggle-row">
+        <button id="archive-toggle-btn" class="archive-toggle-btn" onclick="toggleArchive()">
+          <svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="16" height="12" rx="2"/><path d="M2 6l2-4h12l2 4"/><line x1="10" y1="10" x2="10" y2="14"/></svg>
+          Archive
+          <span id="archive-count-badge" class="archive-count-badge">0</span>
+        </button>
+      </div>
+      <div class="jobs-list" id="archive-jobs-list" style="display:none"></div>
+    </div>
   </div>
 
   <!-- PIPELINE -->
@@ -1365,7 +1388,8 @@ const BOM_LEAD_DEFAULTS = [
 
 const API  = 'https://script.google.com/macros/s/AKfycbyw1VCKKJ3sFE53P4gfoLKgvTw_d4RK0tXXQvnRZQYPn_Wisb5-qnH9CsmtB49KP9zT/exec';
 const PASS = 'Dovetail2025!';
-const STAGES = ['Initial contact','Viewed job','Quote submitted','Quote approved','Deposit issued','Deposit paid','Start date approved','Work commenced','Work completed','Invoice issued'];
+const STAGES = ['Initial contact','Viewed job','Quote submitted','Quote approved','Deposit issued','Deposit paid','Start date approved','Work commenced','Work completed','Invoice issued','Archived'];
+let showArchived = false;
 const MONTHS  = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const SMONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const CHASE_DAYS = 7;
@@ -1613,7 +1637,7 @@ function renderDashboard(){
   const today=new Date(); today.setHours(0,0,0,0);
   const todayStr=toDateStr(today);
 
-  const activeJobs=jobs.filter(j=>!j.declined&&j.stage>0&&j.stage<9);
+  const activeJobs=jobs.filter(j=>!j.declined&&j.stage>0&&j.stage<10);
   const activeVal=activeJobs.reduce((a,j)=>a+safeNum(j.value),0);
   const quotesOut=jobs.filter(j=>!j.declined&&j.stage===2).length;
   const overdueList=jobs.filter(j=>!j.declined&&isOverdue(j));
@@ -1770,56 +1794,92 @@ function getSorted(list){
 function renderJobs(){
   const q=(document.getElementById('search').value||'').toLowerCase();
   const sf=document.getElementById('stage-filter').value;
+  const archivedJobs=jobs.filter(j=>!j.declined&&j.stage===10);
   let list=getSorted(jobs.filter(j=>{
     if(j.declined) return false;
+    if(j.stage===10) return false; // archived always hidden from main list
     const ms=sf===''||j.stage==sf;
     const mq=!q||[j.name,j.client,j.ref,j.address,j.phone].some(f=>safeStr(f).toLowerCase().includes(q));
     return ms&&mq;
   }));
   const el=document.getElementById('jobs-list');
-  if(!list.length){ el.innerHTML=`<div class="empty"><div class="empty-title">${jobs.length?'No matching jobs':'No jobs yet'}</div><p>${jobs.length?'Try adjusting filters':'Use the quick capture bar above to log an enquiry'}</p></div>`; return; }
-  el.innerHTML=list.map(j=>{
-    const od=isOverdue(j),ch=isChaseNeeded(j),dl=durLabel(j),val=fmtVal(j.value),url=gcalUrl(j);
-    const gcalFoot=j.gcalAdded?`<span class="gcal-badge">${calSvg()} In Google Cal</span>`:(url?`<a class="gcal-export" href="${url}" target="_blank" onclick="event.stopPropagation()">${calSvg()} Add to Google Cal</a>`:'');
-    const depFoot=j.depositReceived?`<span style="color:var(--green);font-weight:500">✓ Deposit received</span>`:j.stage>=4?`<span style="color:var(--amber)">Deposit pending</span>`:'';
-    const timeStr=j.startTime?` ${j.startTime}`:'';
-    const prestartStr=j.prestartDate?`Pre-start: ${j.prestartDate}${j.prestartTime?' '+j.prestartTime:''}`:''
-    return `<div class="job-card${od?' overdue':ch?' chasing':''}" onclick="openJob('${j.id}')">
-      <div class="job-card-body">
-        ${(od||ch||j.depositReceived)?`<div class="job-flags">
-          ${od?'<span class="flag flag-overdue">⚠ Start date passed</span>':''}
-          ${ch?'<span class="flag flag-chase">⏳ Chase quote</span>':''}
-          ${j.depositReceived?'<span class="flag flag-deposit">✓ Deposit in</span>':''}
-        </div>`:''}
-        <div class="job-card-top">
-          <div class="job-card-meta">
-            <div class="job-ref">${j.ref}</div>
-            <div class="job-name">${esc(j.name||'Untitled job')}</div>
-            <div class="job-client">${esc(j.client||'—')}</div>
-          </div>
-          <div class="job-right">
-            <span class="stage-pill s${j.stage}">${STAGES[j.stage]}</span>
-            ${j.stage<9?`<button class="next-btn" onclick="advance(event,'${j.id}')">→ ${STAGES[j.stage+1]}</button>`:''}
-          </div>
+  if(!list.length){ el.innerHTML=`<div class="empty"><div class="empty-title">${jobs.length?'No matching jobs':'No jobs yet'}</div><p>${jobs.length?'Try adjusting filters':'Use the quick capture bar above to log an enquiry'}</p></div>`; }
+  else { el.innerHTML=list.map(j=>renderJobCard(j)).join(''); }
+
+  // Archive section
+  const archiveSection=document.getElementById('jobs-archive-section');
+  if(archiveSection){
+    const btn=document.getElementById('archive-toggle-btn');
+    const badge=document.getElementById('archive-count-badge');
+    if(badge) badge.textContent=archivedJobs.length;
+    if(btn) btn.classList.toggle('active',showArchived);
+    const archiveList=document.getElementById('archive-jobs-list');
+    if(archiveList){
+      archiveList.style.display=showArchived?'flex':'none';
+      if(showArchived) archiveList.innerHTML=archivedJobs.length
+        ? archivedJobs.map(j=>renderJobCard(j)).join('')
+        : '<div class="empty" style="padding:1.5rem"><p>No archived jobs</p></div>';
+    }
+    archiveSection.style.display=archivedJobs.length||showArchived?'block':'none';
+  }
+}
+
+function renderJobCard(j){
+  const od=isOverdue(j),ch=isChaseNeeded(j),dl=durLabel(j),val=fmtVal(j.value),url=gcalUrl(j);
+  const gcalFoot=j.gcalAdded?`<span class="gcal-badge">${calSvg()} In Google Cal</span>`:(url?`<a class="gcal-export" href="${url}" target="_blank" onclick="event.stopPropagation()">${calSvg()} Add to Google Cal</a>`:'');
+  const depFoot=j.depositReceived?`<span style="color:var(--green);font-weight:500">✓ Deposit received</span>`:j.stage>=4&&j.stage<10?`<span style="color:var(--amber)">Deposit pending</span>`:'';
+  const timeStr=j.startTime?` ${j.startTime}`:'';
+  const prestartStr=j.prestartDate?`Pre-start: ${j.prestartDate}${j.prestartTime?' '+j.prestartTime:''}`:''
+  const isArchived=j.stage===10;
+  return `<div class="job-card${od&&!isArchived?' overdue':ch&&!isArchived?' chasing':''}" onclick="openJob('${j.id}')">
+    <div class="job-card-body">
+      ${(od||ch||j.depositReceived)&&!isArchived?`<div class="job-flags">
+        ${od?'<span class="flag flag-overdue">⚠ Start date passed</span>':''}
+        ${ch?'<span class="flag flag-chase">⏳ Chase quote</span>':''}
+        ${j.depositReceived?'<span class="flag flag-deposit">✓ Deposit in</span>':''}
+      </div>`:''}
+      <div class="job-card-top">
+        <div class="job-card-meta">
+          <div class="job-ref">${j.ref}</div>
+          <div class="job-name">${esc(j.name||'Untitled job')}</div>
+          <div class="job-client">${esc(j.client||'—')}</div>
         </div>
-        <div class="job-footer">
-          ${val?`<span>${val}</span>`:''}
-          ${prestartStr?`<span style="color:var(--blue)">${prestartStr}</span>`:''}
-          ${j.startDate?`<span>Start: ${j.startDate}${timeStr}</span>`:''}
-          ${dl?`<span>${dl}</span>`:''}
-          ${j.address?`<span>${esc(j.address.split(',')[0])}</span>`:''}
-          ${j.siteLog&&j.siteLog.length?`<span style="color:var(--green-mid)">📋 ${j.siteLog.length} log entr${j.siteLog.length===1?'y':'ies'}</span>`:''}
-          ${depFoot}
-          ${gcalFoot}
+        <div class="job-right">
+          <span class="stage-pill s${j.stage}">${STAGES[j.stage]}</span>
+          ${j.stage<10?`<button class="next-btn" onclick="advance(event,'${j.id}')">${j.stage===9?'→ Archive':'→ '+STAGES[j.stage+1]}</button>`:''}
         </div>
       </div>
-    </div>`;
-  }).join('');
+      <div class="job-footer">
+        ${val?`<span>${val}</span>`:''}
+        ${prestartStr?`<span style="color:var(--blue)">${prestartStr}</span>`:''}
+        ${j.startDate?`<span>Start: ${j.startDate}${timeStr}</span>`:''}
+        ${dl?`<span>${dl}</span>`:''}
+        ${j.address?`<span>${esc(j.address.split(',')[0])}</span>`:''}
+        ${j.siteLog&&j.siteLog.length?`<span style="color:var(--green-mid)">📋 ${j.siteLog.length} log entr${j.siteLog.length===1?'y':'ies'}</span>`:''}
+        ${depFoot}
+        ${gcalFoot}
+      </div>
+    </div>
+  </div>`;
+}
+
+function toggleArchive(){
+  showArchived=!showArchived;
+  renderJobs();
+}
+
+async function unarchiveJob(id){
+  const idx=jobs.findIndex(x=>x.id===id); if(idx<0) return;
+  const job={...jobs[idx]};
+  job.stage=9; job.updated=String(Date.now());
+  job.activityLog=[...(job.activityLog||[]),{stage:9,stageName:STAGES[9],ts:Date.now()}];
+  jobs[idx]=job; closeModal(); renderAll(); await pushJob(job);
+  showToast('Job unarchived');
 }
 
 async function advance(e,id){
   e.stopPropagation();
-  const idx=jobs.findIndex(x=>x.id===id); if(idx<0||jobs[idx].stage>=9) return;
+  const idx=jobs.findIndex(x=>x.id===id); if(idx<0||jobs[idx].stage>=10) return;
   const job={...jobs[idx]},ns=job.stage+1;
   job.activityLog=[...(job.activityLog||[]),{stage:ns,stageName:STAGES[ns],ts:Date.now()}];
   job.stage=ns; job.updated=String(Date.now()); jobs[idx]=job; renderAll(); await pushJob(job);
@@ -1829,7 +1889,7 @@ async function advance(e,id){
 //  PIPELINE
 // ══════════════════════════════════════════════════════════════════════════
 function renderPipeline(){
-  document.getElementById('pipeline').innerHTML=STAGES.map((s,i)=>{
+  document.getElementById('pipeline').innerHTML=STAGES.slice(0,10).map((s,i)=>{
     const cols=jobs.filter(j=>!j.declined&&j.stage===i),val=cols.reduce((a,j)=>a+safeNum(j.value),0);
     return `<div class="pipe-col">
       <div class="pipe-col-hd">${s}<span class="pipe-count">${cols.length}</span></div>
@@ -1964,11 +2024,12 @@ function openJob(id){
   document.getElementById('modal-ft').innerHTML=`
     <div class="modal-ft-left">
       ${!isNew?`<button class="btn-del" onclick="deleteJob('${d.id}')">Delete</button>`:''}
-      ${!isNew?`<button class="btn-decline${d.declined?' btn-decline-active':''}" onclick="toggleDecline('${d.id}')">${d.declined?'↩ Reinstate':'✕ Decline'}</button>`:''}
+      ${!isNew&&!d.declined&&d.stage===10?`<button class="btn-unarchive" onclick="unarchiveJob('${d.id}')">↩ Unarchive</button>`:''}
+      ${!isNew&&d.stage!==10?`<button class="btn-decline${d.declined?' btn-decline-active':''}" onclick="toggleDecline('${d.id}')">${d.declined?'↩ Reinstate':'✕ Decline'}</button>`:''}
     </div>
     <div class="modal-ft-right">
       <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-      ${!isNew?`<button class="btn-price" onclick="openPricingPanel('${d.id}')">
+      ${!isNew&&d.stage!==10?`<button class="btn-price" onclick="openPricingPanel('${d.id}')">
         <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="11 2 14 5 11 8"/><path d="M3 11V7a4 4 0 014-4h7"/></svg>
         Price
       </button>`:''}
@@ -2746,7 +2807,7 @@ function schedRenderJobFilterSelect(){
   const opts = jobIds.map(id=>{
     const j = jobs.find(x=>x.id===id);
     if(!j) return '';
-    const label = j.name || j.client || 'Untitled';
+    const label = (j.name || j.client || 'Untitled') + (j.stage===10?' (archived)':'');
     return `<option value="${id}"${id===schedJobFilter?' selected':''}>${esc(label)}</option>`;
   }).join('');
   sel.innerHTML = '<option value="">All jobs</option>' + opts;
@@ -2887,7 +2948,7 @@ function schedChipStyle(e){
 
 // Auto-populate placeholders from jobs with start dates not yet on schedule
 function schedSyncPlaceholders(){
-  const jobsWithDates=jobs.filter(j=>j.startDate&&j.stage<9);
+  const jobsWithDates=jobs.filter(j=>j.startDate&&j.stage<10);
   // Remove stale placeholders for jobs that now have real entries or no date
   schedEntries=schedEntries.filter(e=>{
     if(!e.isPlaceholder) return true;
