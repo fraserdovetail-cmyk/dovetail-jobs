@@ -1154,7 +1154,11 @@ select.sem-input{cursor:pointer}
     </div>
     <div class="share-modal-ft">
       <button class="btn-cancel" onclick="shareModalClose()">Close</button>
-      <button class="share-copy-btn" onclick="shareModalCopy()">Copy to clipboard</button>
+      <button class="share-copy-btn" style="background:var(--sage);margin-right:auto" onclick="schedPrintCalendar()">
+        <svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:-2px;margin-right:4px"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="8" height="6"/></svg>
+        Print / Save PDF
+      </button>
+      <button class="share-copy-btn" onclick="shareModalCopy()">Copy text</button>
     </div>
   </div>
 </div>
@@ -2884,6 +2888,156 @@ function _fallbackCopy(text){
   ta2.value = text; ta2.style.position='fixed'; ta2.style.opacity='0';
   document.body.appendChild(ta2); ta2.select(); document.execCommand('copy');
   ta2.remove(); showToast('Copied!');
+}
+
+function schedPrintCalendar(){
+  if(!schedJobFilter) return;
+  const j = jobs.find(x=>x.id===schedJobFilter);
+  const jobLabel = j ? (j.name || j.client || 'Job') : 'Job';
+  const clientLine = [j&&j.client, j&&j.address].filter(Boolean).join(' · ');
+
+  const entries = schedEntries.filter(e=>e.jobId===schedJobFilter && !e.isPlaceholder && e.col!=='notes');
+  if(!entries.length){ showToast('No dates to print'); return; }
+
+  // Build dateStr → [{label, bg, text}]
+  const dateMap = {};
+  entries.forEach(e=>{
+    const col = SCHED_COLS.find(c=>c.id===e.col);
+    const label = col ? col.label : e.col;
+    const bg    = col ? col.bg   : '#F1F5F9';
+    const fg    = col ? col.text : '#334155';
+    const cur = schedParseDate(e.start);
+    const end = e.end ? schedParseDate(e.end) : new Date(cur);
+    while(cur <= end){
+      const ds = schedDateStr(cur);
+      if(!dateMap[ds]) dateMap[ds] = [];
+      if(!dateMap[ds].some(x=>x.label===label)) dateMap[ds].push({label,bg,fg});
+      cur.setDate(cur.getDate()+1);
+    }
+  });
+
+  const allDates = Object.keys(dateMap).sort();
+  if(!allDates.length){ showToast('No dates to print'); return; }
+
+  const firstDate = schedParseDate(allDates[0]);
+  const lastDate  = schedParseDate(allDates[allDates.length-1]);
+
+  // Months to render
+  const months = [];
+  const mc = new Date(firstDate.getFullYear(), firstDate.getMonth(), 1);
+  const me = new Date(lastDate.getFullYear(),  lastDate.getMonth(),  1);
+  while(mc <= me){ months.push(new Date(mc)); mc.setMonth(mc.getMonth()+1); }
+
+  const MNAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const DOW    = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const TODAY  = schedDateStr(new Date());
+
+  // Contractor legend (only contractors that actually appear)
+  const usedIds = [...new Set(entries.map(e=>e.col))];
+  const usedCols = usedIds.map(id=>SCHED_COLS.find(c=>c.id===id)).filter(Boolean);
+
+  function renderMonth(mDate){
+    const yr = mDate.getFullYear(), mo = mDate.getMonth();
+    const daysInMo = new Date(yr, mo+1, 0).getDate();
+    const firstDow  = new Date(yr, mo, 1).getDay();               // 0=Sun
+    const startPad  = firstDow===0 ? 6 : firstDow-1;              // Mon=0 offset
+
+    // Build rows of 7
+    const totalCells = startPad + daysInMo;
+    const rows = Math.ceil(totalCells / 7);
+    let cellIdx = 0;
+    let rowsHtml = '';
+
+    for(let r=0; r<rows; r++){
+      let rowHtml = '<tr>';
+      for(let c=0; c<7; c++){
+        const cellNo = r*7 + c;
+        const dayNum = cellNo - startPad + 1;
+        if(dayNum < 1 || dayNum > daysInMo){
+          rowHtml += '<td class="dc empty"></td>';
+        } else {
+          const ds = yr+'-'+String(mo+1).padStart(2,'0')+'-'+String(dayNum).padStart(2,'0');
+          const isWeekend = c>=5;
+          const isToday   = ds===TODAY;
+          const chips     = dateMap[ds]||[];
+          const chipsHtml = chips.map(ch=>`<div class="chip" style="background:${ch.bg};color:${ch.fg}">${ch.label}</div>`).join('');
+          rowHtml += `<td class="dc${isWeekend?' we':''}${isToday?' td':''}${chips.length?' has-work':''}">
+            <div class="dn${isToday?' dn-today':''}">${dayNum}</div>
+            ${chipsHtml}
+          </td>`;
+        }
+      }
+      rowHtml += '</tr>';
+      rowsHtml += rowHtml;
+    }
+
+    return `<div class="mb">
+      <div class="mt">${MNAMES[mo]} ${yr}</div>
+      <table class="ct"><thead><tr>${DOW.map(d=>`<th>${d}</th>`).join('')}</tr></thead>
+      <tbody>${rowsHtml}</tbody></table>
+    </div>`;
+  }
+
+  const d0 = new Date();
+  const genDate = d0.getDate()+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d0.getMonth()]+' '+d0.getFullYear();
+  const legendHtml = usedCols.map(c=>`<span class="lc" style="background:${c.bg};color:${c.text}">${c.label}</span>`).join('');
+  const monthsHtml = months.map(renderMonth).join('');
+
+  const html = `<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<title>${jobLabel} — Schedule</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+@page{size:A4 portrait;margin:14mm}
+body{font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;color:#18181B;background:#fff}
+.ph{display:flex;justify-content:space-between;align-items:flex-end;
+    padding-bottom:10px;margin-bottom:14px;border-bottom:2.5px solid #2D6A0F}
+.jt{font-size:21px;font-weight:700;letter-spacing:-0.3px}
+.jm{font-size:10.5px;color:#71717A;margin-top:3px}
+.hr{text-align:right;font-size:9.5px;color:#A1A1AA;line-height:1.6}
+.legend{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-bottom:14px}
+.ll{font-size:9.5px;font-weight:700;color:#71717A;text-transform:uppercase;letter-spacing:.05em;margin-right:4px}
+.lc{font-size:9.5px;font-weight:600;padding:2px 9px;border-radius:10px}
+.mb{margin-bottom:18px;page-break-inside:avoid}
+.mt{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;
+    color:#4E5E40;margin-bottom:5px}
+.ct{width:100%;border-collapse:collapse;table-layout:fixed}
+.ct th{padding:5px 3px;text-align:center;font-size:8.5px;font-weight:700;
+       text-transform:uppercase;letter-spacing:.05em;background:#F0F4EC;
+       color:#6B7F5A;border:1px solid #E4E4E7}
+.dc{height:58px;border:1px solid #E4E4E7;vertical-align:top;padding:3px 3px 2px;width:14.28%}
+.dc.empty{background:#FAFAFA}
+.dc.we{background:#F9FAF7}
+.dc.has-work{background:#fff}
+.dn{font-size:9.5px;font-weight:500;color:#A1A1AA;margin-bottom:2px;
+    width:16px;height:16px;display:flex;align-items:center;justify-content:center}
+.dn-today{background:#2D6A0F;color:#fff;border-radius:50%}
+.dc.has-work .dn{color:#18181B;font-weight:600}
+.chip{font-size:8px;font-weight:600;padding:1.5px 5px;border-radius:3px;
+      margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+      display:block;line-height:1.5}
+.ft{margin-top:10px;font-size:8.5px;color:#A1A1AA;text-align:center;
+    border-top:1px solid #E4E4E7;padding-top:7px}
+@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style></head><body>
+<div class="ph">
+  <div>
+    <div class="jt">${jobLabel}</div>
+    ${clientLine?`<div class="jm">${clientLine}</div>`:''}
+  </div>
+  <div class="hr">Schedule<br>Generated ${genDate}<br>Dovetail Carpentry &amp; Building</div>
+</div>
+${usedCols.length?`<div class="legend"><span class="ll">Contractors:</span>${legendHtml}</div>`:''}
+${monthsHtml}
+<div class="ft">Dovetail Carpentry &amp; Building — ${jobLabel} schedule — ${genDate}</div>
+</body></html>`;
+
+  const win = window.open('','_blank','width=800,height=900');
+  if(!win){ showToast('Allow pop-ups to print'); return; }
+  win.document.write(html);
+  win.document.close();
+  win.focus();
+  setTimeout(()=>{ win.print(); }, 500);
 }
 
 function schedColWidth(){
