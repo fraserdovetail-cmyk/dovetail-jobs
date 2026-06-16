@@ -546,6 +546,44 @@ textarea.pp-input{resize:vertical;min-height:80px}
   .topbar-brand{display:none}
 }
 
+/* ── SCHED JOB FILTER / SHARE ── */
+.sched-job-filter-sel{
+  padding:5px 8px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);
+  border-radius:var(--radius-xs);font-size:12px;font-family:'Inter',sans-serif;
+  color:#fff;outline:none;cursor:pointer;max-width:150px;
+}
+.sched-job-filter-sel option{background:#2D3B22;color:#fff}
+.sched-share-btn{
+  padding:5px 11px;background:var(--green);color:#fff;border:none;
+  border-radius:var(--radius-xs);font-size:12px;font-weight:600;
+  font-family:'Inter',sans-serif;cursor:pointer;transition:background 0.12s;
+  display:none;align-items:center;gap:5px;white-space:nowrap;
+}
+.sched-share-btn.visible{display:inline-flex}
+.sched-share-btn:hover{background:var(--green-mid)}
+/* Share modal */
+.share-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:600;
+  align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)}
+.share-modal-bg.open{display:flex}
+.share-modal{background:var(--white);border-radius:var(--radius);width:100%;max-width:480px;
+  overflow:hidden;box-shadow:var(--shadow-lg)}
+.share-modal-hd{display:flex;align-items:center;justify-content:space-between;
+  padding:13px 17px;background:var(--sage)}
+.share-modal-title{font-size:13px;font-weight:600;color:#fff}
+.share-modal-close{background:none;border:none;color:rgba(255,255,255,0.5);font-size:20px;cursor:pointer;line-height:1}
+.share-modal-body{padding:16px;display:flex;flex-direction:column;gap:12px}
+.share-modal-hint{font-size:12px;color:var(--muted);line-height:1.5}
+.share-modal-ta{width:100%;padding:11px 13px;border:1px solid var(--border);border-radius:var(--radius-sm);
+  font-size:13px;font-family:'JetBrains Mono',monospace;color:var(--text);background:var(--surface);
+  outline:none;resize:vertical;min-height:180px;line-height:1.6;transition:border-color 0.15s}
+.share-modal-ta:focus{border-color:var(--green-mid);background:var(--white)}
+.share-modal-ft{display:flex;justify-content:flex-end;gap:8px;padding:12px 16px;
+  border-top:1px solid var(--border);background:var(--surface)}
+.share-copy-btn{padding:8px 18px;background:var(--green);color:#fff;border:none;
+  border-radius:var(--radius-sm);font-size:13px;font-weight:600;font-family:'Inter',sans-serif;
+  cursor:pointer;transition:background 0.12s}
+.share-copy-btn:hover{background:var(--green-mid)}
+
 /* ── SCHEDULE TAB ── */
 #tab-schedule{display:none;flex-direction:column;min-height:0;overflow:hidden}
 .sched-outer{display:flex;flex-direction:column;flex:1}
@@ -922,6 +960,13 @@ select.sem-input{cursor:pointer}
       <div class="sched-range-label" id="sched-range-label">Loading…</div>
       <button class="sched-wn-btn" onclick="schedShift(1)">&#8250;</button>
       <button class="sched-today-btn" onclick="schedGoToday()">Today</button>
+      <select id="sched-job-filter" class="sched-job-filter-sel" onchange="schedSetJobFilter(this.value)" title="Filter by job">
+        <option value="">All jobs</option>
+      </select>
+      <button id="sched-share-btn" class="sched-share-btn" onclick="schedOpenShareModal()">
+        <svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2"/><circle cx="6" cy="12" r="2"/><circle cx="18" cy="19" r="2"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        Share
+      </button>
       <button class="sched-add-btn" onclick="schedOpenModal(null,null)">+ Add entry</button>
     </div>
 
@@ -1072,6 +1117,24 @@ select.sem-input{cursor:pointer}
 </div><!-- /main-screen -->
 
 
+
+<!-- ══ SCHEDULE SHARE MODAL ══ -->
+<div class="share-modal-bg" id="share-modal" onclick="if(event.target===this)shareModalClose()">
+  <div class="share-modal">
+    <div class="share-modal-hd">
+      <span class="share-modal-title" id="share-modal-title">Client schedule summary</span>
+      <button class="share-modal-close" onclick="shareModalClose()">&#215;</button>
+    </div>
+    <div class="share-modal-body">
+      <p class="share-modal-hint">Edit the text below, then copy and paste into a WhatsApp message or email.</p>
+      <textarea class="share-modal-ta" id="share-modal-text"></textarea>
+    </div>
+    <div class="share-modal-ft">
+      <button class="btn-cancel" onclick="shareModalClose()">Close</button>
+      <button class="share-copy-btn" onclick="shareModalCopy()">Copy to clipboard</button>
+    </div>
+  </div>
+</div>
 
 <!-- ══ JOB MODAL ══ -->
 <div class="modal-bg" id="modal" onclick="bgClick(event)">
@@ -2371,6 +2434,7 @@ let schedCols     = new Set(['tom','fraser','barnetts','sec','kbc','roofer','pai
 let schedEditId   = null;
 let schedEntryType= 'job';
 let schedDragId   = null;
+let schedJobFilter = null; // jobId to isolate, or null for all
 let schedTouchDragId = null, schedTouchClone = null;
 let schedResizeId = null, schedResizeOrigEnd = null; // for bottom-handle resize
 
@@ -2675,6 +2739,92 @@ function schedToggleCol(id,btn){
 
 function schedActiveCols(){ return SCHED_COLS.filter(c=>schedCols.has(c.id)); }
 
+function schedRenderJobFilterSelect(){
+  const sel = document.getElementById('sched-job-filter');
+  if(!sel) return;
+  const jobIds = [...new Set(schedEntries.filter(e=>e.jobId&&!e.isPlaceholder).map(e=>e.jobId))];
+  const opts = jobIds.map(id=>{
+    const j = jobs.find(x=>x.id===id);
+    if(!j) return '';
+    const label = j.name || j.client || 'Untitled';
+    return `<option value="${id}"${id===schedJobFilter?' selected':''}>${esc(label)}</option>`;
+  }).join('');
+  sel.innerHTML = '<option value="">All jobs</option>' + opts;
+  sel.value = schedJobFilter || '';
+}
+
+function schedSetJobFilter(jobId){
+  schedJobFilter = jobId || null;
+  const shareBtn = document.getElementById('sched-share-btn');
+  if(shareBtn) shareBtn.classList.toggle('visible', !!schedJobFilter);
+  schedRender();
+}
+
+function schedOpenShareModal(){
+  if(!schedJobFilter) return;
+  const j = jobs.find(x=>x.id===schedJobFilter);
+  const jobLabel = j ? (j.name || j.client || 'Job') : 'Job';
+
+  // Collect all non-placeholder, non-notes entries for this job
+  const entries = schedEntries.filter(e=>e.jobId===schedJobFilter && !e.isPlaceholder && e.col!=='notes');
+
+  // Build dateStr → Set<contractorLabel>
+  const dateMap = {};
+  entries.forEach(e=>{
+    const col = SCHED_COLS.find(c=>c.id===e.col);
+    const label = col ? col.label : e.col;
+    const cur = schedParseDate(e.start);
+    const end = e.end ? schedParseDate(e.end) : new Date(cur);
+    while(cur <= end){
+      const dow = cur.getDay();
+      if(dow!==0 && dow!==6){
+        const ds = schedDateStr(cur);
+        if(!dateMap[ds]) dateMap[ds] = new Set();
+        dateMap[ds].add(label);
+      }
+      cur.setDate(cur.getDate()+1);
+    }
+  });
+
+  const DAYS   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const sorted = Object.keys(dateMap).sort();
+
+  let text = `${jobLabel} — Schedule\n\n`;
+  if(sorted.length){
+    sorted.forEach(ds=>{
+      const d = schedParseDate(ds);
+      text += `${DAYS[d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()]}: ${[...dateMap[ds]].join(', ')}\n`;
+    });
+  } else {
+    text += '(No dates scheduled yet)';
+  }
+
+  document.getElementById('share-modal-title').textContent = `${jobLabel} — Client summary`;
+  document.getElementById('share-modal-text').value = text;
+  document.getElementById('share-modal').classList.add('open');
+}
+
+function shareModalClose(){
+  document.getElementById('share-modal').classList.remove('open');
+}
+
+function shareModalCopy(){
+  const ta = document.getElementById('share-modal-text');
+  const text = ta.value;
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(()=>showToast('Copied!')).catch(()=>_fallbackCopy(text));
+  } else {
+    _fallbackCopy(text);
+  }
+}
+function _fallbackCopy(text){
+  const ta2 = document.createElement('textarea');
+  ta2.value = text; ta2.style.position='fixed'; ta2.style.opacity='0';
+  document.body.appendChild(ta2); ta2.select(); document.execCommand('copy');
+  ta2.remove(); showToast('Copied!');
+}
+
 function schedColWidth(){
   const n=schedCols.size;
   if(n<=2) return 160; if(n<=3) return 140; if(n<=5) return 120; return 100;
@@ -2682,6 +2832,7 @@ function schedColWidth(){
 
 function schedEntriesFor(col,ds){
   return schedEntries.filter(e=>{
+    if(schedJobFilter && e.jobId !== schedJobFilter) return false;
     if(e.col!==col) return false;
     const s=e.start,en=e.end||e.start;
     if(ds<s||ds>en) return false;
@@ -2793,6 +2944,7 @@ function schedRender(){
   const SDOW_S=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
   schedSyncPlaceholders();
+  schedRenderJobFilterSelect();
 
   // Range label
   const first=dates[0], last=dates[dates.length-1];
