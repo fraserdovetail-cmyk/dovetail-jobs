@@ -3044,7 +3044,7 @@ function schedDrop(ev,col,date){
 
 // Touch drag — long-press to drag (prevents accidental moves while scrolling)
 function schedInitTouchDrag(){
-  const LONG_PRESS_MS = 400;  // hold this long before drag activates
+  const LONG_PRESS_MS = 1000; // hold this long before drag activates
   const SCROLL_CANCEL_PX = 8; // cancel if finger drifts this far before timer fires
 
   let pressTimer = null, pendingChip = null, startX = 0, startY = 0;
