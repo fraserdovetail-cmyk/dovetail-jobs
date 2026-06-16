@@ -557,6 +557,71 @@ textarea.pp-input{resize:vertical;min-height:80px}
   .topbar-brand{display:none}
 }
 
+/* ── NOTIFICATIONS ── */
+.notif-btn{position:relative;background:none;border:none;color:rgba(255,255,255,0.6);
+  cursor:pointer;padding:6px;transition:color 0.12s;display:flex;align-items:center;flex-shrink:0}
+.notif-btn:hover{color:#fff}
+.notif-badge{position:absolute;top:1px;right:1px;background:#EF4444;color:#fff;
+  font-size:9px;font-weight:700;min-width:15px;height:15px;border-radius:8px;
+  display:none;align-items:center;justify-content:center;padding:0 3px;line-height:1}
+.notif-badge.show{display:flex}
+.notif-panel{display:none;position:fixed;top:0;right:0;width:min(340px,100vw);
+  height:100vh;background:var(--white);box-shadow:-4px 0 24px rgba(0,0,0,0.15);
+  z-index:300;flex-direction:column}
+.notif-panel.open{display:flex}
+.notif-panel-hd{display:flex;align-items:center;justify-content:space-between;
+  padding:14px 17px;background:var(--sage);flex-shrink:0;
+  padding-top:max(14px,calc(env(safe-area-inset-top,0px) + 14px))}
+.notif-panel-title{font-size:14px;font-weight:600;color:#fff}
+.notif-panel-close{background:none;border:none;color:rgba(255,255,255,0.6);
+  font-size:22px;cursor:pointer;line-height:1;padding:0 2px}
+.notif-panel-body{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:6px}
+.notif-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;
+  border-radius:var(--radius-sm);cursor:pointer;transition:background 0.12s;
+  border:1px solid var(--border);background:var(--white)}
+.notif-item:hover{background:var(--surface)}
+.notif-item-icon{font-size:16px;flex-shrink:0;line-height:1.4}
+.notif-item-body{flex:1;min-width:0}
+.notif-item-title{font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px}
+.notif-item-sub{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.notif-empty{padding:24px 12px;text-align:center;font-size:13px;color:var(--hint);font-style:italic}
+.notif-enable-bar{background:var(--blue-light);border:1px solid var(--blue-border);
+  border-radius:var(--radius-sm);padding:10px 13px;display:flex;align-items:center;
+  gap:10px;font-size:12px;color:var(--blue);line-height:1.4}
+.notif-enable-bar button{padding:5px 12px;background:var(--blue);color:#fff;border:none;
+  border-radius:4px;font-size:11px;font-weight:600;font-family:'Inter',sans-serif;
+  cursor:pointer;white-space:nowrap;flex-shrink:0}
+
+/* ── CLIENT VIEW ── */
+#client-view{display:none;min-height:100vh;background:var(--surface)}
+.cv-topbar{background:var(--sage);padding:16px 20px;
+  padding-top:max(16px,calc(env(safe-area-inset-top,0px) + 16px))}
+.cv-brand-main{font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:700;color:#fff;letter-spacing:.04em}
+.cv-brand-sub{font-size:10px;color:rgba(255,255,255,0.7);letter-spacing:.18em;text-transform:uppercase;margin-top:2px}
+.cv-body{max-width:680px;margin:0 auto;padding:18px 14px 48px}
+.cv-job-hd{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-bottom:16px}
+.cv-job-name{font-size:18px;font-weight:700;color:var(--charcoal);margin-bottom:3px}
+.cv-job-meta{font-size:13px;color:var(--muted)}
+.cv-legend{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:14px}
+.cv-leg-label{font-size:10px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.06em;margin-right:2px}
+.cv-leg-chip{font-size:11px;font-weight:600;padding:3px 10px;border-radius:10px}
+.cv-month{margin-bottom:20px}
+.cv-month-title{font-size:12px;font-weight:700;color:var(--sage-dark);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px}
+.cv-cal{width:100%;border-collapse:collapse}
+.cv-cal th{padding:6px 3px;text-align:center;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;background:var(--sage-light);color:var(--sage-dark);border:1px solid var(--border)}
+.cv-cal td{height:58px;border:1px solid var(--border);vertical-align:top;padding:3px;width:14.28%}
+.cv-cal td.cv-empty,.cv-cal td.cv-we{background:#FAFAFA}
+.cv-dn{font-size:9.5px;font-weight:500;color:var(--hint);width:16px;height:16px;
+  display:inline-flex;align-items:center;justify-content:center;margin-bottom:2px}
+.cv-dn.cv-today{background:var(--green);color:#fff;border-radius:50%}
+.cv-cal td.cv-has-work .cv-dn{color:var(--charcoal);font-weight:700}
+.cv-chip{font-size:8.5px;font-weight:600;padding:2px 5px;border-radius:3px;margin-bottom:2px;
+  display:flex;align-items:center;gap:3px;line-height:1.4;overflow:hidden}
+.cv-chip-tick{flex-shrink:0;font-style:normal}
+.cv-footer{margin-top:20px;padding:14px;border-top:1px solid var(--border);
+  font-size:11px;color:var(--hint);text-align:center;line-height:1.8}
+.cv-confirm-key{display:flex;align-items:center;gap:5px;justify-content:center;margin-top:6px;font-size:11px;color:var(--muted)}
+
 /* ── SCHED JOB FILTER / SHARE ── */
 .sched-job-filter-sel{
   padding:5px 8px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);
@@ -885,6 +950,23 @@ select.sem-input{cursor:pointer}
 <body>
 
 <!-- ══ LOGIN ══ -->
+<!-- ══ CLIENT VIEW (read-only, no login required) ══ -->
+<div id="client-view">
+  <div class="cv-topbar">
+    <div class="cv-brand-main">DOVETAIL</div>
+    <div class="cv-brand-sub">Carpentry &amp; Building Ltd</div>
+  </div>
+  <div class="cv-body">
+    <div class="cv-job-hd">
+      <div class="cv-job-name" id="cv-job-name"></div>
+      <div class="cv-job-meta" id="cv-job-meta"></div>
+    </div>
+    <div class="cv-legend" id="cv-legend"></div>
+    <div id="cv-months"></div>
+    <div class="cv-footer" id="cv-footer"></div>
+  </div>
+</div>
+
 <div id="login-screen">
   <div class="login-wrap">
     <div class="login-brand">
@@ -919,12 +1001,25 @@ select.sem-input{cursor:pointer}
       </div>
     </div>
     <div class="topbar-right">
+      <button class="notif-btn" id="notif-btn" onclick="toggleNotifPanel()" title="Reminders">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        <span class="notif-badge" id="notif-badge"></span>
+      </button>
       <div class="sync-pill" onclick="loadJobs()" title="Click to refresh">
         <div class="sync-dot" id="sync-dot"></div>
         <span id="sync-label">Loading</span>
       </div>
       <button class="sched-add-btn" onclick="openNew()" style="font-size:12px">+ New job</button>
     </div>
+  </div>
+
+  <!-- Notification panel (fixed overlay) -->
+  <div class="notif-panel" id="notif-panel">
+    <div class="notif-panel-hd">
+      <span class="notif-panel-title">Reminders</span>
+      <button class="notif-panel-close" onclick="toggleNotifPanel()">&#215;</button>
+    </div>
+    <div class="notif-panel-body" id="notif-panel-body"></div>
   </div>
 
 
@@ -1151,9 +1246,13 @@ select.sem-input{cursor:pointer}
       <p class="share-modal-hint">Edit the text below, then copy and paste into a WhatsApp message or email.</p>
       <textarea class="share-modal-ta" id="share-modal-text"></textarea>
     </div>
-    <div class="share-modal-ft">
+    <div class="share-modal-ft" style="flex-wrap:wrap;gap:6px">
       <button class="btn-cancel" onclick="shareModalClose()">Close</button>
-      <button class="share-copy-btn" style="background:var(--sage);margin-right:auto" onclick="schedPrintCalendar()">
+      <button class="share-copy-btn" style="background:var(--blue);margin-right:auto" onclick="generateClientLink()" title="Generates a link the client can open to view their schedule">
+        <svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:-2px;margin-right:4px"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+        Client link
+      </button>
+      <button class="share-copy-btn" style="background:var(--sage);margin-right:0" onclick="schedPrintCalendar()">
         <svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:-2px;margin-right:4px"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="8" height="6"/></svg>
         Print / Save PDF
       </button>
@@ -1427,10 +1526,13 @@ function logout(){
   document.getElementById('main-screen').style.display='none';
   document.getElementById('login-screen').style.display='flex';
 }
-if(sessionStorage.getItem('dtv')==='1'){
-  document.getElementById('login-screen').style.display='none';
-  document.getElementById('main-screen').style.display='flex';
-  init();
+// Client share link — check before login
+if(!initClientView()){
+  if(sessionStorage.getItem('dtv')==='1'){
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('main-screen').style.display='flex';
+    init();
+  }
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -1631,7 +1733,7 @@ async function deleteJobApi(id){
 // ══════════════════════════════════════════════════════════════════════════
 //  RENDER ALL
 // ══════════════════════════════════════════════════════════════════════════
-function renderAll(){ renderDashboard(); renderJobs(); renderPipeline(); document.getElementById('tb-jobs').textContent=jobs.length; const dash=document.getElementById('tab-dashboard'); if(dash&&dash.style.display!=='none') schedRender(); }
+function renderAll(){ renderDashboard(); renderJobs(); renderPipeline(); document.getElementById('tb-jobs').textContent=jobs.length; const dash=document.getElementById('tab-dashboard'); if(dash&&dash.style.display!=='none') schedRender(); checkReminders(); }
 function populateStageFilter(){ const s=document.getElementById('stage-filter'); STAGES.forEach((st,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent=st; s.appendChild(o); }); }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -3661,6 +3763,209 @@ function semClose(){ document.getElementById('sem-modal').classList.remove('open
 function semBgClick(ev){ if(ev.target===document.getElementById('sem-modal')) semClose(); }
 
 // ─── INIT ───
+// ══════════════════════════════════════════════════════════════════════════
+//  NOTIFICATIONS
+// ══════════════════════════════════════════════════════════════════════════
+function checkReminders(){
+  const today = new Date();
+  const tomorrow = new Date(today); tomorrow.setDate(today.getDate()+1);
+  const todayStr = schedDateStr(today);
+  const tomorrowStr = schedDateStr(tomorrow);
+  const items = [];
+  jobs.filter(j=>!j.declined && j.stage<10).forEach(j=>{
+    const name = esc(j.name||j.client||'Untitled');
+    if(j.startDate===tomorrowStr)
+      items.push({type:'start',   icon:'🗓', title:'Starting tomorrow', sub:name, jobId:j.id});
+    if(isOverdue(j))
+      items.push({type:'overdue', icon:'⚠️', title:'Start date passed',  sub:name, jobId:j.id});
+    if(isChaseNeeded(j))
+      items.push({type:'chase',   icon:'⏳', title:'Chase quote',        sub:`${name} — sent ${CHASE_DAYS}+ days ago`, jobId:j.id});
+    if(j.stage>=4 && !j.depositReceived)
+      items.push({type:'deposit', icon:'💷', title:'Deposit pending',    sub:name, jobId:j.id});
+  });
+  // Update badge
+  const badge = document.getElementById('notif-badge');
+  if(badge){
+    badge.textContent = items.length > 9 ? '9+' : String(items.length);
+    badge.classList.toggle('show', items.length > 0);
+  }
+  // Browser notifications (once per day per item)
+  if(typeof Notification!=='undefined' && Notification.permission==='granted'){
+    let seen = {};
+    try{ seen=JSON.parse(localStorage.getItem('dtv_notified_v1')||'{}'); }catch(e){}
+    const todaySeen = seen[todayStr]||{};
+    let changed=false;
+    items.forEach(item=>{
+      const key=item.type+'_'+item.jobId;
+      if(!todaySeen[key]){
+        try{ new Notification('Dovetail — '+item.title,{body:item.sub,tag:key}); }catch(e){}
+        todaySeen[key]=true; changed=true;
+      }
+    });
+    if(changed){
+      seen[todayStr]=todaySeen;
+      Object.keys(seen).filter(d=>d<todayStr).forEach(d=>delete seen[d]);
+      try{ localStorage.setItem('dtv_notified_v1',JSON.stringify(seen)); }catch(e){}
+    }
+  }
+  return items;
+}
+
+function toggleNotifPanel(){
+  const panel=document.getElementById('notif-panel');
+  if(panel.classList.contains('open')){ panel.classList.remove('open'); return; }
+  const items=checkReminders();
+  const body=document.getElementById('notif-panel-body');
+  let html='';
+  if(typeof Notification!=='undefined' && Notification.permission==='default'){
+    html+=`<div class="notif-enable-bar">
+      <span style="flex:1">Enable notifications for reminders when the app is closed</span>
+      <button onclick="requestNotifPermission()">Enable</button>
+    </div>`;
+  }
+  if(!items.length){
+    html+=`<div class="notif-empty">No reminders right now — you're all caught up!</div>`;
+  } else {
+    html+=items.map(item=>`
+      <div class="notif-item" onclick="openJob('${item.jobId}');toggleNotifPanel()">
+        <div class="notif-item-icon">${item.icon}</div>
+        <div class="notif-item-body">
+          <div class="notif-item-title">${item.title}</div>
+          <div class="notif-item-sub">${item.sub}</div>
+        </div>
+      </div>`).join('');
+  }
+  body.innerHTML=html;
+  panel.classList.add('open');
+}
+
+function requestNotifPermission(){
+  if(typeof Notification==='undefined') return;
+  Notification.requestPermission().then(p=>{
+    if(p==='granted') showToast('Notifications enabled');
+    else showToast('Notifications blocked in browser settings');
+    // refresh panel
+    document.getElementById('notif-panel').classList.remove('open');
+    toggleNotifPanel();
+  });
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+//  CLIENT SHARE LINK
+// ══════════════════════════════════════════════════════════════════════════
+function generateClientLink(){
+  if(!schedJobFilter) return;
+  const j=jobs.find(x=>x.id===schedJobFilter); if(!j) return;
+  const entries=schedEntries
+    .filter(e=>e.jobId===schedJobFilter&&!e.isPlaceholder&&e.col!=='notes')
+    .map(e=>({col:e.col,start:e.start,end:e.end||e.start,confirmed:!!e.confirmed}));
+  if(!entries.length){ showToast('No dates to share'); return; }
+  const usedCols=SCHED_COLS.filter(c=>entries.some(e=>e.col===c.id))
+    .map(c=>({id:c.id,label:c.label,bg:c.bg,text:c.text}));
+  const payload={v:1,
+    job:{name:j.name||'',client:j.client||'',address:j.address||''},
+    entries, cols:usedCols, generated:schedDateStr(new Date())};
+  let encoded;
+  try{ encoded=btoa(unescape(encodeURIComponent(JSON.stringify(payload)))); }
+  catch(e){ showToast('Error generating link'); return; }
+  const url=location.origin+location.pathname+'#client='+encoded;
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(url).then(()=>showToast('Client link copied!'))
+      .catch(()=>{ prompt('Copy this link:',url); });
+  } else {
+    prompt('Copy this link:',url);
+  }
+}
+
+function initClientView(){
+  const hash=location.hash||'';
+  if(!hash.startsWith('#client=')) return false;
+  const encoded=hash.slice(8);
+  let data;
+  try{ data=JSON.parse(decodeURIComponent(escape(atob(encoded)))); }
+  catch(e){
+    document.getElementById('client-view').style.display='block';
+    document.getElementById('cv-months').innerHTML='<p style="padding:20px;color:#888">Invalid or expired link.</p>';
+    return true;
+  }
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('main-screen').style.display='none';
+  document.getElementById('client-view').style.display='block';
+  renderClientView(data);
+  return true;
+}
+
+function renderClientView(data){
+  const job=data.job||{}, entries=data.entries||[], cols=data.cols||[];
+  document.getElementById('cv-job-name').textContent=job.name||'Schedule';
+  document.getElementById('cv-job-meta').textContent=[job.client,job.address].filter(Boolean).join(' · ');
+  // Legend
+  if(cols.length){
+    document.getElementById('cv-legend').innerHTML=
+      '<span class="cv-leg-label">Contractors:</span>'+
+      cols.map(c=>`<span class="cv-leg-chip" style="background:${c.bg};color:${c.text}">${esc(c.label)}</span>`).join('');
+  }
+  // Build dateStr → [{col, confirmed}]
+  const dateMap={};
+  entries.forEach(e=>{
+    const col=cols.find(c=>c.id===e.col); if(!col) return;
+    const cur=new Date(e.start+'T12:00:00'), end=new Date((e.end||e.start)+'T12:00:00');
+    while(cur<=end){
+      const dow=cur.getDay();
+      if(dow!==0&&dow!==6){
+        const ds=schedDateStr(cur);
+        if(!dateMap[ds]) dateMap[ds]=[];
+        if(!dateMap[ds].some(x=>x.id===col.id)) dateMap[ds].push({...col,confirmed:e.confirmed});
+      }
+      cur.setDate(cur.getDate()+1);
+    }
+  });
+  const allDates=Object.keys(dateMap).sort();
+  if(!allDates.length){ document.getElementById('cv-months').innerHTML='<p style="padding:20px;color:#888">No dates scheduled yet.</p>'; return; }
+  const firstDate=new Date(allDates[0]+'T12:00:00'), lastDate=new Date(allDates[allDates.length-1]+'T12:00:00');
+  const MNAMES=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const DOW=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const todayStr=schedDateStr(new Date());
+  const months=[]; const mc=new Date(firstDate.getFullYear(),firstDate.getMonth(),1);
+  const me=new Date(lastDate.getFullYear(),lastDate.getMonth(),1);
+  while(mc<=me){ months.push(new Date(mc)); mc.setMonth(mc.getMonth()+1); }
+
+  function renderCvMonth(mDate){
+    const yr=mDate.getFullYear(),mo=mDate.getMonth();
+    const daysInMo=new Date(yr,mo+1,0).getDate();
+    const firstDow=new Date(yr,mo,1).getDay(), startPad=firstDow===0?6:firstDow-1;
+    const rows=Math.ceil((startPad+daysInMo)/7);
+    let tbody='';
+    for(let r=0;r<rows;r++){
+      let row='<tr>';
+      for(let c=0;c<7;c++){
+        const dayNum=r*7+c-startPad+1;
+        if(dayNum<1||dayNum>daysInMo){ row+='<td class="cv-empty"></td>'; continue; }
+        const ds=yr+'-'+String(mo+1).padStart(2,'0')+'-'+String(dayNum).padStart(2,'0');
+        const isWeekend=c>=5, isToday=ds===todayStr, chips=dateMap[ds]||[];
+        const chipsHtml=chips.map(ch=>
+          `<div class="cv-chip" style="background:${ch.bg};color:${ch.text}">
+            ${ch.confirmed?'<i class="cv-chip-tick">✓</i>':''}<span>${esc(ch.label)}</span>
+          </div>`).join('');
+        row+=`<td class="${isWeekend?'cv-we':''}${chips.length?' cv-has-work':''}">
+          <div class="cv-dn${isToday?' cv-today':''}">${dayNum}</div>${chipsHtml}</td>`;
+      }
+      tbody+=row+'</tr>';
+    }
+    return `<div class="cv-month"><div class="cv-month-title">${MNAMES[mo]} ${yr}</div>
+      <table class="cv-cal"><thead><tr>${DOW.map(d=>`<th>${d}</th>`).join('')}</tr></thead>
+      <tbody>${tbody}</tbody></table></div>`;
+  }
+
+  document.getElementById('cv-months').innerHTML=months.map(renderCvMonth).join('');
+  const SMONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const gen=data.generated?(d=>`${parseInt(d.split('-')[2])} ${SMONTHS[parseInt(d.split('-')[1])-1]} ${d.split('-')[0]}`)(data.generated):'';
+  document.getElementById('cv-footer').innerHTML=
+    `<strong>Dovetail Carpentry &amp; Building Ltd</strong><br>
+    ${gen?`Schedule generated ${gen} · `:''}Subject to change — contact us for updates
+    <div class="cv-confirm-key"><i>✓</i> = Contractor has confirmed availability</div>`;
+}
+
 function updateSchedHeaderTop(){
   const controls = document.querySelector('.sched-controls');
   const header   = document.getElementById('sched-col-header-outer');
