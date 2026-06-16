@@ -615,9 +615,8 @@ textarea.pp-input{resize:vertical;min-height:80px}
 .sched-today-btn:hover{background:rgba(255,255,255,0.08);color:#fff}
 .sched-add-btn{padding:6px 12px;background:var(--green);color:#fff;border:none;border-radius:var(--radius-xs);font-size:12px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:background 0.12s;margin-left:auto}
 .sched-add-btn:hover{background:var(--green-mid)}
-/* column toggles */
-.sched-col-toggles{display:flex;gap:5px;flex-wrap:wrap;padding:8px 16px;background:var(--sage-light);border-bottom:1px solid rgba(107,127,90,0.2);flex-shrink:0;align-items:center;position:sticky;top:154px;z-index:34;}
-@media not all and (display-mode:standalone){.sched-col-toggles{top:154px}}
+/* column toggles — scrolls away, not sticky */
+.sched-col-toggles{display:flex;gap:5px;flex-wrap:wrap;padding:8px 16px;background:var(--sage-light);border-bottom:1px solid rgba(107,127,90,0.2);flex-shrink:0;align-items:center;}
 .sched-col-toggles-label{font-size:11px;font-weight:600;color:var(--sage-dark);text-transform:uppercase;letter-spacing:0.06em;margin-right:4px}
 .col-toggle-btn{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:12px;border:1px solid var(--border);background:var(--white);font-size:11px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;color:var(--muted);transition:all 0.12s;white-space:nowrap}
 .col-toggle-btn.active{color:#fff;border-color:transparent}
@@ -3160,6 +3159,7 @@ function schedRender(){
 
   schedSyncPlaceholders();
   schedRenderJobFilterSelect();
+  updateSchedHeaderTop();
 
   // Range label
   const first=dates[0], last=dates[dates.length-1];
@@ -3646,6 +3646,16 @@ function semClose(){ document.getElementById('sem-modal').classList.remove('open
 function semBgClick(ev){ if(ev.target===document.getElementById('sem-modal')) semClose(); }
 
 // ─── INIT ───
+function updateSchedHeaderTop(){
+  const controls = document.querySelector('.sched-controls');
+  const header   = document.getElementById('sched-col-header-outer');
+  if(!controls || !header) return;
+  const controlsTop    = parseFloat(getComputedStyle(controls).top) || 0;
+  const controlsHeight = controls.offsetHeight;
+  header.style.top = (controlsTop + controlsHeight) + 'px';
+}
+window.addEventListener('resize', updateSchedHeaderTop);
+
 function schedInit(){
   schedLoadLocal();
   contractorsLoadLocal();
