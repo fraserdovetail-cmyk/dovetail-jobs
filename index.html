@@ -1398,8 +1398,9 @@ const SMONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','No
 const CHASE_DAYS = 7;
 
 let jobs = [], saving = false, _durUnit = 'days', _gcalAdded = false, _depositReceived = false;
-let currentStage = 0;
+let currentStage = 0, _currentJobLog = [];
 let _pricingJobId = null, _ppSections = [];
+let builtinLabelOverrides = {}; // persisted to localStorage for renamed built-in contractors
 
 let syncQueue = []; // offline queue
 let isOnline = navigator.onLine;
@@ -1928,6 +1929,7 @@ function openJob(id){
   _depositReceived=safeBool(d.depositReceived);
   currentStage=d.stage;
   const log=Array.isArray(d.activityLog)?d.activityLog:[];
+  _currentJobLog=log;
   const slog=Array.isArray(d.siteLog)?d.siteLog:[];
   const dep=depositAmt(d.value);
 
@@ -2111,7 +2113,7 @@ function setDurUnit(u){
   refreshGcalSection();
 }
 
-function setStage(i){ currentStage=i; document.getElementById('stepper').innerHTML=buildStepper(i,[]); }
+function setStage(i){ currentStage=i; document.getElementById('stepper').innerHTML=buildStepper(i,_currentJobLog); }
 
 async function saveJob(id,isNew){
   if(saving) return; saving=true;
@@ -2532,9 +2534,18 @@ function contractorsAllCols(){
 
 function contractorsSaveLocal(){
   try{ localStorage.setItem('dtv_contractors_v1',JSON.stringify(customContractors)); }catch(e){}
+  try{ localStorage.setItem('dtv_builtin_labels_v1',JSON.stringify(builtinLabelOverrides)); }catch(e){}
 }
 function contractorsLoadLocal(){
   try{ const r=localStorage.getItem('dtv_contractors_v1'); if(r) customContractors=JSON.parse(r); }catch(e){}
+  try{
+    const r=localStorage.getItem('dtv_builtin_labels_v1');
+    if(r){ builtinLabelOverrides=JSON.parse(r);
+      Object.entries(builtinLabelOverrides).forEach(([id,label])=>{
+        const col=SCHED_COLS.find(c=>c.id===id); if(col) col.label=label;
+      });
+    }
+  }catch(e){}
 }
 async function contractorsLoadFromAPI(){
   try{
@@ -2661,11 +2672,11 @@ function mcmSaveBuiltinName(id, val){
   const col = SCHED_COLS.find(c=>c.id===id);
   if(col && col.label !== val){
     col.label = val;
+    builtinLabelOverrides[id] = val;
     schedRenderToggles();
     schedRenderDropdown();
     schedRender();
-    // No separate save needed — built-in names stored in customContractors overrides if we want,
-    // but simplest: store as a name-override blob alongside customContractors
+    contractorsSaveLocal();
     contractorsSaveToAPI();
     showToast('Name updated');
   }
@@ -2908,9 +2919,12 @@ function schedPrintCalendar(){
     const cur = schedParseDate(e.start);
     const end = e.end ? schedParseDate(e.end) : new Date(cur);
     while(cur <= end){
-      const ds = schedDateStr(cur);
-      if(!dateMap[ds]) dateMap[ds] = [];
-      if(!dateMap[ds].some(x=>x.label===label)) dateMap[ds].push({label,bg,fg});
+      const dow = cur.getDay();
+      if(dow!==0 && dow!==6){
+        const ds = schedDateStr(cur);
+        if(!dateMap[ds]) dateMap[ds] = [];
+        if(!dateMap[ds].some(x=>x.label===label)) dateMap[ds].push({label,bg,fg});
+      }
       cur.setDate(cur.getDate()+1);
     }
   });
@@ -3265,6 +3279,7 @@ function schedRenderFooter(dates){
   const counts={};
   schedEntries.forEach(e=>{
     if(e.col==='notes') return;
+    if(schedJobFilter && e.jobId !== schedJobFilter) return;
     const c=new Date(e.start+'T12:00:00');
     const en=e.end||e.start;
     while(schedDateStr(c)<=en){
@@ -3460,7 +3475,7 @@ function schedInitTouchDrag(){
     const el = document.elementFromPoint(t.clientX, t.clientY);
     const cell = el?.closest('.sched-cell');
     if(cell){ const col=cell.dataset.col, date=cell.dataset.date;
-      if(col&&date){ schedDrop({preventDefault:()=>{}},col,date); schedDragId=schedTouchDragId; }
+      if(col&&date){ schedDragId=schedTouchDragId; schedDrop({preventDefault:()=>{}},col,date); }
     }
     schedTouchDragId = null;
   }, {passive:true});
