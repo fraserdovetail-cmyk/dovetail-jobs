@@ -665,6 +665,8 @@ textarea.pp-input{resize:vertical;min-height:80px}
 }
 .chip-confirm:hover {
   opacity: 1;
+  background: rgba(22,163,74,0.2);
+  border-color: #16A34A;
 }
 .chip-confirm.chip-confirm-on {
   background: #16A34A;
@@ -1373,13 +1375,14 @@ function updateQueueBar(){
   } else {
     bar.classList.remove('show');
   }
-  async function schedToggleConfirmed(id) {
+}
+
+async function schedToggleConfirmed(id) {
   const idx = schedEntries.findIndex(x => x.id === id);
   if (idx < 0) return;
   schedEntries[idx] = { ...schedEntries[idx], confirmed: !schedEntries[idx].confirmed };
   schedSaveToAPI();
   schedRender();
-}
 }
 
 // ══════════════════════════════════════════════════════════════════════════
