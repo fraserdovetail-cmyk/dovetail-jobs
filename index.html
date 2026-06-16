@@ -3042,30 +3042,67 @@ function schedDrop(ev,col,date){
   schedSaveToAPI(); schedRender(); showToast('Moved'); schedDragId=null;
 }
 
-// Touch drag
+// Touch drag — long-press to drag (prevents accidental moves while scrolling)
 function schedInitTouchDrag(){
-  document.addEventListener('touchstart',ev=>{
-    const chip=ev.target.closest('.sched-chip'); if(!chip) return;
-    schedTouchDragId=chip.dataset.id;
-    schedTouchClone=chip.cloneNode(true);
-    schedTouchClone.style.cssText='position:fixed;opacity:0.75;pointer-events:none;z-index:9999;transform:scale(1.05);width:'+chip.offsetWidth+'px';
-    document.body.appendChild(schedTouchClone);
-  },{passive:true});
-  document.addEventListener('touchmove',ev=>{
+  const LONG_PRESS_MS = 400;  // hold this long before drag activates
+  const SCROLL_CANCEL_PX = 8; // cancel if finger drifts this far before timer fires
+
+  let pressTimer = null, pendingChip = null, startX = 0, startY = 0;
+
+  function cancelPress(){
+    if(pressTimer){ clearTimeout(pressTimer); pressTimer = null; }
+    pendingChip = null;
+  }
+
+  document.addEventListener('touchstart', ev => {
+    if(ev.target.closest('.chip-confirm,.chip-rm')) return; // let action buttons work
+    const chip = ev.target.closest('.sched-chip'); if(!chip) return;
+    const t = ev.touches[0];
+    startX = t.clientX; startY = t.clientY;
+    pendingChip = chip;
+    pressTimer = setTimeout(() => {
+      pressTimer = null;
+      if(!pendingChip) return;
+      schedTouchDragId = pendingChip.dataset.id;
+      schedTouchClone = pendingChip.cloneNode(true);
+      schedTouchClone.style.cssText = 'position:fixed;opacity:0.75;pointer-events:none;z-index:9999;transform:scale(1.05);width:' + pendingChip.offsetWidth + 'px';
+      schedTouchClone.style.left = (startX - 60) + 'px';
+      schedTouchClone.style.top  = (startY - 15) + 'px';
+      document.body.appendChild(schedTouchClone);
+      pendingChip = null;
+    }, LONG_PRESS_MS);
+  }, {passive:true});
+
+  document.addEventListener('touchmove', ev => {
+    if(pressTimer && pendingChip){
+      const t = ev.touches[0];
+      const dx = t.clientX - startX, dy = t.clientY - startY;
+      if(Math.sqrt(dx*dx + dy*dy) > SCROLL_CANCEL_PX) cancelPress(); // scrolling — abort
+      return;
+    }
     if(!schedTouchClone) return;
-    const t=ev.touches[0];
-    schedTouchClone.style.left=(t.clientX-60)+'px'; schedTouchClone.style.top=(t.clientY-15)+'px';
-  },{passive:true});
-  document.addEventListener('touchend',ev=>{
-    if(!schedTouchDragId||!schedTouchClone){ schedTouchDragId=null; if(schedTouchClone){schedTouchClone.remove();schedTouchClone=null;} return; }
-    const t=ev.changedTouches[0]; schedTouchClone.remove(); schedTouchClone=null;
-    const el=document.elementFromPoint(t.clientX,t.clientY);
-    const cell=el?.closest('.sched-cell');
-    if(cell){ const col=cell.dataset.col,date=cell.dataset.date;
+    const t = ev.touches[0];
+    schedTouchClone.style.left = (t.clientX - 60) + 'px';
+    schedTouchClone.style.top  = (t.clientY - 15) + 'px';
+  }, {passive:true});
+
+  document.addEventListener('touchend', ev => {
+    cancelPress();
+    if(!schedTouchDragId || !schedTouchClone){ schedTouchDragId=null; if(schedTouchClone){schedTouchClone.remove();schedTouchClone=null;} return; }
+    const t = ev.changedTouches[0]; schedTouchClone.remove(); schedTouchClone = null;
+    const el = document.elementFromPoint(t.clientX, t.clientY);
+    const cell = el?.closest('.sched-cell');
+    if(cell){ const col=cell.dataset.col, date=cell.dataset.date;
       if(col&&date){ schedDrop({preventDefault:()=>{}},col,date); schedDragId=schedTouchDragId; }
     }
-    schedTouchDragId=null;
-  },{passive:true});
+    schedTouchDragId = null;
+  }, {passive:true});
+
+  document.addEventListener('touchcancel', () => {
+    cancelPress();
+    if(schedTouchClone){ schedTouchClone.remove(); schedTouchClone=null; }
+    schedTouchDragId = null;
+  }, {passive:true});
 }
 
 function schedCellClick(ev,col,date){ if(ev.target.classList.contains('sched-cell-add')) return; schedOpenModal(col,date); }
