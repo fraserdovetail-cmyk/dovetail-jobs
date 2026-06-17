@@ -909,6 +909,9 @@ textarea.pp-input{resize:vertical;min-height:80px}
 .mcm-swatch.selected{border-color:var(--text);transform:scale(1.1)}
 .mcm-add-btn{padding:8px 14px;background:var(--green);color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;white-space:nowrap;transition:background 0.12s}
 .mcm-add-btn:hover{background:var(--green-mid)}
+.mcm-phone-input{width:112px;border:none;background:transparent;font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--muted);outline:none;padding:0 2px;min-width:0;flex-shrink:0}
+.mcm-phone-input:focus{color:var(--text)}
+.mcm-phone-input::placeholder{color:var(--hint)}
 .mcm-ft{padding:11px 16px;border-top:1px solid var(--border);background:var(--surface);flex-shrink:0;display:flex;justify-content:flex-end}
 /* schedule entry modal */
 .sem-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:300;
@@ -1609,6 +1612,7 @@ let jobs = [], saving = false, _durUnit = 'days', _gcalAdded = false, _depositRe
 let currentStage = 0, _currentJobLog = [];
 let _pricingJobId = null, _ppSections = [];
 let builtinLabelOverrides = {}; // persisted to localStorage for renamed built-in contractors
+let builtinPhoneOverrides = {}; // persisted to localStorage for built-in contractor phone numbers
 
 let syncQueue = []; // offline queue
 let isOnline = navigator.onLine;
@@ -2769,18 +2773,18 @@ function ppCopyHistoryItem(idx){
 function schedIsDesktop(){ return window.matchMedia('(hover:hover) and (pointer:fine)').matches; }
 
 const SCHED_COLS = [
-  {id:'tom',     label:'Tom',              short:'T', bg:'#EFF6FF', border:'#93C5FD', text:'#1D4ED8', avatar:'#1D4ED8'},
-  {id:'fraser',  label:'Fraser',           short:'F', bg:'#F5F3FF', border:'#C4B5FD', text:'#6D28D9', avatar:'#6D28D9'},
-  {id:'barnetts',label:'Plumbing',          short:'PL',bg:'#FFFBEB', border:'#FDE68A', text:'#92400E', avatar:'#B45309'},
-  {id:'sec',     label:'Electrician',       short:'EL',bg:'#ECFDF5', border:'#6EE7B7', text:'#065F46', avatar:'#065F46'},
-  {id:'kbc',     label:'Bricklayer',        short:'BL',bg:'#EFF6FF', border:'#BFDBFE', text:'#1E40AF', avatar:'#1E40AF'},
-  {id:'roofer',  label:'Roofer',           short:'R', bg:'#F5F3FF', border:'#DDD6FE', text:'#5B21B6', avatar:'#5B21B6'},
-  {id:'painter', label:'Painter',          short:'P', bg:'#FDF2F8', border:'#F9A8D4', text:'#9D174D', avatar:'#9D174D'},
-  {id:'flooring',  label:'Carpets/flooring', short:'FL',bg:'#F0FDFA', border:'#99F6E4', text:'#0F766E', avatar:'#0F766E'},
-  {id:'flowscreed',label:'Flowscreed',       short:'FS',bg:'#FFF7ED', border:'#FED7AA', text:'#9A3412', avatar:'#C2410C'},
-  {id:'plasterer', label:'Plasterer',         short:'PL',bg:'#F0F9FF', border:'#BAE6FD', text:'#0369A1', avatar:'#0284C7'},
-  {id:'tonino',    label:'Tiling',            short:'TL',bg:'#FDF4FF', border:'#E9D5FF', text:'#7E22CE', avatar:'#9333EA'},
-  {id:'notes',     label:'Notes/Orders',      short:'N', bg:'var(--surface)', border:'var(--border)', text:'var(--muted)', avatar:'#71717A'},
+  {id:'tom',       label:'Tom',             short:'T', bg:'#EFF6FF', border:'#93C5FD', text:'#1D4ED8', avatar:'#1D4ED8', phone:''},
+  {id:'fraser',    label:'Fraser',          short:'F', bg:'#F5F3FF', border:'#C4B5FD', text:'#6D28D9', avatar:'#6D28D9', phone:''},
+  {id:'barnetts',  label:'Plumbing',        short:'PL',bg:'#FFFBEB', border:'#FDE68A', text:'#92400E', avatar:'#B45309', phone:'07816084847'},
+  {id:'sec',       label:'Electrician',     short:'EL',bg:'#ECFDF5', border:'#6EE7B7', text:'#065F46', avatar:'#065F46', phone:'07985619470'},
+  {id:'kbc',       label:'Bricklayer',      short:'BL',bg:'#EFF6FF', border:'#BFDBFE', text:'#1E40AF', avatar:'#1E40AF', phone:'07548787885'},
+  {id:'roofer',    label:'Roofer',          short:'R', bg:'#F5F3FF', border:'#DDD6FE', text:'#5B21B6', avatar:'#5B21B6', phone:'07930529905'},
+  {id:'painter',   label:'Painter',         short:'P', bg:'#FDF2F8', border:'#F9A8D4', text:'#9D174D', avatar:'#9D174D', phone:'07849508188'},
+  {id:'flooring',  label:'Carpets/flooring',short:'FL',bg:'#F0FDFA', border:'#99F6E4', text:'#0F766E', avatar:'#0F766E', phone:'07803436643'},
+  {id:'flowscreed',label:'Flowscreed',      short:'FS',bg:'#FFF7ED', border:'#FED7AA', text:'#9A3412', avatar:'#C2410C', phone:'07974185799'},
+  {id:'plasterer', label:'Plasterer',       short:'PL',bg:'#F0F9FF', border:'#BAE6FD', text:'#0369A1', avatar:'#0284C7', phone:'07860817415'},
+  {id:'tonino',    label:'Tiling',          short:'TL',bg:'#FDF4FF', border:'#E9D5FF', text:'#7E22CE', avatar:'#9333EA', phone:'07803528957'},
+  {id:'notes',     label:'Notes/Orders',    short:'N', bg:'var(--surface)', border:'var(--border)', text:'var(--muted)', avatar:'#71717A', phone:''},
 ];
 
 const JOB_COLOURS_S = [
@@ -2842,6 +2846,7 @@ function contractorsAllCols(){
 function contractorsSaveLocal(){
   try{ localStorage.setItem('dtv_contractors_v1',JSON.stringify(customContractors)); }catch(e){}
   try{ localStorage.setItem('dtv_builtin_labels_v1',JSON.stringify(builtinLabelOverrides)); }catch(e){}
+  try{ localStorage.setItem('dtv_builtin_phones_v1',JSON.stringify(builtinPhoneOverrides)); }catch(e){}
 }
 function contractorsLoadLocal(){
   try{ const r=localStorage.getItem('dtv_contractors_v1'); if(r) customContractors=JSON.parse(r); }catch(e){}
@@ -2850,6 +2855,14 @@ function contractorsLoadLocal(){
     if(r){ builtinLabelOverrides=JSON.parse(r);
       Object.entries(builtinLabelOverrides).forEach(([id,label])=>{
         const col=SCHED_COLS.find(c=>c.id===id); if(col) col.label=label;
+      });
+    }
+  }catch(e){}
+  try{
+    const r=localStorage.getItem('dtv_builtin_phones_v1');
+    if(r){ builtinPhoneOverrides=JSON.parse(r);
+      Object.entries(builtinPhoneOverrides).forEach(([id,phone])=>{
+        const col=SCHED_COLS.find(c=>c.id===id); if(col) col.phone=phone;
       });
     }
   }catch(e){}
@@ -2914,25 +2927,32 @@ function mcmRender(){
   const body = document.getElementById('mcm-body');
   const builtinIds = new Set(SCHED_COLS.map(c=>c.id));
 
-  // Built-in contractors — editable names only
+  // Built-in contractors — editable names + phones
   const builtinRows = SCHED_COLS.filter(c=>c.id!=='notes'&&c.id!=='tom'&&c.id!=='fraser').map(c=>`
     <div class="mcm-row" id="mcm-row-${c.id}">
       <div class="mcm-dot" style="background:${c.avatar}"></div>
-      <input class="mcm-name-input" id="mcm-inp-${c.id}" value="${esc(c.label)}" 
+      <input class="mcm-name-input" id="mcm-inp-${c.id}" value="${esc(c.label)}"
         onblur="mcmSaveBuiltinName('${c.id}',this.value)"
         onkeydown="if(event.key==='Enter')this.blur()"
-        placeholder="Contractor name">
-      <span style="font-size:10px;color:var(--hint);white-space:nowrap">tap to rename</span>
+        placeholder="Name">
+      <input class="mcm-phone-input" id="mcm-phone-${c.id}" value="${esc(c.phone||'')}"
+        onblur="mcmSaveBuiltinPhone('${c.id}',this.value)"
+        onkeydown="if(event.key==='Enter')this.blur()"
+        placeholder="Phone number" type="tel">
     </div>`).join('');
 
-  // Custom contractors — editable names + delete
+  // Custom contractors — editable names + phones + delete
   const customRows = customContractors.map((c,i)=>`
     <div class="mcm-row" id="mcm-row-${c.id}">
       <div class="mcm-dot" style="background:${c.avatar}"></div>
       <input class="mcm-name-input" id="mcm-inp-${c.id}" value="${esc(c.label)}"
         onblur="mcmSaveCustomName(${i},this.value)"
         onkeydown="if(event.key==='Enter')this.blur()"
-        placeholder="Contractor name">
+        placeholder="Name">
+      <input class="mcm-phone-input" id="mcm-phone-${c.id}" value="${esc(c.phone||'')}"
+        onblur="mcmSaveCustomPhone(${i},this.value)"
+        onkeydown="if(event.key==='Enter')this.blur()"
+        placeholder="Phone number" type="tel">
       <button class="mcm-del-btn" onclick="mcmDelete(${i})" title="Remove">×</button>
     </div>`).join('');
 
@@ -2955,8 +2975,9 @@ function mcmRender(){
       <div class="mcm-section-label">Add new contractor</div>
       <div class="mcm-colour-row">${swatches}</div>
       <div class="mcm-add-row">
-        <input class="mcm-add-input" id="mcm-new-name" placeholder="e.g. Tiler" 
+        <input class="mcm-add-input" id="mcm-new-name" placeholder="e.g. Tiler"
           onkeydown="if(event.key==='Enter')mcmAddNew()">
+        <input class="mcm-add-input" id="mcm-new-phone" placeholder="Phone" type="tel" style="max-width:120px">
         <button class="mcm-add-btn" onclick="mcmAddNew()">Add</button>
       </div>
     </div>`;
@@ -2974,34 +2995,42 @@ function mcmSelectCol(i){
 }
 
 function mcmSaveBuiltinName(id, val){
-  val = val.trim();
-  if(!val) return;
+  val = val.trim(); if(!val) return;
   const col = SCHED_COLS.find(c=>c.id===id);
   if(col && col.label !== val){
-    col.label = val;
-    builtinLabelOverrides[id] = val;
-    schedRenderToggles();
-    schedRenderDropdown();
-    schedRender();
-    contractorsSaveLocal();
-    contractorsSaveToAPI();
-    showToast('Name updated');
+    col.label = val; builtinLabelOverrides[id] = val;
+    schedRenderToggles(); schedRenderDropdown(); schedRender();
+    contractorsSaveLocal(); contractorsSaveToAPI(); showToast('Name updated');
+  }
+}
+
+function mcmSaveBuiltinPhone(id, val){
+  val = val.trim();
+  const col = SCHED_COLS.find(c=>c.id===id);
+  if(col && col.phone !== val){
+    col.phone = val; builtinPhoneOverrides[id] = val;
+    contractorsSaveLocal(); showToast('Phone updated');
   }
 }
 
 function mcmSaveCustomName(idx, val){
-  val = val.trim();
-  if(!val) return;
+  val = val.trim(); if(!val) return;
   if(customContractors[idx] && customContractors[idx].label !== val){
     customContractors[idx].label = val;
-    // Update SCHED_COLS entry too if present
     const col = SCHED_COLS.find(c=>c.id===customContractors[idx].id);
     if(col) col.label = val;
-    schedRenderToggles();
-    schedRenderDropdown();
-    schedRender();
-    contractorsSaveToAPI();
-    showToast('Name updated');
+    schedRenderToggles(); schedRenderDropdown(); schedRender();
+    contractorsSaveToAPI(); showToast('Name updated');
+  }
+}
+
+function mcmSaveCustomPhone(idx, val){
+  val = val.trim();
+  if(customContractors[idx] && customContractors[idx].phone !== val){
+    customContractors[idx].phone = val;
+    const col = SCHED_COLS.find(c=>c.id===customContractors[idx].id);
+    if(col) col.phone = val;
+    contractorsSaveToAPI(); showToast('Phone updated');
   }
 }
 
@@ -3025,15 +3054,16 @@ function mcmAddNew(){
   const inp = document.getElementById('mcm-new-name');
   const name = (inp?.value||'').trim();
   if(!name){ showToast('Enter a name first'); return; }
+  const phone = (document.getElementById('mcm-new-phone')?.value||'').trim();
   const pal = CUSTOM_COL_PALETTE[mcmNewColIdx] || CUSTOM_COL_PALETTE[0];
   const id = 'custom_'+Date.now();
   const short = name.replace(/[^A-Z]/g,'').substring(0,2) || name.substring(0,2).toUpperCase();
-  const entry = {id, label:name, short, bg:pal.bg, border:pal.border, text:pal.text, avatar:pal.avatar};
+  const entry = {id, label:name, short, phone, bg:pal.bg, border:pal.border, text:pal.text, avatar:pal.avatar};
   customContractors.push(entry);
   // Insert into SCHED_COLS before 'notes'
   const ni = SCHED_COLS.findIndex(c=>c.id==='notes');
   SCHED_COLS.splice(ni,0,{...entry});
-  inp.value='';
+  inp.value=''; const pi=document.getElementById('mcm-new-phone'); if(pi) pi.value='';
   schedRenderToggles();
   schedRenderDropdown();
   contractorsSaveToAPI();
@@ -4292,6 +4322,14 @@ function renderContractorView(entries,jobsMap){
 }
 
 // ─── CONTRACTOR LINKS MODAL ───────────────────────────────────────────────
+function formatWaPhone(phone){
+  const d=(phone||'').replace(/\D/g,'');
+  if(!d) return '';
+  if(d.startsWith('44')) return d;
+  if(d.startsWith('0')) return '44'+d.slice(1);
+  return '44'+d;
+}
+
 function clmOpen(){
   document.getElementById('clm-modal').classList.add('open');
   clmRender();
@@ -4306,14 +4344,16 @@ function clmRender(){
     const lastLabel=lastTs?_clmRelTime(lastTs):'Never notified';
     const upcoming=schedEntries.filter(e=>e.col===col.id&&!e.isPlaceholder&&(e.end||e.start)>=today).length;
     const safeId=col.id.replace(/'/g,"\\'"), safeName=col.label.replace(/'/g,"\\'");
+    const phone=col.phone||'';
+    const waPhone=formatWaPhone(phone);
     return `<div class="clm-row">
       <div style="width:10px;height:10px;border-radius:50%;background:${col.avatar||col.text};flex-shrink:0"></div>
       <div class="clm-info">
         <div class="clm-name">${esc(col.label)}</div>
-        <div class="clm-meta">${upcoming} upcoming · ${lastLabel}</div>
+        <div class="clm-meta">${phone?`<span style="font-family:'JetBrains Mono',monospace">${esc(phone)}</span> · `:''}${upcoming} upcoming · ${lastLabel}</div>
       </div>
       <button class="clm-btn clm-copy" onclick="clmCopyLink('${safeId}','${safeName}')">Copy link</button>
-      <button class="clm-btn clm-wa" onclick="clmNotify('${safeId}','${safeName}')">
+      <button class="clm-btn clm-wa" onclick="clmNotify('${safeId}','${safeName}','${waPhone}')"${!waPhone?' title="Add a phone number in Manage Contractors first"':''}>>
         <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" style="display:inline;vertical-align:-1px;margin-right:3px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.115.549 4.1 1.504 5.832L0 24l6.335-1.484A11.944 11.944 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.793 9.793 0 01-5.003-1.374l-.358-.213-3.758.88.927-3.67-.233-.378A9.78 9.78 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/></svg>
         Notify
       </button>
@@ -4351,7 +4391,7 @@ async function clmCopyLink(colId,colName){
   } else { prompt('Copy this link:',url); }
 }
 
-async function clmNotify(colId,colName){
+async function clmNotify(colId,colName,waPhone){
   const today=schedDateStr(new Date());
   const lastNotified=parseInt(localStorage.getItem('ctv_notified_'+colId)||'0');
   const MO=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -4392,7 +4432,8 @@ async function clmNotify(colId,colName){
   msg+=`\n\nDovetail Carpentry & Building`;
 
   localStorage.setItem('ctv_notified_'+colId,String(Date.now()));
-  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+  const waBase=waPhone?`https://wa.me/${waPhone}`:'https://wa.me/';
+  window.open(waBase+'?text='+encodeURIComponent(msg),'_blank');
   clmRender();
 }
 
