@@ -4107,12 +4107,8 @@ async function generateClientLink(){
   showToast('Generating short link…');
   let url=longUrl;
   try{
-    const ctrl=new AbortController();
-    const t=setTimeout(()=>ctrl.abort(),5000);
-    const r=await fetch('https://is.gd/create.php?format=simple&url='+encodeURIComponent(longUrl),{signal:ctrl.signal});
-    clearTimeout(t);
-    const text=(await r.text()).trim();
-    if(/^https:\/\/is\.gd\/\w+$/.test(text)) url=text;
+    const result=await apiCall({action:'shortUrl',url:longUrl});
+    if(result&&result.short&&result.short!==longUrl) url=result.short;
   }catch(e){}
   const label=url===longUrl?'Link copied!':'Short link copied!';
   if(navigator.clipboard&&navigator.clipboard.writeText){
@@ -4364,12 +4360,8 @@ function _clmRelTime(ts){
 async function _clmShortUrl(colId,colName){
   const longUrl=location.origin+location.pathname+'?ctv='+encodeURIComponent(colId)+'&n='+encodeURIComponent(colName);
   try{
-    const ctrl=new AbortController();
-    const t=setTimeout(()=>ctrl.abort(),5000);
-    const r=await fetch('https://is.gd/create.php?format=simple&url='+encodeURIComponent(longUrl),{signal:ctrl.signal});
-    clearTimeout(t);
-    const text=(await r.text()).trim();
-    if(/^https:\/\/is\.gd\/\w+$/.test(text)) return text;
+    const result=await apiCall({action:'shortUrl',url:longUrl});
+    if(result&&result.short&&result.short!==longUrl) return result.short;
   }catch(e){}
   return longUrl;
 }
