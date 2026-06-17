@@ -4215,10 +4215,21 @@ let _ctvId=null, _ctvName=null;
 
 function initContractorView(){
   const params=new URLSearchParams(location.search);
-  const ctvId=params.get('ctv');
+  let ctvId=params.get('ctv');
+  let ctvName=params.get('n');
+  // Legacy: old links used #ctv=<base64>
+  if(!ctvId){
+    const hash=location.hash||'';
+    if(hash.startsWith('#ctv=')){
+      try{
+        const d=JSON.parse(decodeURIComponent(escape(atob(hash.slice(5)))));
+        ctvId=d.id; ctvName=d.name;
+      }catch(e){}
+    }
+  }
   if(!ctvId) return false;
   _ctvId=ctvId;
-  _ctvName=params.get('n')||ctvId;
+  _ctvName=ctvName||ctvId;
   document.getElementById('login-screen').style.display='none';
   document.getElementById('main-screen').style.display='none';
   document.getElementById('contractor-view').style.display='block';
