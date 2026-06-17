@@ -888,6 +888,29 @@ select.sem-input{cursor:pointer}
 }
 
 
+/* ── EXTRAS ── */
+.extras-list{display:flex;flex-direction:column;gap:5px}
+.extra-row{display:flex;align-items:center;gap:8px;padding:8px 11px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius-sm)}
+.extra-desc{flex:1;font-size:13px;color:var(--text);min-width:0;line-height:1.4}
+.extra-val{font-size:12px;font-weight:600;color:var(--green);font-family:'JetBrains Mono',monospace;white-space:nowrap;flex-shrink:0}
+.extra-status{font-size:10px;font-weight:700;padding:3px 9px;border-radius:10px;cursor:pointer;white-space:nowrap;border:none;font-family:'Inter',sans-serif;letter-spacing:0.03em;flex-shrink:0;transition:all 0.12s}
+.extra-status.s-pending{background:var(--amber-light);color:var(--amber)}
+.extra-status.s-approved{background:var(--green-light);color:var(--green)}
+.extra-status.s-invoiced{background:var(--blue-light);color:var(--blue)}
+.extra-del{background:none;border:none;color:var(--hint);font-size:17px;cursor:pointer;padding:0 2px;line-height:1;flex-shrink:0;transition:color 0.12s}
+.extra-del:hover{color:var(--red)}
+.extras-add-row{display:flex;gap:6px;margin-top:8px;align-items:center}
+.extras-add-desc{flex:1;padding:8px 11px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:'Inter',sans-serif;color:var(--text);background:var(--white);outline:none;transition:border-color 0.15s;min-width:0}
+.extras-add-desc:focus{border-color:var(--green-mid)}
+.extras-add-val{width:86px;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:'JetBrains Mono',monospace;color:var(--text);background:var(--white);outline:none;transition:border-color 0.15s;flex-shrink:0}
+.extras-add-val:focus{border-color:var(--green-mid)}
+.extras-add-btn{padding:8px 13px;background:var(--green);color:#fff;border:none;border-radius:var(--radius-sm);font-size:12px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:background 0.12s}
+.extras-add-btn:hover{background:var(--green-mid)}
+.extras-total-row{display:flex;align-items:center;justify-content:space-between;padding:7px 11px;background:var(--green-light);border:1px solid var(--green-border);border-radius:var(--radius-sm);margin-top:6px}
+.extras-total-lbl{font-size:11px;font-weight:600;color:var(--green-dark);text-transform:uppercase;letter-spacing:0.05em}
+.extras-total-val{font-size:14px;font-weight:600;color:var(--green);font-family:'JetBrains Mono',monospace}
+.extras-empty{font-size:13px;color:var(--hint);font-style:italic;padding:2px 0 4px}
+
 /* ── BILL OF MATERIALS ── */
 .bom-upload-area{border:2px dashed var(--green-border);border-radius:var(--radius-sm);padding:18px 14px;text-align:center;cursor:pointer;transition:all 0.15s;background:var(--green-light);position:relative}
 .bom-upload-area:hover,.bom-upload-area.drag-hover{border-color:var(--green-mid);background:#D4EDBA}
@@ -1691,12 +1714,13 @@ function parseJob(j){
     siteLog:(()=>{ try{ const v=j.siteLog; if(!v||v==='') return []; return typeof v==='string'?JSON.parse(v):v; }catch(e){return [];} })(),
     promptHistory:(()=>{ try{ const v=j.promptHistory; if(!v||v==='') return []; return typeof v==='string'?JSON.parse(v):v; }catch(e){return [];} })(),
     bom:(()=>{ try{ const v=j.bom; if(!v||v==='') return null; return typeof v==='string'?JSON.parse(v):v; }catch(e){return null;} })(),
+    extras:(()=>{ try{ const v=j.extras; if(!v||v==='') return []; return typeof v==='string'?JSON.parse(v):v; }catch(e){return [];} })(),
     bomFilename:safeStr(j.bomFilename||''),
   };
 }
 
 async function pushJob(job){
-  const payload={action:'saveJob',job:{...job,activityLog:JSON.stringify(job.activityLog||[]),siteLog:JSON.stringify(job.siteLog||[]),promptHistory:JSON.stringify(job.promptHistory||[]),bom:job.bom?JSON.stringify(job.bom):'',bomFilename:job.bomFilename||''}};
+  const payload={action:'saveJob',job:{...job,activityLog:JSON.stringify(job.activityLog||[]),siteLog:JSON.stringify(job.siteLog||[]),promptHistory:JSON.stringify(job.promptHistory||[]),bom:job.bom?JSON.stringify(job.bom):'',bomFilename:job.bomFilename||'',extras:JSON.stringify(job.extras||[])}};
   if(!isOnline){
     // queue for later
     syncQueue=syncQueue.filter(q=>q.job.id!==job.id);
@@ -1962,6 +1986,7 @@ function renderJobCard(j){
         ${dl?`<span>${dl}</span>`:''}
         ${j.address?`<span>${esc(j.address.split(',')[0])}</span>`:''}
         ${j.siteLog&&j.siteLog.length?`<span style="color:var(--green-mid)">📋 ${j.siteLog.length} log entr${j.siteLog.length===1?'y':'ies'}</span>`:''}
+        ${j.extras&&j.extras.length?`<span style="color:var(--amber);font-weight:600">+ ${j.extras.length} extra${j.extras.length===1?'':'s'}${extrasTotal(j.extras)?' · '+extrasTotal(j.extras):''}</span>`:''}
         ${depFoot}
         ${gcalFoot}
       </div>
@@ -2023,7 +2048,7 @@ function openJob(id){
     startDate:'',startTime:'',prestartDate:'',prestartTime:'',
     durationNum:'',durationUnit:'days',notes:'',stage:0,declined:false,
     gcalAdded:false,depositReceived:false,
-    activityLog:[],siteLog:[],promptHistory:[],
+    activityLog:[],siteLog:[],extras:[],promptHistory:[],
     created:String(Date.now()),updated:String(Date.now())
   };
   _durUnit=safeStr(d.durationUnit)||'days';
@@ -2113,6 +2138,19 @@ function openJob(id){
       <div class="site-log-add">
         <textarea id="site-log-input" placeholder="Add a site visit note, observation..." rows="2"></textarea>
         <button class="site-add-btn" onclick="addSiteLog('${d.id}')">Add note</button>
+      </div>
+    </div>`:''}
+
+    ${!isNew?`<div class="modal-section" id="extras-section">
+      <div class="sec-hd" style="display:flex;align-items:center;justify-content:space-between">
+        <span>Extras</span>
+        ${(d.extras||[]).length?`<span id="extras-sec-total" style="font-size:12px;color:var(--green);font-weight:600;font-family:'JetBrains Mono',monospace;text-transform:none;letter-spacing:0">${extrasTotal(d.extras)}</span>`:''}
+      </div>
+      <div id="extras-list-wrap">${buildExtrasList(d.id, d.extras||[])}</div>
+      <div class="extras-add-row">
+        <input class="extras-add-desc" id="extras-add-desc" placeholder="Describe the extra work…" onkeydown="if(event.key==='Enter')addExtra('${d.id}')"/>
+        <input class="extras-add-val" id="extras-add-val" type="number" min="0" step="0.01" placeholder="£ value"/>
+        <button class="extras-add-btn" onclick="addExtra('${d.id}')">+ Add</button>
       </div>
     </div>`:''}
 
@@ -2245,6 +2283,7 @@ async function saveJob(id,isNew){
     gcalAdded:_gcalAdded,
     depositReceived:_depositReceived,
     siteLog:Array.isArray(existing.siteLog)?existing.siteLog:[],
+    extras:Array.isArray(existing.extras)?existing.extras:[],
     bom:existing.bom||null,
     bomFilename:existing.bomFilename||'',
     promptHistory:Array.isArray(existing.promptHistory)?existing.promptHistory:[],
@@ -2280,7 +2319,7 @@ async function duplicateJob(id){
     name:(orig.name?orig.name+' (copy)':'Copy'),
     stage:0,gcalAdded:false,depositReceived:false,declined:false,
     activityLog:[{stage:0,stageName:STAGES[0],ts:Date.now()}],
-    siteLog:[],promptHistory:[],
+    siteLog:[],extras:[],promptHistory:[],
     created:String(Date.now()),updated:String(Date.now())
   };
   jobs.push(dup); closeModal(); renderAll();
@@ -2309,6 +2348,78 @@ async function addSiteLog(jobId){
   showToast('Note added');
   await pushJob(job);
   renderAll();
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+//  EXTRAS
+// ══════════════════════════════════════════════════════════════════════════
+const EXTRA_STATUSES=['pending','approved','invoiced'];
+const EXTRA_STATUS_LABELS={pending:'Pending',approved:'Approved',invoiced:'Invoiced'};
+
+function extrasTotal(extras){
+  if(!Array.isArray(extras)||!extras.length) return '';
+  const sum=extras.reduce((t,e)=>t+(parseFloat(e.value)||0),0);
+  return sum>0?'£'+sum.toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:2}):'';
+}
+
+function buildExtrasList(jobId, extras){
+  if(!extras||!extras.length) return '<div class="extras-empty">No extras yet — use the form below to add one.</div>';
+  const rows=extras.slice().reverse().map(e=>`
+    <div class="extra-row" id="extra-${e.id}">
+      <span class="extra-desc">${esc(e.desc)}</span>
+      ${e.value?`<span class="extra-val">£${parseFloat(e.value).toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:2})}</span>`:''}
+      <button class="extra-status s-${e.status||'pending'}" onclick="cycleExtraStatus('${jobId}','${e.id}')">${EXTRA_STATUS_LABELS[e.status||'pending']}</button>
+      <button class="extra-del" onclick="deleteExtra('${jobId}','${e.id}')" title="Remove">&#215;</button>
+    </div>`).join('');
+  const total=extrasTotal(extras);
+  return rows+(total?`<div class="extras-total-row"><span class="extras-total-lbl">Total extras</span><span class="extras-total-val">${total}</span></div>`:'');
+}
+
+function refreshExtrasUI(jobId, extras){
+  const wrap=document.getElementById('extras-list-wrap'); if(wrap) wrap.innerHTML=buildExtrasList(jobId,extras);
+  const totEl=document.getElementById('extras-sec-total');
+  const t=extrasTotal(extras);
+  if(totEl){ totEl.textContent=t; totEl.style.display=t?'':'none'; }
+}
+
+async function addExtra(jobId){
+  const descEl=document.getElementById('extras-add-desc');
+  const valEl=document.getElementById('extras-add-val');
+  const desc=(descEl.value||'').trim(); if(!desc) return;
+  const value=parseFloat(valEl.value)||0;
+  const idx=jobs.findIndex(x=>x.id===jobId); if(idx<0) return;
+  const job={...jobs[idx]};
+  const extras=Array.isArray(job.extras)?[...job.extras]:[];
+  extras.push({id:genId(),desc,value:value||'',status:'pending',ts:Date.now()});
+  job.extras=extras; job.updated=String(Date.now());
+  jobs[idx]=job; descEl.value=''; valEl.value='';
+  refreshExtrasUI(jobId,extras);
+  showToast('Extra added');
+  await pushJob(job); renderAll();
+}
+
+async function deleteExtra(jobId,extraId){
+  const idx=jobs.findIndex(x=>x.id===jobId); if(idx<0) return;
+  const job={...jobs[idx]};
+  job.extras=(Array.isArray(job.extras)?job.extras:[]).filter(e=>e.id!==extraId);
+  job.updated=String(Date.now());
+  jobs[idx]=job;
+  refreshExtrasUI(jobId,job.extras);
+  await pushJob(job); renderAll();
+}
+
+async function cycleExtraStatus(jobId,extraId){
+  const idx=jobs.findIndex(x=>x.id===jobId); if(idx<0) return;
+  const job={...jobs[idx]};
+  const extras=(Array.isArray(job.extras)?[...job.extras]:[]).map(e=>{
+    if(e.id!==extraId) return e;
+    const next=EXTRA_STATUSES[(EXTRA_STATUSES.indexOf(e.status||'pending')+1)%EXTRA_STATUSES.length];
+    return {...e,status:next};
+  });
+  job.extras=extras; job.updated=String(Date.now());
+  jobs[idx]=job;
+  refreshExtrasUI(jobId,extras);
+  await pushJob(job); renderAll();
 }
 
 // ══════════════════════════════════════════════════════════════════════════
