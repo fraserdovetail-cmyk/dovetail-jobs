@@ -594,6 +594,58 @@ textarea.pp-input{resize:vertical;min-height:80px}
 
 /* ── CLIENT VIEW ── */
 #client-view{display:none;min-height:100vh;background:var(--surface)}
+/* ── CONTRACTOR VIEW ── */
+#contractor-view{display:none;min-height:100vh;background:var(--surface)}
+.ctv-topbar{background:var(--sage-dark);padding:16px 20px;padding-top:max(16px,calc(env(safe-area-inset-top,0px)+16px))}
+.ctv-brand-main{font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:700;color:#fff;letter-spacing:.04em}
+.ctv-brand-sub{font-size:10px;color:rgba(255,255,255,0.7);letter-spacing:.18em;text-transform:uppercase;margin-top:2px}
+.ctv-for{display:flex;align-items:center;gap:8px;margin-top:10px}
+.ctv-for-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.ctv-for-name{font-size:15px;font-weight:600;color:#fff}
+.ctv-refresh{margin-top:10px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.18);color:rgba(255,255,255,0.75);border-radius:6px;padding:6px 14px;font-size:12px;font-family:'Inter',sans-serif;cursor:pointer;transition:all 0.12s}
+.ctv-refresh:hover{background:rgba(255,255,255,0.2);color:#fff}
+.ctv-body{max-width:600px;margin:0 auto;padding:16px 14px 48px}
+.ctv-empty{text-align:center;padding:40px 20px;color:var(--muted);font-size:14px;font-style:italic}
+.ctv-week-hd{font-size:10px;font-weight:700;color:var(--sage);text-transform:uppercase;letter-spacing:.09em;margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--sage-light)}
+.ctv-week-hd:first-child{margin-top:0}
+.ctv-entry{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:8px;border-left:4px solid var(--border-strong)}
+.ctv-entry.ctv-confirmed{border-left-color:var(--green)}
+.ctv-entry.ctv-past{opacity:0.45}
+.ctv-entry-badges{display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap}
+.ctv-badge{display:inline-flex;align-items:center;font-size:9px;font-weight:700;border-radius:8px;padding:2px 8px;text-transform:uppercase;letter-spacing:.04em}
+.ctv-badge-date{background:var(--surface);color:var(--muted);border:1px solid var(--border)}
+.ctv-badge-new{background:#FEF3C7;color:#92400E;border:1px solid #FDE68A}
+.ctv-badge-confirmed{background:var(--green-light);color:var(--green);border:1px solid var(--green-border)}
+.ctv-badge-prov{background:var(--surface);color:var(--hint);border:1px solid var(--border)}
+.ctv-job-name{font-size:16px;font-weight:600;color:var(--charcoal);margin-bottom:2px}
+.ctv-phase{font-size:12px;color:var(--muted);margin-bottom:10px}
+.ctv-detail-row{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--text);margin-bottom:5px}
+.ctv-detail-ico{flex-shrink:0;width:16px;text-align:center;line-height:1.5}
+.ctv-addr-link{color:var(--text);text-decoration:none}
+.ctv-addr-link:hover{color:var(--green);text-decoration:underline}
+.ctv-keycode-box{display:inline-flex;align-items:center;gap:6px;background:#FFF7ED;border:1px solid #FED7AA;border-radius:6px;padding:5px 12px;font-size:13px;color:#C2410C;font-weight:600;font-family:'JetBrains Mono',monospace}
+.ctv-notes-box{background:var(--surface);border-radius:6px;padding:8px 11px;font-size:12px;color:var(--text);line-height:1.6}
+.ctv-footer{padding:20px 14px;border-top:1px solid var(--border);font-size:11px;color:var(--hint);text-align:center;line-height:1.8}
+/* Contractor links modal */
+.clm-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:600;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)}
+.clm-bg.open{display:flex}
+.clm-box{background:var(--white);border-radius:var(--radius);width:100%;max-width:500px;overflow:hidden;box-shadow:var(--shadow-lg);max-height:90vh;display:flex;flex-direction:column}
+.clm-hd{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:var(--sage)}
+.clm-title{font-size:14px;font-weight:600;color:#fff}
+.clm-close{background:none;border:none;color:rgba(255,255,255,0.5);font-size:22px;cursor:pointer;line-height:1}
+.clm-body{padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:8px}
+.clm-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border-radius:var(--radius-sm);border:1px solid var(--border)}
+.clm-info{flex:1;min-width:0}
+.clm-name{font-size:13px;font-weight:500;color:var(--text)}
+.clm-meta{font-size:11px;color:var(--hint);margin-top:2px}
+.clm-btn{padding:6px 11px;border-radius:var(--radius-xs);font-size:11px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all 0.12s}
+.clm-copy{background:var(--green-light);color:var(--green);border:1px solid var(--green-border)}
+.clm-copy:hover{background:#D4EDBA}
+.clm-wa{background:#DCF8C6;color:#075E54;border:1px solid #B7EBA1}
+.clm-wa:hover{background:#C8F0AF}
+.clm-ft{padding:11px 16px;border-top:1px solid var(--border);background:var(--surface);display:flex;justify-content:flex-end}
+.clink-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.18);border-radius:var(--radius-xs);font-size:12px;color:rgba(255,255,255,0.75);cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.12s;white-space:nowrap;flex-shrink:0}
+.clink-btn:hover{background:rgba(255,255,255,0.2);color:#fff}
 .cv-topbar{background:var(--sage);padding:16px 20px;
   padding-top:max(16px,calc(env(safe-area-inset-top,0px) + 16px))}
 .cv-brand-main{font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:700;color:#fff;letter-spacing:.04em}
@@ -990,6 +1042,20 @@ select.sem-input{cursor:pointer}
   </div>
 </div>
 
+<!-- ══ CONTRACTOR VIEW (read-only, no login required) ══ -->
+<div id="contractor-view">
+  <div class="ctv-topbar">
+    <div class="ctv-brand-main">DOVETAIL</div>
+    <div class="ctv-brand-sub">Carpentry &amp; Building Ltd</div>
+    <div class="ctv-for" id="ctv-for"><span class="ctv-for-name">Loading…</span></div>
+    <button class="ctv-refresh" onclick="ctvReload()">↻ Refresh schedule</button>
+  </div>
+  <div class="ctv-body">
+    <div id="ctv-content"><div class="ctv-empty">Loading your schedule…</div></div>
+  </div>
+  <div class="ctv-footer">Dovetail Carpentry &amp; Building Ltd<br>This schedule updates in real time — tap Refresh for the latest version</div>
+</div>
+
 <div id="login-screen">
   <div class="login-wrap">
     <div class="login-brand">
@@ -1091,6 +1157,10 @@ select.sem-input{cursor:pointer}
       <select id="sched-job-filter" class="sched-job-filter-sel" onchange="schedSetJobFilter(this.value)" title="Filter by job">
         <option value="">All jobs</option>
       </select>
+      <button class="clink-btn" onclick="clmOpen()" title="Share live schedule links with contractors">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        Contractors
+      </button>
       <button id="sched-share-btn" class="sched-share-btn" onclick="schedOpenShareModal()">
         <svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2"/><circle cx="6" cy="12" r="2"/><circle cx="18" cy="19" r="2"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
         Share
@@ -1280,6 +1350,22 @@ select.sem-input{cursor:pointer}
         Print / Save PDF
       </button>
       <button class="share-copy-btn" onclick="shareModalCopy()">Copy text</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CONTRACTOR LINKS MODAL ══ -->
+<div class="clm-bg" id="clm-modal" onclick="if(event.target===this)clmClose()">
+  <div class="clm-box">
+    <div class="clm-hd">
+      <span class="clm-title">Contractor schedule links</span>
+      <button class="clm-close" onclick="clmClose()">&#215;</button>
+    </div>
+    <div class="clm-body" id="clm-body">
+      <div style="padding:20px;text-align:center;color:var(--muted)">Loading…</div>
+    </div>
+    <div class="clm-ft">
+      <button class="btn-cancel" onclick="clmClose()">Close</button>
     </div>
   </div>
 </div>
@@ -1549,8 +1635,8 @@ function logout(){
   document.getElementById('main-screen').style.display='none';
   document.getElementById('login-screen').style.display='flex';
 }
-// Client share link — check before login
-if(!initClientView()){
+// Client / contractor share links — check before login
+if(!initClientView()&&!initContractorView()){
   if(sessionStorage.getItem('dtv')==='1'){
     document.getElementById('login-screen').style.display='none';
     document.getElementById('main-screen').style.display='flex';
@@ -1715,6 +1801,8 @@ function parseJob(j){
     promptHistory:(()=>{ try{ const v=j.promptHistory; if(!v||v==='') return []; return typeof v==='string'?JSON.parse(v):v; }catch(e){return [];} })(),
     bom:(()=>{ try{ const v=j.bom; if(!v||v==='') return null; return typeof v==='string'?JSON.parse(v):v; }catch(e){return null;} })(),
     extras:(()=>{ try{ const v=j.extras; if(!v||v==='') return []; return typeof v==='string'?JSON.parse(v):v; }catch(e){return [];} })(),
+    keyCode:safeStr(j.keyCode),
+    contractorNotes:safeStr(j.contractorNotes),
     bomFilename:safeStr(j.bomFilename||''),
   };
 }
@@ -2048,7 +2136,7 @@ function openJob(id){
     startDate:'',startTime:'',prestartDate:'',prestartTime:'',
     durationNum:'',durationUnit:'days',notes:'',stage:0,declined:false,
     gcalAdded:false,depositReceived:false,
-    activityLog:[],siteLog:[],extras:[],promptHistory:[],
+    activityLog:[],siteLog:[],extras:[],promptHistory:[],keyCode:'',contractorNotes:'',
     created:String(Date.now()),updated:String(Date.now())
   };
   _durUnit=safeStr(d.durationUnit)||'days';
@@ -2106,6 +2194,10 @@ function openJob(id){
       </div>
       <div class="fg full"><div class="fgroup"><label class="flabel">Site address</label><input class="finput" id="f-addr" value="${esc(d.address)}" placeholder="12 High Street, Stamford"/></div></div>
       <div class="fg full"><div class="fgroup"><label class="flabel">Notes</label><textarea class="finput" id="f-notes">${esc(d.notes)}</textarea></div></div>
+      <div class="fg">
+        <div class="fgroup"><label class="flabel">🔑 Key / access code</label><input class="finput" id="f-keycode" value="${esc(d.keyCode||'')}" placeholder="e.g. Key box B2 — code 1234#"/></div>
+        <div class="fgroup"><label class="flabel">🏗 Contractor notes</label><input class="finput" id="f-contractor-notes" value="${esc(d.contractorNotes||'')}" placeholder="Parking, site contact, access…"/></div>
+      </div>
     </div>
 
     <div class="modal-section">
@@ -2284,6 +2376,8 @@ async function saveJob(id,isNew){
     depositReceived:_depositReceived,
     siteLog:Array.isArray(existing.siteLog)?existing.siteLog:[],
     extras:Array.isArray(existing.extras)?existing.extras:[],
+    keyCode:(document.getElementById('f-keycode')||{}).value||'',
+    contractorNotes:(document.getElementById('f-contractor-notes')||{}).value||'',
     bom:existing.bom||null,
     bomFilename:existing.bomFilename||'',
     promptHistory:Array.isArray(existing.promptHistory)?existing.promptHistory:[],
@@ -3563,7 +3657,7 @@ function schedResizeMouseUp(ev){
     if(dow===0) snapEnd=schedPrevWeekday(snapEnd); // Sun → Fri
   }
   if(idx>=0 && snapEnd && snapEnd >= schedEntries[idx].start){
-    schedEntries[idx] = {...schedEntries[idx], end: snapEnd, isPlaceholder: false};
+    schedEntries[idx] = {...schedEntries[idx], end: snapEnd, isPlaceholder: false, updatedAt: Date.now()};
     schedSaveToAPI();
     showToast('Duration updated');
   } else if(idx>=0){
@@ -3611,7 +3705,7 @@ function schedResizeTouchEnd(ev){
   const newEnd = cell?.dataset?.date;
   const idx = schedEntries.findIndex(x=>x.id===schedResizeTouchId);
   if(idx>=0 && newEnd && newEnd >= schedEntries[idx].start){
-    schedEntries[idx] = {...schedEntries[idx], end: newEnd, isPlaceholder: false};
+    schedEntries[idx] = {...schedEntries[idx], end: newEnd, isPlaceholder: false, updatedAt: Date.now()};
     schedSaveToAPI();
     showToast('Duration updated');
   } else if(idx>=0){
@@ -3633,7 +3727,7 @@ function schedDrop(ev,col,date){
   const oldStart=schedParseDate(e.start), oldEnd=e.end?schedParseDate(e.end):oldStart;
   const span=Math.round((oldEnd-oldStart)/86400000);
   const newEnd=new Date(schedParseDate(date)); newEnd.setDate(newEnd.getDate()+span);
-  schedEntries[idx]={...e,col,start:date,end:span>0?schedDateStr(newEnd):date,isPlaceholder:false};
+  schedEntries[idx]={...e,col,start:date,end:span>0?schedDateStr(newEnd):date,isPlaceholder:false,updatedAt:Date.now()};
   schedSaveToAPI(); schedRender(); showToast('Moved'); schedDragId=null;
 }
 
@@ -3850,20 +3944,20 @@ function semSave(){
       if(colVal==='both'){
         // Changing to Both — update the current entry to Tom, add Fraser if not already there
         const existing=schedEntries[idx];
-        schedEntries[idx]={...existing,col:'tom',jobId,text,start,end,colour,type:schedEntryType,isPlaceholder:false};
+        schedEntries[idx]={...existing,col:'tom',jobId,text,start,end,colour,type:schedEntryType,isPlaceholder:false,updatedAt:Date.now()};
         // Check if a Fraser entry already exists for same job+dates
         const fraserExists=schedEntries.some((e,i)=>i!==idx&&e.col==='fraser'&&e.jobId===jobId&&e.start===start&&e.end===end);
         if(!fraserExists){
-          schedEntries.splice(idx+1,0,{id:genId(),col:'fraser',jobId,text,start,end,colour,type:schedEntryType,isPlaceholder:false});
+          schedEntries.splice(idx+1,0,{id:genId(),col:'fraser',jobId,text,start,end,colour,type:schedEntryType,isPlaceholder:false,updatedAt:Date.now()});
         }
       } else {
         // Normal single-person edit
-        schedEntries[idx]={...schedEntries[idx],col,jobId,text,start,end,colour,type:schedEntryType,isPlaceholder:false};
+        schedEntries[idx]={...schedEntries[idx],col,jobId,text,start,end,colour,type:schedEntryType,isPlaceholder:false,updatedAt:Date.now()};
       }
     }
   } else {
     cols.forEach(c=>{
-      schedEntries.push({id:genId(),col:c,jobId,text,start,end,colour,type:schedEntryType,isPlaceholder:false});
+      schedEntries.push({id:genId(),col:c,jobId,text,start,end,colour,type:schedEntryType,isPlaceholder:false,updatedAt:Date.now()});
     });
   }
   schedSaveToAPI(); semClose(); schedRender();
@@ -4086,6 +4180,220 @@ function renderClientView(data){
     `<strong>Dovetail Carpentry &amp; Building Ltd</strong><br>
     ${gen?`Schedule generated ${gen} · `:''}Subject to change — contact us for updates
     <div class="cv-confirm-key"><i>✓</i> = Contractor has confirmed availability</div>`;
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+//  CONTRACTOR VIEW
+// ══════════════════════════════════════════════════════════════════════════
+let _ctvId=null, _ctvName=null;
+
+function initContractorView(){
+  const hash=location.hash||'';
+  if(!hash.startsWith('#ctv=')) return false;
+  const encoded=hash.slice(5);
+  let data;
+  try{ data=JSON.parse(decodeURIComponent(escape(atob(encoded)))); }
+  catch(e){
+    document.getElementById('contractor-view').style.display='block';
+    document.getElementById('ctv-content').innerHTML='<div class="ctv-empty">Invalid or expired link.</div>';
+    return true;
+  }
+  _ctvId=data.id; _ctvName=data.name;
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('main-screen').style.display='none';
+  document.getElementById('contractor-view').style.display='block';
+  const forEl=document.getElementById('ctv-for');
+  if(forEl) forEl.innerHTML=`<span class="ctv-for-name">Schedule for ${esc(_ctvName)}</span>`;
+  loadContractorView();
+  return true;
+}
+
+async function loadContractorView(){
+  if(!_ctvId) return;
+  try{
+    const [schedData,jobsData]=await Promise.all([
+      apiCall({action:'getSchedule'}),
+      apiCall({action:'getJobs'})
+    ]);
+    const twoWeeksAgo=schedDateStr(new Date(Date.now()-14*24*3600*1000));
+    const entries=(schedData.entries||[])
+      .filter(e=>e.col===_ctvId&&!e.isPlaceholder&&(e.end||e.start)>=twoWeeksAgo)
+      .sort((a,b)=>a.start.localeCompare(b.start));
+    const jobsMap={};
+    (jobsData.jobs||[]).forEach(j=>{ jobsMap[j.id]=parseJob(j); });
+    renderContractorView(entries,jobsMap);
+  }catch(e){
+    document.getElementById('ctv-content').innerHTML='<div class="ctv-empty">Could not load schedule — tap Refresh to try again.</div>';
+  }
+}
+
+function ctvReload(){
+  document.getElementById('ctv-content').innerHTML='<div class="ctv-empty">Refreshing…</div>';
+  loadContractorView();
+}
+
+function renderContractorView(entries,jobsMap){
+  const today=schedDateStr(new Date());
+  const lastNotified=parseInt(localStorage.getItem('ctv_notified_'+_ctvId)||'0');
+  const MO=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const DO=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  function fd(ds){ const d=new Date(ds+'T12:00:00'); return DO[d.getDay()]+' '+d.getDate()+' '+MO[d.getMonth()]; }
+  function fdr(s,e){
+    if(!e||e===s) return fd(s)+' '+new Date(s+'T12:00:00').getFullYear();
+    const sm=s.slice(0,7),em=e.slice(0,7);
+    if(sm===em){
+      const sd=new Date(s+'T12:00:00'),ed=new Date(e+'T12:00:00');
+      return DO[sd.getDay()]+' '+sd.getDate()+'–'+DO[ed.getDay()]+' '+ed.getDate()+' '+MO[sd.getMonth()]+' '+sd.getFullYear();
+    }
+    return fd(s)+' – '+fd(e)+' '+new Date(e+'T12:00:00').getFullYear();
+  }
+  function weekOf(ds){
+    const d=new Date(ds+'T12:00:00'),dow=d.getDay(),diff=dow===0?-6:1-dow;
+    const m=new Date(d); m.setDate(d.getDate()+diff); return schedDateStr(m);
+  }
+
+  if(!entries.length){
+    document.getElementById('ctv-content').innerHTML='<div class="ctv-empty">No upcoming bookings — check back soon.</div>';
+    return;
+  }
+
+  let html='', lastWk=null;
+  entries.forEach(e=>{
+    const job=e.jobId?jobsMap[e.jobId]:null;
+    const isPast=(e.end||e.start)<today;
+    const isNew=lastNotified>0&&(e.updatedAt||0)>lastNotified;
+    const confirmed=!!e.confirmed;
+    const wk=weekOf(e.start);
+    if(wk!==lastWk){
+      lastWk=wk;
+      const wd=new Date(wk+'T12:00:00');
+      html+=`<div class="ctv-week-hd">Week of ${wd.getDate()} ${MO[wd.getMonth()]} ${wd.getFullYear()}</div>`;
+    }
+    const jobName=job?(job.name||'Job'):(e.text||'—');
+    const phase=(e.text&&job)?e.text:'';
+    const addr=job&&job.address?job.address.trim():'';
+    const keyCode=job&&job.keyCode?job.keyCode.trim():'';
+    const notes=job&&job.contractorNotes?job.contractorNotes.trim():'';
+    const mapsUrl=addr?`https://maps.google.com/?q=${encodeURIComponent(addr)}`:'';
+    html+=`<div class="ctv-entry${confirmed?' ctv-confirmed':''}${isPast?' ctv-past':''}">
+      <div class="ctv-entry-badges">
+        <span class="ctv-badge ctv-badge-date">${fdr(e.start,e.end)}</span>
+        ${isNew?`<span class="ctv-badge ctv-badge-new">⚠ Updated</span>`:''}
+        ${confirmed?`<span class="ctv-badge ctv-badge-confirmed">✓ Confirmed</span>`:`<span class="ctv-badge ctv-badge-prov">Provisional</span>`}
+      </div>
+      <div class="ctv-job-name">${esc(jobName)}</div>
+      ${phase?`<div class="ctv-phase">${esc(phase)}</div>`:''}
+      ${addr?`<div class="ctv-detail-row"><span class="ctv-detail-ico">📍</span>${mapsUrl?`<a class="ctv-addr-link" href="${mapsUrl}" target="_blank">${esc(addr)}</a>`:`<span>${esc(addr)}</span>`}</div>`:''}
+      ${keyCode?`<div class="ctv-detail-row"><span class="ctv-detail-ico">🔑</span><div class="ctv-keycode-box">${esc(keyCode)}</div></div>`:''}
+      ${notes?`<div class="ctv-detail-row" style="align-items:flex-start"><span class="ctv-detail-ico" style="margin-top:2px">ℹ️</span><div class="ctv-notes-box">${esc(notes).replace(/\n/g,'<br>')}</div></div>`:''}
+    </div>`;
+  });
+  document.getElementById('ctv-content').innerHTML=html;
+}
+
+// ─── CONTRACTOR LINKS MODAL ───────────────────────────────────────────────
+function clmOpen(){
+  document.getElementById('clm-modal').classList.add('open');
+  clmRender();
+}
+function clmClose(){ document.getElementById('clm-modal').classList.remove('open'); }
+
+function clmRender(){
+  const today=schedDateStr(new Date());
+  const allCols=contractorsAllCols().filter(c=>c.id!=='notes');
+  document.getElementById('clm-body').innerHTML=allCols.map(col=>{
+    const lastTs=parseInt(localStorage.getItem('ctv_notified_'+col.id)||'0');
+    const lastLabel=lastTs?_clmRelTime(lastTs):'Never notified';
+    const upcoming=schedEntries.filter(e=>e.col===col.id&&!e.isPlaceholder&&(e.end||e.start)>=today).length;
+    const safeId=col.id.replace(/'/g,"\\'"), safeName=col.label.replace(/'/g,"\\'");
+    return `<div class="clm-row">
+      <div style="width:10px;height:10px;border-radius:50%;background:${col.avatar||col.text};flex-shrink:0"></div>
+      <div class="clm-info">
+        <div class="clm-name">${esc(col.label)}</div>
+        <div class="clm-meta">${upcoming} upcoming · ${lastLabel}</div>
+      </div>
+      <button class="clm-btn clm-copy" onclick="clmCopyLink('${safeId}','${safeName}')">Copy link</button>
+      <button class="clm-btn clm-wa" onclick="clmNotify('${safeId}','${safeName}')">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" style="display:inline;vertical-align:-1px;margin-right:3px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.115.549 4.1 1.504 5.832L0 24l6.335-1.484A11.944 11.944 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.793 9.793 0 01-5.003-1.374l-.358-.213-3.758.88.927-3.67-.233-.378A9.78 9.78 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/></svg>
+        Notify
+      </button>
+    </div>`;
+  }).join('');
+}
+
+function _clmRelTime(ts){
+  const d=Math.floor((Date.now()-ts)/86400000);
+  if(d===0) return 'Notified today'; if(d===1) return 'Notified yesterday';
+  return `Notified ${d}d ago`;
+}
+
+async function _clmShortUrl(colId,colName){
+  const payload={id:colId,name:colName};
+  const encoded=btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+  const longUrl=location.origin+location.pathname+'#ctv='+encoded;
+  try{
+    const ctrl=new AbortController();
+    const t=setTimeout(()=>ctrl.abort(),5000);
+    const r=await fetch('https://tinyurl.com/api-create.php?url='+encodeURIComponent(longUrl),{signal:ctrl.signal});
+    clearTimeout(t);
+    const text=(await r.text()).trim();
+    if(/^https:\/\/tinyurl\.com\/\w+$/.test(text)) return text;
+  }catch(e){}
+  return longUrl;
+}
+
+async function clmCopyLink(colId,colName){
+  showToast('Generating short link…');
+  const url=await _clmShortUrl(colId,colName);
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(url).then(()=>showToast('Link copied!'))
+      .catch(()=>{ prompt('Copy this link:',url); });
+  } else { prompt('Copy this link:',url); }
+}
+
+async function clmNotify(colId,colName){
+  const today=schedDateStr(new Date());
+  const lastNotified=parseInt(localStorage.getItem('ctv_notified_'+colId)||'0');
+  const MO=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const DO=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  function fd(ds){ const d=new Date(ds+'T12:00:00'); return DO[d.getDay()]+' '+d.getDate()+' '+MO[d.getMonth()]; }
+  function fdr(s,e){ return e&&e!==s?fd(s)+' – '+fd(e):fd(s); }
+
+  const upcoming=schedEntries
+    .filter(e=>e.col===colId&&!e.isPlaceholder&&(e.end||e.start)>=today)
+    .sort((a,b)=>a.start.localeCompare(b.start));
+
+  if(!upcoming.length){ showToast('No upcoming bookings for '+colName); return; }
+
+  const changed=lastNotified>0?upcoming.filter(e=>(e.updatedAt||0)>lastNotified):[];
+
+  showToast('Generating message…');
+  const link=await _clmShortUrl(colId,colName);
+
+  let msg=`Hi ${colName},\n\n`;
+  if(changed.length){
+    msg+=`Your Dovetail schedule has been updated. Here's what's changed:\n\n`;
+    changed.forEach(e=>{
+      const job=e.jobId?jobs.find(j=>j.id===e.jobId):null;
+      const name=job?(job.name||'Job'):(e.text||'—');
+      msg+=`⚠ ${name}${e.text&&job?' — '+e.text:''}: ${fdr(e.start,e.end)}\n`;
+    });
+    msg+='\n';
+  }
+  msg+=`Your full upcoming schedule:\n\n`;
+  upcoming.forEach(e=>{
+    const job=e.jobId?jobs.find(j=>j.id===e.jobId):null;
+    const name=job?(job.name||'Job'):(e.text||'—');
+    const addr=job&&job.address?'\n  📍 '+job.address:'';
+    const key=job&&job.keyCode?'\n  🔑 '+job.keyCode:'';
+    msg+=`• ${name}${e.text&&job?' ('+e.text+')':''}: ${fdr(e.start,e.end)}${e.confirmed?' ✓':' (provisional)'}${addr}${key}\n`;
+  });
+  msg+=`\nView your live schedule here:\n${link}`;
+  msg+=`\n\nDovetail Carpentry & Building`;
+
+  localStorage.setItem('ctv_notified_'+colId,String(Date.now()));
+  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+  clmRender();
 }
 
 function updateSchedHeaderTop(){
