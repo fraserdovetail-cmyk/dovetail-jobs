@@ -3853,7 +3853,7 @@ function requestNotifPermission(){
 // ══════════════════════════════════════════════════════════════════════════
 //  CLIENT SHARE LINK
 // ══════════════════════════════════════════════════════════════════════════
-function generateClientLink(){
+async function generateClientLink(){
   if(!schedJobFilter) return;
   const j=jobs.find(x=>x.id===schedJobFilter); if(!j) return;
   const entries=schedEntries
@@ -3868,9 +3868,20 @@ function generateClientLink(){
   let encoded;
   try{ encoded=btoa(unescape(encodeURIComponent(JSON.stringify(payload)))); }
   catch(e){ showToast('Error generating link'); return; }
-  const url=location.origin+location.pathname+'#client='+encoded;
+  const longUrl=location.origin+location.pathname+'#client='+encoded;
+  showToast('Generating short link…');
+  let url=longUrl;
+  try{
+    const ctrl=new AbortController();
+    const t=setTimeout(()=>ctrl.abort(),5000);
+    const r=await fetch('https://tinyurl.com/api-create.php?url='+encodeURIComponent(longUrl),{signal:ctrl.signal});
+    clearTimeout(t);
+    const text=(await r.text()).trim();
+    if(/^https:\/\/tinyurl\.com\/\w+$/.test(text)) url=text;
+  }catch(e){}
+  const label=url===longUrl?'Link copied!':'Short link copied!';
   if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(url).then(()=>showToast('Client link copied!'))
+    navigator.clipboard.writeText(url).then(()=>showToast(label))
       .catch(()=>{ prompt('Copy this link:',url); });
   } else {
     prompt('Copy this link:',url);
