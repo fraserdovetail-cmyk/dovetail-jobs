@@ -1609,6 +1609,7 @@ const SMONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','No
 const CHASE_DAYS = 7;
 
 let jobs = [], saving = false, _durUnit = 'days', _gcalAdded = false, _depositReceived = false;
+let _ctvId=null, _ctvName=null;
 let currentStage = 0, _currentJobLog = [];
 let _pricingJobId = null, _ppSections = [];
 let builtinLabelOverrides = {}; // persisted to localStorage for renamed built-in contractors
@@ -4211,8 +4212,6 @@ function renderClientView(data){
 // ══════════════════════════════════════════════════════════════════════════
 //  CONTRACTOR VIEW
 // ══════════════════════════════════════════════════════════════════════════
-let _ctvId=null, _ctvName=null;
-
 function initContractorView(){
   const params=new URLSearchParams(location.search);
   let ctvId=params.get('ctv');
