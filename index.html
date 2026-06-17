@@ -202,6 +202,24 @@ body{min-height:100vh;overflow-x:hidden}
 .chase-name{font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .chase-meta{font-size:12px;color:var(--amber)}
 .dash-empty{padding:16px;font-size:13px;color:var(--hint);font-style:italic}
+.dex-item{display:flex;align-items:center;gap:10px;padding:9px 16px;border-bottom:1px solid var(--border)}
+.dex-item:last-of-type{border-bottom:none}
+.dex-info{flex:1;min-width:0;cursor:pointer}
+.dex-info:hover .dex-name{color:var(--green)}
+.dex-name{font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dex-meta{font-size:12px;color:var(--muted);margin-top:1px}
+.dex-btn{padding:4px 11px;background:var(--green-light);color:var(--green-dark);border:1px solid var(--green-border);border-radius:var(--radius-sm);font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.dex-btn:hover{background:var(--green-border)}
+.dex-form{display:none;gap:6px;padding:6px 16px 10px;background:var(--surface);border-bottom:1px solid var(--border);align-items:center}
+.dex-form.open{display:flex}
+.dex-desc{flex:1;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:'Inter',sans-serif;color:var(--text);background:var(--white);outline:none;min-width:0}
+.dex-desc:focus{border-color:var(--green-mid)}
+.dex-val{width:80px;padding:7px 9px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:'JetBrains Mono',monospace;color:var(--text);background:var(--white);outline:none;flex-shrink:0}
+.dex-val:focus{border-color:var(--green-mid)}
+.dex-save{padding:7px 12px;background:var(--green);color:#fff;border:none;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0}
+.dex-save:hover{background:var(--green-mid)}
+.dex-cancel{padding:7px 9px;background:none;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;color:var(--muted);cursor:pointer;flex-shrink:0}
+.dex-cancel:hover{background:var(--surface)}
 .declined-item{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;border-bottom:1px solid var(--border);transition:background 0.12s}
 .declined-item:last-child{border-bottom:none}
 .declined-item:hover{background:var(--surface)}
@@ -1129,6 +1147,15 @@ select.sem-input{cursor:pointer}
     <div class="content" style="padding-bottom:10px;flex-shrink:0">
       <div class="offline-queue-bar" id="offline-queue-bar">⚡ <span id="offline-queue-count">0</span> job(s) queued to sync when back online. <button onclick="retrySyncQueue()" style="background:none;border:none;color:var(--amber);font-weight:600;cursor:pointer;font-size:12px;margin-left:4px">Retry now</button></div>
       <div class="dash-kpi-row" id="dash-kpis"></div>
+      <div class="dash-row" style="grid-template-columns:1fr;margin-bottom:16px">
+        <div class="dash-panel" id="dash-extras-panel">
+          <div class="dash-panel-hd" style="background:var(--green-light);border-color:var(--green-border)">
+            <span class="dash-panel-title" style="color:var(--green-dark)">Extras · jobs in progress</span>
+            <span id="dash-extras-total" style="font-size:12px;font-weight:600;font-family:'JetBrains Mono',monospace;color:var(--green)"></span>
+          </div>
+          <div class="dash-panel-body" id="dash-extras-body"><div class="dash-empty">No jobs currently in progress</div></div>
+        </div>
+      </div>
       <div class="dash-row">
         <div class="dash-panel" id="dash-quotes-panel">
           <div class="dash-panel-hd"><span class="dash-panel-title">Needs quoting</span></div>
@@ -1863,7 +1890,8 @@ function renderDashboard(){
   const activeJobs=jobs.filter(j=>!j.declined&&j.stage>0&&j.stage<10);
   const activeVal=activeJobs.reduce((a,j)=>a+safeNum(j.value),0);
   const quotesOut=jobs.filter(j=>!j.declined&&j.stage===2).length;
-  const overdueList=jobs.filter(j=>!j.declined&&isOverdue(j));
+  const inProgressJobs=jobs.filter(j=>!j.declined&&j.stage===7);
+  const allExtrasVal=inProgressJobs.reduce((t,j)=>t+(Array.isArray(j.extras)?j.extras.reduce((s,e)=>s+(parseFloat(e.value)||0),0):0),0);
 
   // Needs quoting: stages 0 (Initial contact) and 1 (Viewed job), newest first
   const needsQuoting=jobs.filter(j=>!j.declined&&(j.stage===0||j.stage===1))
@@ -1897,16 +1925,40 @@ function renderDashboard(){
       <div class="kpi-val" style="${needsQuoting.length?'color:var(--blue)':''}">${needsQuoting.length}</div>
       <div class="kpi-sub">${needsQuoting.length?'quote required':'all quoted'}</div>
     </div>
-    ${overdueList.length?`<div class="kpi-card accent-amber clickable" onclick="filterToSort('overdue')">
-      <div class="kpi-label">Overdue starts</div>
-      <div class="kpi-val">${overdueList.length}</div>
-      <div class="kpi-sub">start date passed</div>
-    </div>`:`<div class="kpi-card">
-      <div class="kpi-label">Total jobs</div>
-      <div class="kpi-val">${jobs.filter(j=>!j.declined).length}</div>
-      <div class="kpi-sub">${jobs.filter(j=>j.stage===9).length} completed</div>
-    </div>`}
+    <div class="kpi-card clickable${inProgressJobs.length?' accent-green':''}" onclick="document.getElementById('dash-extras-panel').scrollIntoView({behavior:'smooth',block:'nearest'})">
+      <div class="kpi-label">Extras</div>
+      <div class="kpi-val">${inProgressJobs.length}</div>
+      <div class="kpi-sub">${allExtrasVal>0?'£'+allExtrasVal.toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:2})+' tracked':'jobs in progress'}</div>
+    </div>
   `;
+
+  // Extras panel
+  const extrasBody=document.getElementById('dash-extras-body');
+  const extrasTotalEl=document.getElementById('dash-extras-total');
+  if(extrasTotalEl) extrasTotalEl.textContent=allExtrasVal>0?'£'+allExtrasVal.toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:2}):'';
+  if(inProgressJobs.length){
+    extrasBody.innerHTML=inProgressJobs.map(j=>{
+      const ex=Array.isArray(j.extras)?j.extras:[];
+      const cnt=ex.length;
+      const tot=extrasTotal(ex);
+      const meta=cnt?(cnt+' extra'+(cnt!==1?'s':''))+(tot?' · '+tot:''):'No extras yet';
+      return `<div class="dex-item">
+        <div class="dex-info" onclick="openJob('${j.id}')">
+          <div class="dex-name">${esc(j.name||'Untitled')} — ${esc(j.client||'—')}</div>
+          <div class="dex-meta">${meta}</div>
+        </div>
+        <button class="dex-btn" onclick="dexToggleForm('${j.id}')">+ Extra</button>
+      </div>
+      <div class="dex-form" id="dex-form-${j.id}">
+        <input class="dex-desc" id="dex-desc-${j.id}" placeholder="Describe the extra work…" onkeydown="if(event.key==='Enter')dexAdd('${j.id}')"/>
+        <input class="dex-val" id="dex-val-${j.id}" type="number" min="0" step="0.01" placeholder="£ value"/>
+        <button class="dex-save" onclick="dexAdd('${j.id}')">Add</button>
+        <button class="dex-cancel" onclick="dexToggleForm('${j.id}')">✕</button>
+      </div>`;
+    }).join('');
+  } else {
+    extrasBody.innerHTML='<div class="dash-empty">No jobs currently in progress — set a job to "Work commenced" to track extras here</div>';
+  }
 
   // Needs quoting panel
   const quotesBody=document.getElementById('dash-quotes-body');
@@ -2479,6 +2531,29 @@ function refreshExtrasUI(jobId, extras){
   const totEl=document.getElementById('extras-sec-total');
   const t=extrasTotal(extras);
   if(totEl){ totEl.textContent=t; totEl.style.display=t?'':'none'; }
+}
+
+function dexToggleForm(jobId){
+  const form=document.getElementById('dex-form-'+jobId); if(!form) return;
+  const opening=!form.classList.contains('open');
+  document.querySelectorAll('.dex-form.open').forEach(f=>f.classList.remove('open'));
+  if(opening){ form.classList.add('open'); setTimeout(()=>{ const d=document.getElementById('dex-desc-'+jobId); if(d) d.focus(); },40); }
+}
+
+async function dexAdd(jobId){
+  const descEl=document.getElementById('dex-desc-'+jobId);
+  const valEl=document.getElementById('dex-val-'+jobId);
+  const desc=(descEl?.value||'').trim(); if(!desc) return;
+  const value=parseFloat(valEl?.value)||0;
+  const idx=jobs.findIndex(x=>x.id===jobId); if(idx<0) return;
+  const job={...jobs[idx]};
+  const extras=Array.isArray(job.extras)?[...job.extras]:[];
+  extras.push({id:genId(),desc,value:value||'',status:'pending',ts:Date.now()});
+  job.extras=extras; job.updated=String(Date.now());
+  jobs[idx]=job;
+  document.getElementById('dex-form-'+jobId)?.classList.remove('open');
+  showToast('Extra added');
+  await pushJob(job); renderAll();
 }
 
 async function addExtra(jobId){
