@@ -4109,10 +4109,10 @@ async function generateClientLink(){
   try{
     const ctrl=new AbortController();
     const t=setTimeout(()=>ctrl.abort(),5000);
-    const r=await fetch('https://tinyurl.com/api-create.php?url='+encodeURIComponent(longUrl),{signal:ctrl.signal});
+    const r=await fetch('https://is.gd/create.php?format=simple&url='+encodeURIComponent(longUrl),{signal:ctrl.signal});
     clearTimeout(t);
     const text=(await r.text()).trim();
-    if(/^https:\/\/tinyurl\.com\/\w+$/.test(text)) url=text;
+    if(/^https:\/\/is\.gd\/\w+$/.test(text)) url=text;
   }catch(e){}
   const label=url===longUrl?'Link copied!':'Short link copied!';
   if(navigator.clipboard&&navigator.clipboard.writeText){
@@ -4366,10 +4366,10 @@ async function _clmShortUrl(colId,colName){
   try{
     const ctrl=new AbortController();
     const t=setTimeout(()=>ctrl.abort(),5000);
-    const r=await fetch('https://tinyurl.com/api-create.php?url='+encodeURIComponent(longUrl),{signal:ctrl.signal});
+    const r=await fetch('https://is.gd/create.php?format=simple&url='+encodeURIComponent(longUrl),{signal:ctrl.signal});
     clearTimeout(t);
     const text=(await r.text()).trim();
-    if(/^https:\/\/tinyurl\.com\/\w+$/.test(text)) return text;
+    if(/^https:\/\/is\.gd\/\w+$/.test(text)) return text;
   }catch(e){}
   return longUrl;
 }
