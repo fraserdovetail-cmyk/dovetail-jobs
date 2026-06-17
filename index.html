@@ -4103,7 +4103,7 @@ async function generateClientLink(){
   let encoded;
   try{ encoded=btoa(unescape(encodeURIComponent(JSON.stringify(payload)))); }
   catch(e){ showToast('Error generating link'); return; }
-  const longUrl=location.origin+location.pathname+'#client='+encoded;
+  const longUrl=location.origin+location.pathname+'?client='+encoded;
   showToast('Generating short link…');
   let url=longUrl;
   try{
@@ -4124,9 +4124,9 @@ async function generateClientLink(){
 }
 
 function initClientView(){
-  const hash=location.hash||'';
-  if(!hash.startsWith('#client=')) return false;
-  const encoded=hash.slice(8);
+  const params=new URLSearchParams(location.search);
+  const encoded=params.get('client');
+  if(!encoded) return false;
   let data;
   try{ data=JSON.parse(decodeURIComponent(escape(atob(encoded)))); }
   catch(e){
@@ -4218,17 +4218,11 @@ function renderClientView(data){
 let _ctvId=null, _ctvName=null;
 
 function initContractorView(){
-  const hash=location.hash||'';
-  if(!hash.startsWith('#ctv=')) return false;
-  const encoded=hash.slice(5);
-  let data;
-  try{ data=JSON.parse(decodeURIComponent(escape(atob(encoded)))); }
-  catch(e){
-    document.getElementById('contractor-view').style.display='block';
-    document.getElementById('ctv-content').innerHTML='<div class="ctv-empty">Invalid or expired link.</div>';
-    return true;
-  }
-  _ctvId=data.id; _ctvName=data.name;
+  const params=new URLSearchParams(location.search);
+  const ctvId=params.get('ctv');
+  if(!ctvId) return false;
+  _ctvId=ctvId;
+  _ctvName=params.get('n')||ctvId;
   document.getElementById('login-screen').style.display='none';
   document.getElementById('main-screen').style.display='none';
   document.getElementById('contractor-view').style.display='block';
@@ -4368,9 +4362,7 @@ function _clmRelTime(ts){
 }
 
 async function _clmShortUrl(colId,colName){
-  const payload={id:colId,name:colName};
-  const encoded=btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
-  const longUrl=location.origin+location.pathname+'#ctv='+encoded;
+  const longUrl=location.origin+location.pathname+'?ctv='+encodeURIComponent(colId)+'&n='+encodeURIComponent(colName);
   try{
     const ctrl=new AbortController();
     const t=setTimeout(()=>ctrl.abort(),5000);
