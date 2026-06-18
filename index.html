@@ -1041,6 +1041,28 @@ select.sem-input{cursor:pointer}
 .bom-schedule-all{margin-top:10px;padding:9px 14px;background:var(--green);color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:background 0.12s;width:100%}
 .bom-schedule-all:hover{background:var(--green-mid)}
 
+/* ── INVOICE LINKS (job modal) ── */
+.inv-links-grid{display:flex;flex-direction:column;gap:10px}
+.inv-link-row{display:flex;align-items:center;gap:10px}
+.inv-link-lbl{font-size:12px;font-weight:600;color:var(--text);min-width:140px;flex-shrink:0}
+.inv-link-pct{font-size:11px;font-weight:700;color:var(--muted);font-family:'JetBrains Mono',monospace;min-width:34px;text-align:right;flex-shrink:0}
+.inv-link-input{flex:1;padding:8px 11px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;font-family:'Inter',sans-serif;color:var(--text);background:var(--white);outline:none;transition:border-color 0.15s}
+.inv-link-input:focus{border-color:var(--green-mid)}
+.inv-link-input::placeholder{color:var(--hint)}
+@media(max-width:520px){.inv-link-row{flex-wrap:wrap}.inv-link-lbl{min-width:0;flex:1}.inv-link-pct{order:-1;min-width:auto}}
+
+/* ── INVOICE PAYMENT CARDS (client view) ── */
+.cv-invoices{margin-top:22px}
+.cv-invoices-hd{font-size:11px;font-weight:700;color:var(--sage-dark);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px}
+.cv-inv-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:440px){.cv-inv-cards{grid-template-columns:1fr}}
+.cv-inv-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+.cv-inv-card-name{font-size:14px;font-weight:600;color:var(--charcoal)}
+.cv-inv-card-pct{font-size:12px;color:var(--muted);font-family:'JetBrains Mono',monospace}
+.cv-inv-pay-btn{display:block;margin-top:8px;padding:10px 14px;background:var(--sage);color:#fff;border-radius:var(--radius-sm);font-size:13px;font-weight:600;font-family:'Inter',sans-serif;text-decoration:none;text-align:center;transition:background 0.12s}
+.cv-inv-pay-btn:hover{background:var(--sage-dark)}
+.cv-inv-pending{margin-top:8px;padding:8px 12px;background:var(--surface);border:1px dashed var(--border-strong);border-radius:var(--radius-sm);font-size:12px;color:var(--hint);text-align:center;font-style:italic}
+
 </style>
 </head>
 <body>
@@ -1059,6 +1081,7 @@ select.sem-input{cursor:pointer}
     </div>
     <div class="cv-legend" id="cv-legend"></div>
     <div id="cv-months"></div>
+    <div id="cv-invoices"></div>
     <div class="cv-footer" id="cv-footer"></div>
   </div>
 </div>
@@ -1836,6 +1859,10 @@ function parseJob(j){
     keyCode:safeStr(j.keyCode),
     contractorNotes:safeStr(j.contractorNotes),
     bomFilename:safeStr(j.bomFilename||''),
+    invoiceDepositUrl:safeStr(j.invoiceDepositUrl||''),
+    invoiceStage1Url:safeStr(j.invoiceStage1Url||''),
+    invoiceStage2Url:safeStr(j.invoiceStage2Url||''),
+    invoiceStage3Url:safeStr(j.invoiceStage3Url||''),
   };
 }
 
@@ -2275,6 +2302,32 @@ function openJob(id){
     </div>
 
     <div class="modal-section">
+      <div class="sec-hd">Invoice links</div>
+      <div class="inv-links-grid">
+        <div class="inv-link-row">
+          <span class="inv-link-pct">10%</span>
+          <span class="inv-link-lbl">Deposit</span>
+          <input class="inv-link-input" id="f-inv-deposit" type="url" value="${esc(d.invoiceDepositUrl||'')}" placeholder="Paste Monzo payment link…"/>
+        </div>
+        <div class="inv-link-row">
+          <span class="inv-link-pct">30%</span>
+          <span class="inv-link-lbl">Stage Payment 1</span>
+          <input class="inv-link-input" id="f-inv-stage1" type="url" value="${esc(d.invoiceStage1Url||'')}" placeholder="Paste Monzo payment link…"/>
+        </div>
+        <div class="inv-link-row">
+          <span class="inv-link-pct">30%</span>
+          <span class="inv-link-lbl">Stage Payment 2</span>
+          <input class="inv-link-input" id="f-inv-stage2" type="url" value="${esc(d.invoiceStage2Url||'')}" placeholder="Paste Monzo payment link…"/>
+        </div>
+        <div class="inv-link-row">
+          <span class="inv-link-pct">30%</span>
+          <span class="inv-link-lbl">Stage Payment 3</span>
+          <input class="inv-link-input" id="f-inv-stage3" type="url" value="${esc(d.invoiceStage3Url||'')}" placeholder="Paste Monzo payment link…"/>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-section">
       <div class="sec-hd">Workflow stage</div>
       <div class="stepper" id="stepper">${buildStepper(currentStage,log)}</div>
     </div>
@@ -2435,6 +2488,10 @@ async function saveJob(id,isNew){
     extras:Array.isArray(existing.extras)?existing.extras:[],
     keyCode:(document.getElementById('f-keycode')||{}).value||'',
     contractorNotes:(document.getElementById('f-contractor-notes')||{}).value||'',
+    invoiceDepositUrl:(document.getElementById('f-inv-deposit')||{}).value||'',
+    invoiceStage1Url:(document.getElementById('f-inv-stage1')||{}).value||'',
+    invoiceStage2Url:(document.getElementById('f-inv-stage2')||{}).value||'',
+    invoiceStage3Url:(document.getElementById('f-inv-stage3')||{}).value||'',
     bom:existing.bom||null,
     bomFilename:existing.bomFilename||'',
     promptHistory:Array.isArray(existing.promptHistory)?existing.promptHistory:[],
@@ -4173,9 +4230,16 @@ async function generateClientLink(){
   if(!entries.length){ showToast('No dates to share'); return; }
   const usedCols=SCHED_COLS.filter(c=>entries.some(e=>e.col===c.id))
     .map(c=>({id:c.id,label:c.label,bg:c.bg,text:c.text}));
+  const invoices=[
+    {name:'Deposit',pct:10,url:j.invoiceDepositUrl||''},
+    {name:'Stage Payment 1',pct:30,url:j.invoiceStage1Url||''},
+    {name:'Stage Payment 2',pct:30,url:j.invoiceStage2Url||''},
+    {name:'Stage Payment 3',pct:30,url:j.invoiceStage3Url||''},
+  ];
   const payload={v:1,
     job:{name:j.name||'',client:j.client||'',address:j.address||''},
-    entries, cols:usedCols, generated:schedDateStr(new Date())};
+    entries, cols:usedCols, generated:schedDateStr(new Date()),
+    invoices};
   let encoded;
   try{ encoded=btoa(unescape(encodeURIComponent(JSON.stringify(payload)))); }
   catch(e){ showToast('Error generating link'); return; }
@@ -4276,6 +4340,23 @@ function renderClientView(data){
   }
 
   document.getElementById('cv-months').innerHTML=months.map(renderCvMonth).join('');
+
+  const invEl=document.getElementById('cv-invoices');
+  const invoices=data.invoices||[];
+  const hasAnyUrl=invoices.some(inv=>inv.url);
+  if(invEl&&hasAnyUrl){
+    invEl.innerHTML=`<div class="cv-invoices">
+      <div class="cv-invoices-hd">Payments</div>
+      <div class="cv-inv-cards">${invoices.map(inv=>`
+        <div class="cv-inv-card">
+          <div class="cv-inv-card-name">${esc(inv.name)}</div>
+          <div class="cv-inv-card-pct">${inv.pct}% of total</div>
+          ${inv.url?`<a class="cv-inv-pay-btn" href="${esc(inv.url)}" target="_blank" rel="noopener noreferrer">Pay now</a>`:`<div class="cv-inv-pending">Not yet issued</div>`}
+        </div>`).join('')}
+      </div>
+    </div>`;
+  } else if(invEl){ invEl.innerHTML=''; }
+
   const SMONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const gen=data.generated?(d=>`${parseInt(d.split('-')[2])} ${SMONTHS[parseInt(d.split('-')[1])-1]} ${d.split('-')[0]}`)(data.generated):'';
   document.getElementById('cv-footer').innerHTML=
