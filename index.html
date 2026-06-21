@@ -2244,9 +2244,6 @@ function openJob(id){
   document.getElementById('modal-title').textContent=isNew?'New job':(d.ref+(d.name?' — '+d.name:''));
 
   document.getElementById('modal-body').innerHTML=`
-    <div class="modal-section" id="bom-header-section" style="margin-bottom:12px">
-      \${buildBomHeader(d.id,isNew)}
-    </div>
     <div class="modal-section">
       <div class="sec-hd">Job details</div>
       <div class="fg">
@@ -2257,32 +2254,6 @@ function openJob(id){
         <div class="fgroup"><label class="flabel">Total value (£)</label><input class="finput" id="f-value" type="number" min="0" step="0.01" value="${esc(d.value)}" placeholder="0" oninput="updateDeposit()"/></div>
         <div class="fgroup"><label class="flabel">Deposit (10%)</label>
           <div class="deposit-box"><span class="deposit-lbl">10% deposit</span><span class="deposit-amt" id="deposit-amount">${dep||'—'}</span></div>
-        </div>
-      </div>
-      <div class="fgroup" style="margin-bottom:12px">
-        <div class="deposit-toggle${_depositReceived?' received':''}" onclick="toggleDepositReceived()" id="deposit-toggle">
-          <div class="dep-check"><svg class="dep-check-ico" viewBox="0 0 12 10"><polyline points="1 5 4 8 11 1"/></svg></div>
-          <span class="dep-lbl-text">${_depositReceived?'Deposit received ✓':'Mark deposit as received'}</span>
-        </div>
-      </div>
-      <div class="fg">
-        <div class="fgroup"><label class="flabel">Pre-start meeting date</label><input class="finput" id="f-prestart" type="date" value="${esc(d.prestartDate||'')}"/></div>
-        <div class="fgroup"><label class="flabel">Pre-start time (optional)</label><input class="finput" id="f-prestart-time" type="time" value="${esc(d.prestartTime||'')}"/></div>
-      </div>
-      <div class="fg">
-        <div class="fgroup"><label class="flabel">Job start date</label><input class="finput" id="f-start" type="date" value="${esc(d.startDate)}" oninput="refreshGcalSection()"/></div>
-        <div class="fgroup"><label class="flabel">Start time (optional)</label><input class="finput" id="f-start-time" type="time" value="${esc(d.startTime||'')}"/></div>
-      </div>
-      <div class="fg">
-        <div class="fgroup"></div>
-        <div class="fgroup"><label class="flabel">Duration</label>
-          <div class="dur-wrap">
-            <input class="finput" id="f-durnum" type="number" min="1" max="999" value="${esc(d.durationNum)}" placeholder="e.g. 5" style="flex:1" oninput="refreshGcalSection()"/>
-            <div class="dur-toggle">
-              <button class="dur-opt${_durUnit==='days'?' active':''}" id="dur-days" onclick="setDurUnit('days')">Days</button>
-              <button class="dur-opt${_durUnit==='weeks'?' active':''}" id="dur-weeks" onclick="setDurUnit('weeks')">Wks</button>
-            </div>
-          </div>
         </div>
       </div>
       <div class="fg full"><div class="fgroup"><label class="flabel">Site address</label><input class="finput" id="f-addr" value="${esc(d.address)}" placeholder="12 High Street, Stamford"/></div></div>
@@ -2306,25 +2277,9 @@ function openJob(id){
     </div>
 
     <div class="modal-section">
-      <div class="sec-hd">Google Calendar</div>
-      <div id="gcal-section">${buildGcalSection(d)}</div>
-    </div>
-
-    <div class="modal-section">
       <div class="sec-hd">Workflow stage</div>
       <div class="stepper" id="stepper">${buildStepper(currentStage,log)}</div>
     </div>
-
-    ${!isNew?`<div class="modal-section">
-      <div class="sec-hd">Site log</div>
-      <div id="site-log-entries">
-        ${slog.length?`<div class="site-log-list">${slog.slice().reverse().map(e=>`<div class="site-entry"><div class="site-dot"></div><div><div class="site-text">${esc(e.text)}</div><div class="site-time">${fmtTs(e.ts)}</div></div></div>`).join('')}</div>`:'<div class="log-empty">No entries yet.</div>'}
-      </div>
-      <div class="site-log-add">
-        <textarea id="site-log-input" placeholder="Add a site visit note, observation..." rows="2"></textarea>
-        <button class="site-add-btn" onclick="addSiteLog('${d.id}')">Add note</button>
-      </div>
-    </div>`:''}
 
     ${!isNew?`<div class="modal-section" id="extras-section">
       <div class="sec-hd" style="display:flex;align-items:center;justify-content:space-between">
@@ -2456,17 +2411,17 @@ async function saveJob(id,isNew){
     email:document.getElementById('f-email').value,
     address:document.getElementById('f-addr').value,
     value:document.getElementById('f-value').value,
-    startDate:document.getElementById('f-start').value,
-    startTime:(document.getElementById('f-start-time')||{}).value||'',
-    prestartDate:(document.getElementById('f-prestart')||{}).value||'',
-    prestartTime:(document.getElementById('f-prestart-time')||{}).value||'',
-    durationNum:document.getElementById('f-durnum').value,
-    durationUnit:_durUnit,
+    startDate:existing.startDate||'',
+    startTime:existing.startTime||'',
+    prestartDate:existing.prestartDate||'',
+    prestartTime:existing.prestartTime||'',
+    durationNum:existing.durationNum||'',
+    durationUnit:existing.durationUnit||'days',
     notes:document.getElementById('f-notes').value,
     stage:currentStage,
     activityLog:newLog,
-    gcalAdded:_gcalAdded,
-    depositReceived:_depositReceived,
+    gcalAdded:existing.gcalAdded||false,
+    depositReceived:existing.depositReceived||false,
     siteLog:Array.isArray(existing.siteLog)?existing.siteLog:[],
     extras:Array.isArray(existing.extras)?existing.extras:[],
     keyCode:(document.getElementById('f-keycode')||{}).value||'',
