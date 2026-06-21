@@ -1,7 +1,7 @@
 // ════════════════════════════════════════════════════════════════════════════
-//  DOVETAIL JOB PORTAL — Google Apps Script backend
-//  Deploy: Extensions → Apps Script → Deploy → New deployment → Web app
-//  Execute as: Me   |   Who has access: Anyone
+//  DOVETAIL JOB PORTAL — Google Apps Script backend  v2
+//  Deploy: Extensions → Apps Script → Deploy → Manage deployments
+//         → edit existing → New version → Deploy  (URL stays the same)
 // ════════════════════════════════════════════════════════════════════════════
 
 // ─── ENTRY POINTS ────────────────────────────────────────────────────────────
@@ -11,20 +11,20 @@ function doPost(e) { return handleRequest(e); }
 
 function handleRequest(e) {
   try {
-    const raw  = e.postData ? e.postData.contents : (e.parameter ? JSON.stringify(e.parameter) : '{}');
+    const raw  = (e && e.postData) ? e.postData.contents : '{}';
     const body = JSON.parse(raw || '{}');
     let result;
 
     switch (body.action) {
-      case 'getJobs':          result = getJobs();                          break;
-      case 'saveJob':          result = saveJob(body.job);                  break;
-      case 'deleteJob':        result = deleteJob(body.id);                 break;
-      case 'getSchedule':      result = getSchedule();                      break;
-      case 'saveSchedule':     result = saveSchedule(body.entries);         break;
-      case 'getContractors':   result = getContractors();                   break;
-      case 'saveContractors':  result = saveContractors(body.contractors);  break;
-      case 'shortUrl':         result = shortUrl(body.url);                 break;
-      default:                 result = { error: 'Unknown action: ' + body.action };
+      case 'getJobs':         result = getJobs();                         break;
+      case 'saveJob':         result = saveJob(body.job);                 break;
+      case 'deleteJob':       result = deleteJob(body.id);                break;
+      case 'getSchedule':     result = getSchedule();                     break;
+      case 'saveSchedule':    result = saveSchedule(body.entries);        break;
+      case 'getContractors':  result = getContractors();                  break;
+      case 'saveContractors': result = saveContractors(body.contractors); break;
+      case 'shortUrl':        result = { short: body.url || '' };        break;
+      default:                result = { error: 'Unknown action: ' + body.action };
     }
 
     return ContentService
@@ -32,6 +32,7 @@ function handleRequest(e) {
       .setMimeType(ContentService.MimeType.JSON);
 
   } catch (err) {
+    Logger.log('handleRequest error: ' + err.toString());
     return ContentService
       .createTextOutput(JSON.stringify({ error: err.toString() }))
       .setMimeType(ContentService.MimeType.JSON);
@@ -40,9 +41,11 @@ function handleRequest(e) {
 
 // ════════════════════════════════════════════════════════════════════════════
 //  JOBS
-//  Every field the portal uses is listed here.  Adding a new field to the
-//  portal only requires adding its key to JOB_COLS below — the script will
-//  automatically append the column to the sheet on the next save.
+//
+//  Adding a new field to the portal:
+//    1. Add the key to JOB_COLS below
+//    2. Redeploy the script (Manage deployments → edit → New version)
+//    3. The column will be added to the sheet automatically on the next save
 // ════════════════════════════════════════════════════════════════════════════
 
 const JOB_COLS = [
@@ -67,130 +70,156 @@ const JOB_COLS = [
   'updated',
   'gcalAdded',
   'depositReceived',
-  'activityLog',      // stored as JSON string
-  'siteLog',          // stored as JSON string
-  'promptHistory',    // stored as JSON string
-  'bom',              // stored as JSON string
+  'activityLog',     // JSON string
+  'siteLog',         // JSON string
+  'promptHistory',   // JSON string
+  'bom',             // JSON string
   'bomFilename',
-  'extras',           // stored as JSON string
-  'paymentLinks',     // stored as JSON string  ← Monzo payment links
+  'extras',          // JSON string
+  'paymentLinks',    // JSON string  ← Monzo payment links
   'keyCode',
   'contractorNotes',
 ];
 
+// Find the Jobs sheet by name (tries common variants), falls back to first sheet.
 function getJobsSheet() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  let sheet = ss.getSheetByName('Jobs');
-  if (!sheet) {
-    sheet = ss.insertSheet('Jobs');
-    sheet.getRange(1, 1, 1, JOB_COLS.length).setValues([JOB_COLS]);
-    sheet.setFrozenRows(1);
-  }
-  return sheet;
+  return ss.getSheetByName('Jobs')
+      || ss.getSheetByName('jobs')
+      || ss.getSheetByName('Sheet1')
+      || ss.getSheets()[0];
 }
 
-/**
- * Reads the current header row and appends any columns from JOB_COLS that are
- * missing.  Returns the up-to-date headers array.
- */
-function ensureJobColumns(sheet) {
-  const lastCol = sheet.getLastColumn() || 0;
-  const headers = lastCol > 0
-    ? sheet.getRange(1, 1, 1, lastCol).getValues()[0].map(String)
+// Return lowercase header array, automatically appending any columns from
+// JOB_COLS that are missing.  Case-insensitive — works with existing sheets
+// that have headers like 'ID', 'Ref', 'Name', etc.
+function getAndEnsureHeaders(sheet) {
+  const lastCol = sheet.getLastColumn();
+  const rawHeaders = lastCol > 0
+    ? sheet.getRange(1, 1, 1, lastCol).getValues()[0].map(v => String(v).trim())
     : [];
+  const lcHeaders = rawHeaders.map(h => h.toLowerCase());
 
   JOB_COLS.forEach(col => {
-    if (!headers.includes(col)) {
-      const newIdx = headers.length + 1;
-      sheet.getRange(1, newIdx).setValue(col);
-      headers.push(col);
+    if (!lcHeaders.includes(col.toLowerCase())) {
+      const nextCol = rawHeaders.length + 1;
+      sheet.getRange(1, nextCol).setValue(col);
+      rawHeaders.push(col);
+      lcHeaders.push(col.toLowerCase());
     }
   });
 
-  return headers;
+  return lcHeaders; // always lowercase for consistent key lookup
 }
 
 function getJobs() {
-  const sheet   = getJobsSheet();
-  const lastRow = sheet.getLastRow();
-  if (lastRow < 2) return { jobs: [] };
+  try {
+    const sheet = getJobsSheet();
+    if (!sheet || sheet.getLastRow() < 2) return { jobs: [] };
 
-  const headers = ensureJobColumns(sheet);
-  const lastCol = headers.length;
-  const data    = sheet.getRange(2, 1, lastRow - 1, lastCol).getValues();
-  const idIdx   = headers.indexOf('id');
+    const lastRow = sheet.getLastRow();
+    const lastCol = sheet.getLastColumn();
+    if (lastCol === 0) return { jobs: [] };
 
-  const jobs = data
-    .filter(row => row[idIdx] !== '' && row[idIdx] !== undefined)
-    .map(row => {
+    const allData  = sheet.getRange(1, 1, lastRow, lastCol).getValues();
+    const lcHeaders = allData[0].map(v => String(v).trim().toLowerCase());
+    const idIdx    = lcHeaders.indexOf('id');
+
+    if (idIdx === -1) {
+      Logger.log('getJobs: no "id" column found. Headers: ' + lcHeaders.join(', '));
+      return { jobs: [] };
+    }
+
+    const jobs = [];
+    for (let r = 1; r < allData.length; r++) {
+      const row = allData[r];
+      const idVal = String(row[idIdx] || '').trim();
+      if (!idVal) continue;
+
       const job = {};
-      headers.forEach((h, i) => {
-        const v = row[i];
-        job[h] = (v === null || v === undefined) ? '' : String(v);
+      lcHeaders.forEach((h, i) => {
+        if (h) job[h] = (row[i] === null || row[i] === undefined) ? '' : String(row[i]);
       });
-      return job;
-    });
+      // Fill any fields not yet in the sheet with empty string
+      JOB_COLS.forEach(col => { if (job[col] === undefined) job[col] = ''; });
+      jobs.push(job);
+    }
 
-  return { jobs };
+    return { jobs };
+  } catch (err) {
+    Logger.log('getJobs error: ' + err.toString());
+    return { jobs: [], error: err.toString() };
+  }
 }
 
 function saveJob(job) {
   if (!job || !job.id) return { error: 'Missing job id' };
+  try {
+    const sheet     = getJobsSheet();
+    const lcHeaders = getAndEnsureHeaders(sheet); // adds missing columns
 
-  const sheet   = getJobsSheet();
-  const headers = ensureJobColumns(sheet);
-  const lastCol = headers.length;
-  const idIdx   = headers.indexOf('id') + 1; // 1-based
+    // Build the row using lowercase key lookup from the job object
+    const rowData = lcHeaders.map(h => {
+      const v = job[h];
+      return (v !== undefined && v !== null) ? v : '';
+    });
 
-  // Find existing row by id
-  let targetRow = -1;
-  const lastRow = sheet.getLastRow();
-  if (lastRow > 1) {
-    const ids = sheet.getRange(2, idIdx, lastRow - 1, 1).getValues();
-    for (let i = 0; i < ids.length; i++) {
-      if (String(ids[i][0]) === String(job.id)) {
-        targetRow = i + 2; // offset by header row
-        break;
+    // Find the existing row for this job (match by id, case-insensitive)
+    const idColIdx = lcHeaders.indexOf('id') + 1; // 1-based
+    let targetRow  = -1;
+    const lastRow  = sheet.getLastRow();
+
+    if (lastRow > 1 && idColIdx > 0) {
+      const ids = sheet.getRange(2, idColIdx, lastRow - 1, 1).getValues();
+      for (let i = 0; i < ids.length; i++) {
+        if (String(ids[i][0]).trim() === String(job.id).trim()) {
+          targetRow = i + 2;
+          break;
+        }
       }
     }
+
+    if (targetRow > 0) {
+      sheet.getRange(targetRow, 1, 1, rowData.length).setValues([rowData]);
+    } else {
+      sheet.appendRow(rowData);
+    }
+
+    return { success: true };
+  } catch (err) {
+    Logger.log('saveJob error: ' + err.toString());
+    return { error: err.toString() };
   }
-
-  const rowData = [headers.map(h => (job[h] !== undefined && job[h] !== null) ? job[h] : '')];
-
-  if (targetRow > 0) {
-    sheet.getRange(targetRow, 1, 1, lastCol).setValues(rowData);
-  } else {
-    sheet.appendRow(rowData[0]);
-  }
-
-  return { success: true };
 }
 
 function deleteJob(id) {
   if (!id) return { error: 'Missing id' };
+  try {
+    const sheet   = getJobsSheet();
+    const lastRow = sheet.getLastRow();
+    if (lastRow < 2) return { success: true };
 
-  const sheet   = getJobsSheet();
-  const lastRow = sheet.getLastRow();
-  if (lastRow < 2) return { success: true };
+    const headers  = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0]
+                       .map(v => String(v).trim().toLowerCase());
+    const idColIdx = headers.indexOf('id') + 1;
+    if (idColIdx === 0) return { error: 'No id column in sheet' };
 
-  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0].map(String);
-  const idCol   = headers.indexOf('id') + 1;
-  const ids     = sheet.getRange(2, idCol, lastRow - 1, 1).getValues();
-
-  for (let i = ids.length - 1; i >= 0; i--) {
-    if (String(ids[i][0]) === String(id)) {
-      sheet.deleteRow(i + 2);
-      break;
+    const ids = sheet.getRange(2, idColIdx, lastRow - 1, 1).getValues();
+    for (let i = ids.length - 1; i >= 0; i--) {
+      if (String(ids[i][0]).trim() === String(id).trim()) {
+        sheet.deleteRow(i + 2);
+        break;
+      }
     }
+    return { success: true };
+  } catch (err) {
+    Logger.log('deleteJob error: ' + err.toString());
+    return { error: err.toString() };
   }
-
-  return { success: true };
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-//  SCHEDULE
-//  Stored as a single JSON blob (cell B2) — the whole array is sent and
-//  received in one go, matching how the portal manages the schedule.
+//  SCHEDULE  — stored as a JSON blob (all entries sent/received as one array)
 // ════════════════════════════════════════════════════════════════════════════
 
 function getScheduleSheet() {
@@ -204,25 +233,34 @@ function getScheduleSheet() {
 }
 
 function getSchedule() {
-  const sheet = getScheduleSheet();
-  const raw   = String(sheet.getRange(2, 1).getValue() || '');
   try {
-    const entries = JSON.parse(raw);
-    return { entries: Array.isArray(entries) ? entries : [] };
-  } catch (e) {
+    const sheet = getScheduleSheet();
+    // Try cell B2 first (header in A1, data in A2)
+    const raw = String(sheet.getRange(2, 1).getValue() || '').trim();
+    if (raw) {
+      const entries = JSON.parse(raw);
+      return { entries: Array.isArray(entries) ? entries : [] };
+    }
+    return { entries: [] };
+  } catch (err) {
+    Logger.log('getSchedule error: ' + err.toString());
     return { entries: [] };
   }
 }
 
 function saveSchedule(entries) {
-  const sheet = getScheduleSheet();
-  sheet.getRange(2, 1).setValue(JSON.stringify(Array.isArray(entries) ? entries : []));
-  return { success: true };
+  try {
+    const sheet = getScheduleSheet();
+    sheet.getRange(2, 1).setValue(JSON.stringify(Array.isArray(entries) ? entries : []));
+    return { success: true };
+  } catch (err) {
+    Logger.log('saveSchedule error: ' + err.toString());
+    return { error: err.toString() };
+  }
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-//  CONTRACTORS
-//  Custom contractor list stored as a single JSON blob (cell B2).
+//  CONTRACTORS — stored as a JSON blob
 // ════════════════════════════════════════════════════════════════════════════
 
 function getContractorsSheet() {
@@ -236,27 +274,53 @@ function getContractorsSheet() {
 }
 
 function getContractors() {
-  const sheet = getContractorsSheet();
-  const raw   = String(sheet.getRange(2, 1).getValue() || '');
   try {
-    const contractors = JSON.parse(raw);
-    return { contractors: Array.isArray(contractors) ? contractors : [] };
-  } catch (e) {
+    const sheet = getContractorsSheet();
+    const raw   = String(sheet.getRange(2, 1).getValue() || '').trim();
+    if (raw) {
+      const contractors = JSON.parse(raw);
+      return { contractors: Array.isArray(contractors) ? contractors : [] };
+    }
+    return { contractors: [] };
+  } catch (err) {
+    Logger.log('getContractors error: ' + err.toString());
     return { contractors: [] };
   }
 }
 
 function saveContractors(contractors) {
-  const sheet = getContractorsSheet();
-  sheet.getRange(2, 1).setValue(JSON.stringify(Array.isArray(contractors) ? contractors : []));
-  return { success: true };
+  try {
+    const sheet = getContractorsSheet();
+    sheet.getRange(2, 1).setValue(JSON.stringify(Array.isArray(contractors) ? contractors : []));
+    return { success: true };
+  } catch (err) {
+    Logger.log('saveContractors error: ' + err.toString());
+    return { error: err.toString() };
+  }
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-//  SHORT URL
-//  Returns the URL unchanged.  Replace with a URL-shortening API if needed.
+//  DIAGNOSTICS — run this from the Apps Script editor to check sheet state
 // ════════════════════════════════════════════════════════════════════════════
 
-function shortUrl(url) {
-  return { short: url || '' };
+function runDiagnostics() {
+  const ss     = SpreadsheetApp.getActiveSpreadsheet();
+  const sheets = ss.getSheets().map(s => s.getName());
+  Logger.log('Sheets in workbook: ' + sheets.join(', '));
+
+  const jobSheet = getJobsSheet();
+  Logger.log('Jobs sheet name: ' + (jobSheet ? jobSheet.getName() : 'NOT FOUND'));
+
+  if (jobSheet && jobSheet.getLastRow() > 0) {
+    const headers = jobSheet.getRange(1, 1, 1, jobSheet.getLastColumn()).getValues()[0];
+    Logger.log('Jobs headers (' + headers.length + '): ' + headers.join(' | '));
+    Logger.log('Jobs data rows: ' + (jobSheet.getLastRow() - 1));
+
+    const missing = JOB_COLS.filter(c => !headers.map(h => String(h).toLowerCase()).includes(c.toLowerCase()));
+    if (missing.length) {
+      Logger.log('MISSING columns (will be added on next save): ' + missing.join(', '));
+    } else {
+      Logger.log('All required columns present.');
+    }
+  }
 }
