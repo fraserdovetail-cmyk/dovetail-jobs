@@ -463,6 +463,7 @@ textarea.finput{resize:vertical;min-height:68px;line-height:1.5}
 .pmt-mode-btn.active{background:var(--green);border-color:var(--green);color:#fff}
 .pmt-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)}
 .pmt-row:last-child{border-bottom:none}
+.pmt-extras-divider{border-top:2px dashed var(--border);margin:4px 0}
 .pmt-row-label{display:flex;flex-direction:column;min-width:120px;flex-shrink:0}
 .pmt-name{font-size:12px;font-weight:500;color:var(--text)}
 .pmt-pct{font-size:11px;color:var(--hint)}
@@ -478,6 +479,7 @@ textarea.finput{resize:vertical;min-height:68px;line-height:1.5}
 .cv-payments-title{font-size:11px;font-weight:700;color:var(--sage-dark);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
 .cv-pmt-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--border)}
 .cv-pmt-row:last-child{border-bottom:none}
+.cv-pmt-divider{border-top:2px dashed var(--border);margin:4px 0}
 .cv-pmt-info{display:flex;flex-direction:column;gap:2px}
 .cv-pmt-name{font-size:13px;font-weight:500;color:var(--text)}
 .cv-pmt-amt{font-size:12px;color:var(--muted)}
@@ -1709,7 +1711,7 @@ const MONTHS  = ['January','February','March','April','May','June','July','Augus
 const SMONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const CHASE_DAYS = 7;
 
-let jobs = [], saving = false, _durUnit = 'days', _gcalAdded = false, _depositReceived = false, _paymentLinks = {mode:'2',links:['','','','']};
+let jobs = [], saving = false, _durUnit = 'days', _gcalAdded = false, _depositReceived = false, _paymentLinks = {mode:'2',links:['','','',''],extrasLink:''};
 let _ctvId=null, _ctvName=null;
 let currentStage = 0, _currentJobLog = [];
 let _pricingJobId = null, _ppSections = [];
@@ -2279,7 +2281,7 @@ function openJob(id){
   _gcalAdded=safeBool(d.gcalAdded);
   _depositReceived=safeBool(d.depositReceived);
   const _pl=d.paymentLinks||{};
-  _paymentLinks={mode:_pl.mode||'2',links:Array.isArray(_pl.links)?[..._pl.links]:['','','','']};
+  _paymentLinks={mode:_pl.mode||'2',links:Array.isArray(_pl.links)?[..._pl.links]:['','','',''],extrasLink:_pl.extrasLink||''};
   while(_paymentLinks.links.length<4) _paymentLinks.links.push('');
   currentStage=d.stage;
   const log=Array.isArray(d.activityLog)?d.activityLog:[];
@@ -2527,18 +2529,31 @@ function buildPaymentLinksSection(job){
       <button class="pmt-open${lnk?'':'  disabled'}" onclick="openPmtLink(${i})" title="Open link">↗</button>
     </div>`;
   }).join('');
+  const extrasLnk=pl.extrasLink||'';
+  const extrasRow=`<div class="pmt-row pmt-row-extras">
+    <div class="pmt-row-label"><span class="pmt-name">Agreed extras</span><span class="pmt-pct" style="color:var(--hint)">optional</span></div>
+    <span class="pmt-amt"></span>
+    <input class="pmt-input${extrasLnk?' has-link':''}" id="pmt-link-extras" type="url" value="${esc(extrasLnk)}" placeholder="Paste Monzo link for extras…" oninput="this.classList.toggle('has-link',!!this.value.trim())"/>
+    <button class="pmt-open${extrasLnk?'':'  disabled'}" onclick="openExtrasLink()" title="Open link">↗</button>
+  </div>`;
   return `<div class="pmt-mode-row">
     <button class="pmt-mode-btn${mode==='2'?' active':''}" onclick="setPaymentMode('2')">10 / 90%</button>
     <button class="pmt-mode-btn${mode==='4'?' active':''}" onclick="setPaymentMode('4')">10 / 30 / 30 / 30%</button>
-  </div>${rows}`;
+  </div>${rows}<div class="pmt-extras-divider"></div>${extrasRow}`;
 }
 
 function setPaymentMode(mode){
   const links=[0,1,2,3].map(i=>(document.getElementById('pmt-link-'+i)||{}).value||'');
-  _paymentLinks={mode,links};
+  const extrasLink=(document.getElementById('pmt-link-extras')||{}).value||'';
+  _paymentLinks={mode,links,extrasLink};
   const wrap=document.getElementById('pmt-links-wrap');
   const jobVal=(document.getElementById('f-value')||{}).value||'0';
   if(wrap) wrap.innerHTML=buildPaymentLinksSection({value:jobVal});
+}
+
+function openExtrasLink(){
+  const url=(document.getElementById('pmt-link-extras')||{}).value||'';
+  if(url.trim()) window.open(url.trim(),'_blank');
 }
 
 function refreshPaymentAmounts(jobVal){
@@ -2593,7 +2608,7 @@ async function saveJob(id,isNew){
     depositReceived:existing.depositReceived||false,
     siteLog:Array.isArray(existing.siteLog)?existing.siteLog:[],
     extras:Array.isArray(existing.extras)?existing.extras:[],
-    paymentLinks:{mode:_paymentLinks.mode,links:[0,1,2,3].map(i=>(document.getElementById('pmt-link-'+i)||{}).value||'')},
+    paymentLinks:{mode:_paymentLinks.mode,links:[0,1,2,3].map(i=>(document.getElementById('pmt-link-'+i)||{}).value||''),extrasLink:(document.getElementById('pmt-link-extras')||{}).value||''},
     keyCode:(document.getElementById('f-keycode')||{}).value||'',
     contractorNotes:(document.getElementById('f-contractor-notes')||{}).value||'',
     bom:existing.bom||null,
@@ -4493,8 +4508,9 @@ function renderClientView(data){
   const pmtEl=document.getElementById('cv-payments');
   if(pmtEl){
     const pl=paymentLinks; const plLinks=Array.isArray(pl?.links)?pl.links:[];
+    const extrasLnk=pl?.extrasLink||'';
     const activeLinks=plLinks.filter(Boolean);
-    if(pl&&activeLinks.length){
+    if(pl&&(activeLinks.length||extrasLnk)){
       const val=parseFloat(job.value)||0;
       const slots=pl.mode==='4'?[
         {pct:10,name:'Deposit'},{pct:30,name:'Stage 2'},{pct:30,name:'Stage 3'},{pct:30,name:'Final payment'}
@@ -4512,7 +4528,13 @@ function renderClientView(data){
           <a class="cv-pmt-btn" href="${esc(lnk)}" target="_blank">Pay now ↗</a>
         </div>`;
       }).filter(Boolean).join('');
-      pmtEl.innerHTML=`<div class="cv-payments"><div class="cv-payments-title">Payments</div>${rows}</div>`;
+      const extrasRow=extrasLnk?`<div class="cv-pmt-row cv-pmt-row-extras">
+        <div class="cv-pmt-info">
+          <span class="cv-pmt-name">Agreed extras</span>
+        </div>
+        <a class="cv-pmt-btn" href="${esc(extrasLnk)}" target="_blank">Pay now ↗</a>
+      </div>`:'';
+      pmtEl.innerHTML=`<div class="cv-payments"><div class="cv-payments-title">Payments</div>${rows}${extrasRow?'<div class="cv-pmt-divider"></div>'+extrasRow:''}</div>`;
     }else{ pmtEl.innerHTML=''; }
   }
 
