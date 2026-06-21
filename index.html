@@ -445,6 +445,18 @@ textarea.finput{resize:vertical;min-height:68px;line-height:1.5}
 .site-add-btn:hover{background:var(--green-mid)}
 .log-empty{font-size:13px;color:var(--hint);font-style:italic;padding:6px 0}
 
+/* Address postcode search */
+.addr-wrap{position:relative;display:flex;flex-direction:column;gap:6px}
+.addr-search-row{display:flex;gap:6px}
+.addr-search-inp{flex:1;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:'Inter',sans-serif;color:var(--text);background:var(--white);outline:none;transition:border-color 0.15s}
+.addr-search-inp:focus{border-color:var(--green-mid)}
+.addr-search-btn{padding:7px 13px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;font-weight:500;font-family:'Inter',sans-serif;color:var(--text);cursor:pointer;white-space:nowrap;transition:all 0.12s;flex-shrink:0}
+.addr-search-btn:hover{border-color:var(--green-mid);color:var(--green);background:var(--green-light)}
+.pc-drop{position:absolute;top:32px;left:0;right:0;z-index:200;background:var(--white);border:1px solid var(--border-strong);border-radius:var(--radius-sm);box-shadow:0 4px 16px rgba(0,0,0,0.12);overflow:hidden}
+.pc-item{padding:9px 12px;font-size:13px;cursor:pointer;border-bottom:1px solid var(--border);font-family:'JetBrains Mono',monospace;letter-spacing:0.03em;color:var(--text)}
+.pc-item:hover{background:var(--green-light);color:var(--green)}
+.pc-item:last-child{border-bottom:none}
+
 /* Payment links */
 .pmt-mode-row{display:flex;gap:6px;margin-bottom:12px}
 .pmt-mode-btn{padding:5px 13px;font-size:12px;font-weight:500;border:1px solid var(--border);border-radius:var(--radius-xs);background:var(--surface);color:var(--muted);cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.12s;white-space:nowrap}
@@ -2276,6 +2288,18 @@ function openJob(id){
 
   document.getElementById('modal-body').innerHTML=`
     <div class="modal-section">
+      <div class="sec-hd">Client</div>
+      <div class="fg">
+        <div class="fgroup"><label class="flabel">Name</label><input class="finput" id="f-client" value="${esc(d.client)}" placeholder="Full name or company"/></div>
+        <div class="fgroup"><label class="flabel">Phone</label><input class="finput" id="f-phone" type="tel" value="${esc(d.phone||'')}" placeholder="07700 000000"/></div>
+      </div>
+      <div class="fg">
+        <div class="fgroup"><label class="flabel">Email</label><input class="finput" id="f-email" type="email" value="${esc(d.email)}" placeholder="client@email.com"/></div>
+        <div class="fgroup"></div>
+      </div>
+    </div>
+
+    <div class="modal-section">
       <div class="sec-hd">Job details</div>
       <div class="fg">
         <div class="fgroup"><label class="flabel">Reference</label><input class="finput" id="f-ref" value="${esc(d.ref)}" readonly/></div>
@@ -2287,23 +2311,23 @@ function openJob(id){
           <div class="deposit-box"><span class="deposit-lbl">10% deposit</span><span class="deposit-amt" id="deposit-amount">${dep||'—'}</span></div>
         </div>
       </div>
-      <div class="fg full"><div class="fgroup"><label class="flabel">Site address</label><input class="finput" id="f-addr" value="${esc(d.address)}" placeholder="12 High Street, Stamford"/></div></div>
+      <div class="fg full"><div class="fgroup"><label class="flabel">Site address</label>
+        <div class="addr-wrap">
+          <div class="addr-search-row">
+            <input class="addr-search-inp" id="f-pc-search" placeholder="Search by postcode…" autocomplete="off"
+              oninput="pcAutoInput(this.value)"
+              onkeydown="if(event.key==='Enter'){event.preventDefault();pcLookup(this.value)}"
+              onblur="setTimeout(()=>{const d=document.getElementById('pc-drop');if(d)d.style.display='none'},200)"/>
+            <button class="addr-search-btn" id="pc-search-btn" onclick="pcLookup(document.getElementById('f-pc-search').value)">Search</button>
+          </div>
+          <div id="pc-drop" class="pc-drop" style="display:none"></div>
+          <input class="finput" id="f-addr" value="${esc(d.address)}" placeholder="e.g. 12 High Street, Stamford, PE9 2HH"/>
+        </div>
+      </div></div>
       <div class="fg full"><div class="fgroup"><label class="flabel">Notes</label><textarea class="finput" id="f-notes">${esc(d.notes)}</textarea></div></div>
       <div class="fg">
         <div class="fgroup"><label class="flabel">🔑 Key / access code</label><input class="finput" id="f-keycode" value="${esc(d.keyCode||'')}" placeholder="e.g. Key box B2 — code 1234#"/></div>
         <div class="fgroup"><label class="flabel">🏗 Contractor notes</label><input class="finput" id="f-contractor-notes" value="${esc(d.contractorNotes||'')}" placeholder="Parking, site contact, access…"/></div>
-      </div>
-    </div>
-
-    <div class="modal-section">
-      <div class="sec-hd">Client</div>
-      <div class="fg">
-        <div class="fgroup"><label class="flabel">Name</label><input class="finput" id="f-client" value="${esc(d.client)}" placeholder="Full name or company"/></div>
-        <div class="fgroup"><label class="flabel">Phone</label><input class="finput" id="f-phone" type="tel" value="${esc(d.phone||'')}" placeholder="07700 000000"/></div>
-      </div>
-      <div class="fg">
-        <div class="fgroup"><label class="flabel">Email</label><input class="finput" id="f-email" type="email" value="${esc(d.email)}" placeholder="client@email.com"/></div>
-        <div class="fgroup"></div>
       </div>
     </div>
 
@@ -2421,6 +2445,62 @@ function updateDeposit(){
   const el=document.getElementById('deposit-amount'); if(el) el.textContent=depositAmt(v)||'—';
   refreshGcalSection();
   refreshPaymentAmounts(v);
+}
+
+// ══ POSTCODE / ADDRESS SEARCH ══════════════════════════════════════════════
+let _pcTimer=null;
+function pcAutoInput(val){
+  clearTimeout(_pcTimer);
+  const v=(val||'').trim().replace(/\s/g,'');
+  if(v.length<2){ const d=document.getElementById('pc-drop'); if(d) d.style.display='none'; return; }
+  _pcTimer=setTimeout(()=>pcLookup(val),400);
+}
+async function pcLookup(rawVal){
+  const v=(rawVal||'').trim().replace(/\s/g,'').toUpperCase();
+  if(!v||v.length<2) return;
+  const drop=document.getElementById('pc-drop'); if(!drop) return;
+  const isFullPc=/^[A-Z]{1,2}\d[A-Z\d]?\d[A-Z]{2}$/.test(v);
+  if(isFullPc){
+    drop.style.display='none';
+    const btn=document.getElementById('pc-search-btn');
+    if(btn){btn.textContent='…';btn.disabled=true;}
+    try{
+      const r=await fetch('https://api.postcodes.io/postcodes/'+encodeURIComponent(v)).then(r=>r.json());
+      if(r.status===200&&r.result) fillAddrFromPcResult(r.result);
+      else showToast('Postcode not found');
+    }catch(e){showToast('Lookup failed — enter address manually');}
+    finally{const btn=document.getElementById('pc-search-btn');if(btn){btn.textContent='Search';btn.disabled=false;}}
+  }else{
+    try{
+      const r=await fetch('https://api.postcodes.io/postcodes/'+encodeURIComponent(v)+'/autocomplete').then(r=>r.json());
+      const pcs=(r.result||[]).slice(0,8);
+      if(!pcs.length){drop.style.display='none';return;}
+      drop.innerHTML=pcs.map(pc=>`<div class="pc-item" onmousedown="pcSelectItem('${pc}')">${pc}</div>`).join('');
+      drop.style.display='block';
+    }catch(e){drop.style.display='none';}
+  }
+}
+async function pcSelectItem(pc){
+  const drop=document.getElementById('pc-drop'); if(drop) drop.style.display='none';
+  const inp=document.getElementById('f-pc-search'); if(inp) inp.value=pc;
+  const btn=document.getElementById('pc-search-btn');
+  if(btn){btn.textContent='…';btn.disabled=true;}
+  try{
+    const r=await fetch('https://api.postcodes.io/postcodes/'+encodeURIComponent(pc.replace(/\s/g,''))).then(r=>r.json());
+    if(r.status===200&&r.result) fillAddrFromPcResult(r.result);
+    else showToast('Could not load postcode data');
+  }catch(e){showToast('Lookup failed');}
+  finally{const btn=document.getElementById('pc-search-btn');if(btn){btn.textContent='Search';btn.disabled=false;}}
+}
+function fillAddrFromPcResult(res){
+  const pc=res.postcode||'';
+  const locality=(res.parish&&res.parish!==res.admin_district)?res.parish:(res.admin_ward||res.admin_district||'');
+  const parts=[locality,pc].filter(Boolean);
+  const addrEl=document.getElementById('f-addr'); if(!addrEl) return;
+  addrEl.value=parts.join(', ');
+  addrEl.focus();
+  addrEl.setSelectionRange(0,0);
+  showToast('Found — type street/building number at the start');
 }
 
 function buildPaymentLinksSection(job){
