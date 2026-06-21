@@ -1008,6 +1008,15 @@ select.sem-input{cursor:pointer}
 .extras-total-val{font-size:14px;font-weight:600;color:var(--green);font-family:'JetBrains Mono',monospace}
 .extras-empty{font-size:13px;color:var(--hint);font-style:italic;padding:2px 0 4px}
 
+/* ── CLIENT VIEW EXTRAS ── */
+.cv-extras{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-top:16px}
+.cv-extras-title{font-size:11px;font-weight:700;color:var(--sage-dark);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.cv-extra-row{display:flex;align-items:flex-start;gap:12px;padding:8px 0;border-bottom:1px solid var(--border)}
+.cv-extra-row:last-child{border-bottom:none}
+.cv-extra-desc{flex:1;font-size:13px;color:var(--text);line-height:1.4}
+.cv-extra-amount{font-size:13px;font-weight:600;color:var(--green);font-family:'JetBrains Mono',monospace;white-space:nowrap}
+.cv-live-badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:600;padding:3px 8px;background:var(--green-light);color:var(--green);border:1px solid var(--green-border);border-radius:8px;letter-spacing:0.04em;text-transform:uppercase}
+
 /* ── BILL OF MATERIALS ── */
 .bom-upload-area{border:2px dashed var(--green-border);border-radius:var(--radius-sm);padding:18px 14px;text-align:center;cursor:pointer;transition:all 0.15s;background:var(--green-light);position:relative}
 .bom-upload-area:hover,.bom-upload-area.drag-hover{border-color:var(--green-mid);background:#D4EDBA}
@@ -4299,7 +4308,7 @@ function renderClientView(data){
   });
   const allDates=Object.keys(dateMap).sort();
   if(!allDates.length){ document.getElementById('cv-months').innerHTML='<p style="padding:20px;color:#888">No dates scheduled yet.</p>'; }
-  else {
+  else{
     const firstDate=new Date(allDates[0]+'T12:00:00'), lastDate=new Date(allDates[allDates.length-1]+'T12:00:00');
     const MNAMES=['January','February','March','April','May','June','July','August','September','October','November','December'];
     const DOW=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
@@ -4345,12 +4354,12 @@ function renderClientView(data){
       extrasEl.innerHTML=`<div class="cv-extras">
         <div class="cv-extras-title">Additional Works / Extras</div>
         ${extras.map(e=>`<div class="cv-extra-row">
-          <span class="cv-extra-desc">${esc(e.description)}</span>
-          ${e.amount?`<span class="cv-extra-amount">£${parseFloat(e.amount).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>`
+          <span class="cv-extra-desc">${esc(e.desc||e.description||'')}</span>
+          ${e.value?`<span class="cv-extra-amount">£${parseFloat(e.value).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>`
             :'<span class="cv-extra-amount" style="color:var(--hint);font-size:12px">To be agreed</span>'}
         </div>`).join('')}
       </div>`;
-    } else {
+    }else{
       extrasEl.innerHTML='';
     }
   }
