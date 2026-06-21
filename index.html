@@ -445,6 +445,33 @@ textarea.finput{resize:vertical;min-height:68px;line-height:1.5}
 .site-add-btn:hover{background:var(--green-mid)}
 .log-empty{font-size:13px;color:var(--hint);font-style:italic;padding:6px 0}
 
+/* Payment links */
+.pmt-mode-row{display:flex;gap:6px;margin-bottom:12px}
+.pmt-mode-btn{padding:5px 13px;font-size:12px;font-weight:500;border:1px solid var(--border);border-radius:var(--radius-xs);background:var(--surface);color:var(--muted);cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.12s;white-space:nowrap}
+.pmt-mode-btn.active{background:var(--green);border-color:var(--green);color:#fff}
+.pmt-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)}
+.pmt-row:last-child{border-bottom:none}
+.pmt-row-label{display:flex;flex-direction:column;min-width:120px;flex-shrink:0}
+.pmt-name{font-size:12px;font-weight:500;color:var(--text)}
+.pmt-pct{font-size:11px;color:var(--hint)}
+.pmt-amt{font-size:12px;color:var(--green);font-weight:600;font-family:'JetBrains Mono',monospace;min-width:56px;flex-shrink:0}
+.pmt-input{flex:1;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;font-family:'Inter',sans-serif;color:var(--text);background:var(--white);outline:none;min-width:0;transition:border-color 0.15s}
+.pmt-input:focus{border-color:var(--green-mid)}
+.pmt-input.has-link{border-color:var(--green-border);background:var(--green-light)}
+.pmt-open{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--muted);cursor:pointer;font-family:'Inter',sans-serif;font-size:13px;text-decoration:none;flex-shrink:0;transition:all 0.12s}
+.pmt-open:hover{border-color:var(--green-mid);color:var(--green);background:var(--green-light)}
+.pmt-open:disabled,.pmt-open.disabled{opacity:0.25;pointer-events:none}
+/* Payment links — client view */
+.cv-payments{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-top:16px}
+.cv-payments-title{font-size:11px;font-weight:700;color:var(--sage-dark);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.cv-pmt-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--border)}
+.cv-pmt-row:last-child{border-bottom:none}
+.cv-pmt-info{display:flex;flex-direction:column;gap:2px}
+.cv-pmt-name{font-size:13px;font-weight:500;color:var(--text)}
+.cv-pmt-amt{font-size:12px;color:var(--muted)}
+.cv-pmt-btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;background:var(--green);color:#fff;border-radius:var(--radius-sm);font-size:12px;font-weight:600;font-family:'Inter',sans-serif;text-decoration:none;white-space:nowrap;transition:background 0.12s}
+.cv-pmt-btn:hover{background:var(--green-mid)}
+
 /* Prompt history */
 .ph-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:8px}
 .ph-item-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
@@ -1093,6 +1120,7 @@ select.sem-input{cursor:pointer}
     <div class="cv-legend" id="cv-legend"></div>
     <div id="cv-months"></div>
     <div id="cv-extras"></div>
+    <div id="cv-payments"></div>
     <div class="cv-footer" id="cv-footer"></div>
   </div>
 </div>
@@ -1669,7 +1697,7 @@ const MONTHS  = ['January','February','March','April','May','June','July','Augus
 const SMONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const CHASE_DAYS = 7;
 
-let jobs = [], saving = false, _durUnit = 'days', _gcalAdded = false, _depositReceived = false;
+let jobs = [], saving = false, _durUnit = 'days', _gcalAdded = false, _depositReceived = false, _paymentLinks = {mode:'2',links:['','','','']};
 let _ctvId=null, _ctvName=null;
 let currentStage = 0, _currentJobLog = [];
 let _pricingJobId = null, _ppSections = [];
@@ -1867,15 +1895,15 @@ function parseJob(j){
     promptHistory:(()=>{ try{ const v=j.promptHistory; if(!v||v==='') return []; return typeof v==='string'?JSON.parse(v):v; }catch(e){return [];} })(),
     bom:(()=>{ try{ const v=j.bom; if(!v||v==='') return null; return typeof v==='string'?JSON.parse(v):v; }catch(e){return null;} })(),
     extras:(()=>{ try{ const v=j.extras; if(!v||v==='') return []; return typeof v==='string'?JSON.parse(v):v; }catch(e){return [];} })(),
+    paymentLinks:(()=>{ try{ const v=j.paymentLinks; if(!v||v==='') return null; return typeof v==='string'?JSON.parse(v):v; }catch(e){return null;} })(),
     keyCode:safeStr(j.keyCode),
     contractorNotes:safeStr(j.contractorNotes),
     bomFilename:safeStr(j.bomFilename||''),
-    extras:(()=>{ try{ const v=j.extras; if(!v||v==='') return []; return typeof v==='string'?JSON.parse(v):v; }catch(e){return [];} })(),
   };
 }
 
 async function pushJob(job){
-  const payload={action:'saveJob',job:{...job,activityLog:JSON.stringify(job.activityLog||[]),siteLog:JSON.stringify(job.siteLog||[]),promptHistory:JSON.stringify(job.promptHistory||[]),bom:job.bom?JSON.stringify(job.bom):'',bomFilename:job.bomFilename||'',extras:JSON.stringify(job.extras||[])}};
+  const payload={action:'saveJob',job:{...job,activityLog:JSON.stringify(job.activityLog||[]),siteLog:JSON.stringify(job.siteLog||[]),promptHistory:JSON.stringify(job.promptHistory||[]),bom:job.bom?JSON.stringify(job.bom):'',bomFilename:job.bomFilename||'',extras:JSON.stringify(job.extras||[]),paymentLinks:job.paymentLinks?JSON.stringify(job.paymentLinks):''}};
   if(!isOnline){
     // queue for later
     syncQueue=syncQueue.filter(q=>q.job.id!==job.id);
@@ -2228,12 +2256,15 @@ function openJob(id){
     startDate:'',startTime:'',prestartDate:'',prestartTime:'',
     durationNum:'',durationUnit:'days',notes:'',stage:0,declined:false,
     gcalAdded:false,depositReceived:false,
-    activityLog:[],siteLog:[],extras:[],promptHistory:[],keyCode:'',contractorNotes:'',
+    activityLog:[],siteLog:[],extras:[],promptHistory:[],keyCode:'',contractorNotes:'',paymentLinks:null,
     created:String(Date.now()),updated:String(Date.now())
   };
   _durUnit=safeStr(d.durationUnit)||'days';
   _gcalAdded=safeBool(d.gcalAdded);
   _depositReceived=safeBool(d.depositReceived);
+  const _pl=d.paymentLinks||{};
+  _paymentLinks={mode:_pl.mode||'2',links:Array.isArray(_pl.links)?[..._pl.links]:['','','','']};
+  while(_paymentLinks.links.length<4) _paymentLinks.links.push('');
   currentStage=d.stage;
   const log=Array.isArray(d.activityLog)?d.activityLog:[];
   _currentJobLog=log;
@@ -2274,6 +2305,11 @@ function openJob(id){
         <div class="fgroup"><label class="flabel">Email</label><input class="finput" id="f-email" type="email" value="${esc(d.email)}" placeholder="client@email.com"/></div>
         <div class="fgroup"></div>
       </div>
+    </div>
+
+    <div class="modal-section">
+      <div class="sec-hd">Payment links</div>
+      <div id="pmt-links-wrap">${buildPaymentLinksSection(d)}</div>
     </div>
 
     <div class="modal-section">
@@ -2384,6 +2420,55 @@ function updateDeposit(){
   const v=(document.getElementById('f-value')||{}).value||'';
   const el=document.getElementById('deposit-amount'); if(el) el.textContent=depositAmt(v)||'—';
   refreshGcalSection();
+  refreshPaymentAmounts(v);
+}
+
+function buildPaymentLinksSection(job){
+  const pl=_paymentLinks;
+  const mode=pl.mode||'2';
+  const links=pl.links||['','','',''];
+  const val=parseFloat(job.value)||0;
+  const slots=mode==='4'?[
+    {pct:10,name:'Deposit'},{pct:30,name:'Stage 2'},{pct:30,name:'Stage 3'},{pct:30,name:'Final payment'}
+  ]:[
+    {pct:10,name:'Deposit'},{pct:90,name:'Final payment'}
+  ];
+  function fmtAmt(pct){ if(!val) return ''; const a=val*pct/100; return '£'+a.toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:2}); }
+  const rows=slots.map((s,i)=>{
+    const lnk=links[i]||'';
+    return `<div class="pmt-row">
+      <div class="pmt-row-label"><span class="pmt-name">${s.name}</span><span class="pmt-pct">${s.pct}%</span></div>
+      <span class="pmt-amt" id="pmt-amt-${i}">${fmtAmt(s.pct)}</span>
+      <input class="pmt-input${lnk?' has-link':''}" id="pmt-link-${i}" type="url" value="${esc(lnk)}" placeholder="Paste Monzo link…" oninput="this.classList.toggle('has-link',!!this.value.trim())"/>
+      <button class="pmt-open${lnk?'':'  disabled'}" onclick="openPmtLink(${i})" title="Open link">↗</button>
+    </div>`;
+  }).join('');
+  return `<div class="pmt-mode-row">
+    <button class="pmt-mode-btn${mode==='2'?' active':''}" onclick="setPaymentMode('2')">10 / 90%</button>
+    <button class="pmt-mode-btn${mode==='4'?' active':''}" onclick="setPaymentMode('4')">10 / 30 / 30 / 30%</button>
+  </div>${rows}`;
+}
+
+function setPaymentMode(mode){
+  const links=[0,1,2,3].map(i=>(document.getElementById('pmt-link-'+i)||{}).value||'');
+  _paymentLinks={mode,links};
+  const wrap=document.getElementById('pmt-links-wrap');
+  const jobVal=(document.getElementById('f-value')||{}).value||'0';
+  if(wrap) wrap.innerHTML=buildPaymentLinksSection({value:jobVal});
+}
+
+function refreshPaymentAmounts(jobVal){
+  const val=parseFloat(jobVal)||0;
+  const pcts=_paymentLinks.mode==='4'?[10,30,30,30]:[10,90];
+  pcts.forEach((pct,i)=>{
+    const el=document.getElementById('pmt-amt-'+i); if(!el) return;
+    el.textContent=val?'£'+(val*pct/100).toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:2}):'';
+  });
+}
+
+function openPmtLink(i){
+  const url=(document.getElementById('pmt-link-'+i)||{}).value||'';
+  if(url.trim()) window.open(url.trim(),'_blank');
 }
 
 function setDurUnit(u){
@@ -2424,12 +2509,12 @@ async function saveJob(id,isNew){
     depositReceived:existing.depositReceived||false,
     siteLog:Array.isArray(existing.siteLog)?existing.siteLog:[],
     extras:Array.isArray(existing.extras)?existing.extras:[],
+    paymentLinks:{mode:_paymentLinks.mode,links:[0,1,2,3].map(i=>(document.getElementById('pmt-link-'+i)||{}).value||'')},
     keyCode:(document.getElementById('f-keycode')||{}).value||'',
     contractorNotes:(document.getElementById('f-contractor-notes')||{}).value||'',
     bom:existing.bom||null,
     bomFilename:existing.bomFilename||'',
     promptHistory:Array.isArray(existing.promptHistory)?existing.promptHistory:[],
-    extras:Array.isArray(existing.extras)?existing.extras:[],
     created:isNew==='true'?String(Date.now()):(safeStr(existing.created)||String(Date.now())),
     updated:String(Date.now())
   };
@@ -4224,10 +4309,11 @@ async function loadClientViewLive(jobId){
       .map(c=>({id:c.id,label:c.label,bg:c.bg,text:c.text}));
     const payload={
       v:2,live:true,
-      job:{name:job.name||'',client:job.client||'',address:job.address||''},
+      job:{name:job.name||'',client:job.client||'',address:job.address||'',value:job.value||''},
       entries:entries.map(e=>({col:e.col,start:e.start,end:e.end||e.start,confirmed:!!e.confirmed})),
       cols,
       extras:Array.isArray(job.extras)?job.extras:[],
+      paymentLinks:job.paymentLinks||null,
       generated:schedDateStr(new Date())
     };
     renderClientView(payload);
@@ -4237,7 +4323,7 @@ async function loadClientViewLive(jobId){
 }
 
 function renderClientView(data){
-  const job=data.job||{}, entries=data.entries||[], cols=data.cols||[], extras=data.extras||[];
+  const job=data.job||{}, entries=data.entries||[], cols=data.cols||[], extras=data.extras||[], paymentLinks=data.paymentLinks||null;
   document.getElementById('cv-job-name').textContent=job.name||'Schedule';
   document.getElementById('cv-job-meta').textContent=[job.client,job.address].filter(Boolean).join(' · ');
   // Legend
@@ -4317,6 +4403,33 @@ function renderClientView(data){
     }else{
       extrasEl.innerHTML='';
     }
+  }
+
+  // Payment links section
+  const pmtEl=document.getElementById('cv-payments');
+  if(pmtEl){
+    const pl=paymentLinks; const plLinks=Array.isArray(pl?.links)?pl.links:[];
+    const activeLinks=plLinks.filter(Boolean);
+    if(pl&&activeLinks.length){
+      const val=parseFloat(job.value)||0;
+      const slots=pl.mode==='4'?[
+        {pct:10,name:'Deposit'},{pct:30,name:'Stage 2'},{pct:30,name:'Stage 3'},{pct:30,name:'Final payment'}
+      ]:[
+        {pct:10,name:'Deposit'},{pct:90,name:'Final payment'}
+      ];
+      const rows=slots.map((s,i)=>{
+        const lnk=plLinks[i]||''; if(!lnk) return '';
+        const amt=val?'£'+(val*s.pct/100).toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:2}):'';
+        return `<div class="cv-pmt-row">
+          <div class="cv-pmt-info">
+            <span class="cv-pmt-name">${s.name} (${s.pct}%)</span>
+            ${amt?`<span class="cv-pmt-amt">${amt}</span>`:''}
+          </div>
+          <a class="cv-pmt-btn" href="${esc(lnk)}" target="_blank">Pay now ↗</a>
+        </div>`;
+      }).filter(Boolean).join('');
+      pmtEl.innerHTML=`<div class="cv-payments"><div class="cv-payments-title">Payments</div>${rows}</div>`;
+    }else{ pmtEl.innerHTML=''; }
   }
 
   const SMONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
