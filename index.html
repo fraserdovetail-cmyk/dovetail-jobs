@@ -1914,6 +1914,10 @@ function parseJob(j){
   };
 }
 
+// IMPORTANT: Every field sent in the payload below MUST have a matching column
+// in the Google Sheet AND be listed in JOB_COLS in Code.gs.
+// The Code.gs ensureJobColumns() function adds missing columns automatically,
+// but you MUST redeploy the Apps Script after adding new fields here.
 async function pushJob(job){
   const payload={action:'saveJob',job:{...job,activityLog:JSON.stringify(job.activityLog||[]),siteLog:JSON.stringify(job.siteLog||[]),promptHistory:JSON.stringify(job.promptHistory||[]),bom:job.bom?JSON.stringify(job.bom):'',bomFilename:job.bomFilename||'',extras:JSON.stringify(job.extras||[]),paymentLinks:job.paymentLinks?JSON.stringify(job.paymentLinks):''}};
   if(!isOnline){
