@@ -1978,6 +1978,7 @@ function parseJob(j){
     keyCode:safeStr(j.keyCode),
     contractorNotes:safeStr(j.contractorNotes),
     bomFilename:safeStr(j.bomFilename||''),
+    bomDropboxUrl:safeStr(j.bomdropboxurl||j.bomDropboxUrl||''),
     clientNotes:(()=>{ try{ const v=j.clientnotes||j.clientNotes; if(!v||v==='') return []; return typeof v==='string'?JSON.parse(v):v; }catch(e){return [];} })(),
   };
 }
@@ -1987,7 +1988,7 @@ function parseJob(j){
 // The Code.gs ensureJobColumns() function adds missing columns automatically,
 // but you MUST redeploy the Apps Script after adding new fields here.
 async function pushJob(job){
-  const payload={action:'saveJob',job:{...job,activityLog:JSON.stringify(job.activityLog||[]),siteLog:JSON.stringify(job.siteLog||[]),promptHistory:JSON.stringify(job.promptHistory||[]),bom:job.bom?JSON.stringify(job.bom):'',bomFilename:job.bomFilename||'',extras:JSON.stringify(job.extras||[]),paymentLinks:job.paymentLinks?JSON.stringify(job.paymentLinks):'',clientNotes:JSON.stringify(job.clientNotes||[])}};
+  const payload={action:'saveJob',job:{...job,activityLog:JSON.stringify(job.activityLog||[]),siteLog:JSON.stringify(job.siteLog||[]),promptHistory:JSON.stringify(job.promptHistory||[]),bom:job.bom?JSON.stringify(job.bom):'',bomFilename:job.bomFilename||'',bomDropboxUrl:job.bomDropboxUrl||'',extras:JSON.stringify(job.extras||[]),paymentLinks:job.paymentLinks?JSON.stringify(job.paymentLinks):'',clientNotes:JSON.stringify(job.clientNotes||[])}};
   if(!isOnline){
     // queue for later
     syncQueue=syncQueue.filter(q=>q.job.id!==job.id);

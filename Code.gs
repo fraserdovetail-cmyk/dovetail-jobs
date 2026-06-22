@@ -81,6 +81,7 @@ const JOB_COLS = [
   'keyCode',
   'contractorNotes',
   'clientNotes',    // JSON string — notes posted by client from the client portal
+  'bomDropboxUrl',
 ];
 
 // Find the Jobs sheet by name (tries common variants), falls back to first sheet.
