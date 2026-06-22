@@ -1167,15 +1167,8 @@ select.sem-input{cursor:pointer}
 /* ── CLIENT PORTAL: customer actions ── */
 .cv-actions{background:var(--amber-light);border:1px solid var(--amber-border);border-radius:var(--radius);padding:16px 18px;margin-top:16px}
 .cv-actions-title{font-size:11px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--amber-border)}
-/* ── CLIENT PORTAL: invoices ── */
-.cv-invoices{background:#F0FDF4;border:1px solid #86EFAC;border-radius:var(--radius);padding:16px 18px;margin-top:16px}
-.cv-invoices-title{font-size:11px;font-weight:700;color:#15803D;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #86EFAC}
-.cv-inv-row{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid #BBF7D0}
-.cv-inv-row:last-child{border-bottom:none;padding-bottom:0}
-.cv-inv-icon{color:#16A34A;font-size:14px;margin-top:1px;flex-shrink:0}
-.cv-inv-body{flex:1;min-width:0}
-.cv-inv-text{font-size:14px;color:#14532D;font-weight:500;line-height:1.4}
-.cv-inv-date{font-size:12px;color:#15803D;margin-top:2px}
+/* ── CLIENT PORTAL: invoice calendar badge ── */
+.cv-inv-badge{display:block;margin-top:2px;background:#DCFCE7;color:#15803D;border:1px solid #86EFAC;border-radius:3px;font-size:9px;font-weight:700;padding:1px 4px;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cv-action-row{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid rgba(245,158,11,0.25)}
 .cv-action-row:last-child{border-bottom:none}
 .cv-action-icon{font-size:15px;flex-shrink:0;margin-top:1px}
@@ -1207,7 +1200,6 @@ select.sem-input{cursor:pointer}
     <div id="cv-extras"></div>
     <div id="cv-payments"></div>
     <div id="cv-actions"></div>
-    <div id="cv-invoices"></div>
     <div id="cv-notes-form"></div>
     <div class="cv-footer" id="cv-footer"></div>
   </div>
@@ -3234,7 +3226,6 @@ const SCHED_COLS = [
   {id:'scaffold',   label:'Scaffolding',       short:'SC',bg:'#FFF7ED', border:'#FDBA74', text:'#9A3412', avatar:'#EA580C', phone:''},
   {id:'steel',      label:'Steel Fabrication',short:'SF',bg:'#F1F5F9', border:'#94A3B8', text:'#1E293B', avatar:'#475569', phone:''},
   {id:'client-actions', label:'Client Actions', short:'CA', bg:'#FFFBEB', border:'#FDE68A', text:'#92400E', avatar:'#B45309', phone:''},
-  {id:'invoices',       label:'Invoices',       short:'INV',bg:'#F0FDF4', border:'#86EFAC', text:'#15803D', avatar:'#16A34A', phone:''},
   {id:'notes',     label:'Notes/Orders',    short:'N', bg:'var(--surface)', border:'var(--border)', text:'var(--muted)', avatar:'#71717A', phone:''},
 ];
 
@@ -3258,7 +3249,7 @@ let schedViewWeeks= 16;  // chunk size rendered at a time (not user-selectable)
 let schedInfiniteStart = null; // earliest date currently rendered
 let schedInfiniteEnd = null;   // latest date currently rendered
 const SCHED_CHUNK = 16; // weeks per chunk
-let schedCols     = new Set(['tom','fraser','barnetts','sec','kbc','roofer','painter','flooring','flowscreed','plasterer','tonino','scaffold','steel','client-actions','invoices','notes']);
+let schedCols     = new Set(['tom','fraser','barnetts','sec','kbc','roofer','painter','flooring','flowscreed','plasterer','tonino','scaffold','steel','client-actions','notes']);
 let schedEditId   = null;
 let schedEntryType= 'job';
 let schedDragId   = null;
@@ -4674,8 +4665,7 @@ async function loadClientViewLive(jobId){
     }
     const allEntries=(schedData.entries||[]).filter(e=>e.jobId===jobId&&!e.isPlaceholder);
     const clientActionEntries=allEntries.filter(e=>e.col==='client-actions');
-    const invoiceEntries=allEntries.filter(e=>e.col==='invoices');
-    const schedEntries=allEntries.filter(e=>e.col!=='notes'&&e.col!=='client-actions'&&e.col!=='invoices');
+    const schedEntries=allEntries.filter(e=>e.col!=='notes'&&e.col!=='client-actions');
     const usedColIds=[...new Set(schedEntries.map(e=>e.col))];
     const cols=contractorsAllCols().filter(c=>usedColIds.includes(c.id)&&c.id!=='notes'&&c.id!=='client-actions')
       .map(c=>({id:c.id,label:c.label,bg:c.bg,text:c.text}));
@@ -4697,7 +4687,6 @@ async function loadClientViewLive(jobId){
       invoiceDates:Array.isArray(job.paymentLinks?.invoiceDates)?job.paymentLinks.invoiceDates:[],
       clientActions,
       clientNotesHistory,
-      invoices:invoiceEntries.filter(e=>e.text).map(e=>({text:e.text||'',start:e.start||'',end:e.end||e.start||''})).sort((a,b)=>a.start.localeCompare(b.start)),
       generated:schedDateStr(new Date())
     };
     renderClientView(payload);
@@ -4731,10 +4720,21 @@ function renderClientView(data){
       cur.setDate(cur.getDate()+1);
     }
   });
+  // Build invoice date map from paymentLinks — no manual entry needed
+  const invDates=Array.isArray(data.invoiceDates)?data.invoiceDates:[];
+  const pl=data.paymentLinks;
+  const invSlots=pl?.mode==='4'
+    ?['Deposit','Stage 2','Stage 3','Final payment']
+    :['Deposit','Final payment'];
+  const invMap={};
+  invDates.forEach((ds,i)=>{ if(ds) invMap[ds]=invSlots[i]||('Invoice '+(i+1)); });
+
   const allDates=Object.keys(dateMap).sort();
-  if(!allDates.length){ document.getElementById('cv-months').innerHTML='<p style="padding:20px;color:#888">No dates scheduled yet.</p>'; }
+  const allInvDates=Object.keys(invMap);
+  const combinedDates=[...allDates,...allInvDates].sort();
+  if(!combinedDates.length){ document.getElementById('cv-months').innerHTML='<p style="padding:20px;color:#888">No dates scheduled yet.</p>'; }
   else{
-    const firstDate=new Date(allDates[0]+'T12:00:00'), lastDate=new Date(allDates[allDates.length-1]+'T12:00:00');
+    const firstDate=new Date(combinedDates[0]+'T12:00:00'), lastDate=new Date(combinedDates[combinedDates.length-1]+'T12:00:00');
     const MNAMES=['January','February','March','April','May','June','July','August','September','October','November','December'];
     const DOW=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
     const todayStr=schedDateStr(new Date());
@@ -4759,8 +4759,9 @@ function renderClientView(data){
             `<div class="cv-chip" style="background:${ch.bg};color:${ch.text}">
               ${ch.confirmed?'<i class="cv-chip-tick">✓</i>':''}<span>${esc(ch.label)}</span>
             </div>`).join('');
-          row+=`<td class="${isWeekend?'cv-we':''}${chips.length?' cv-has-work':''}">
-            <div class="cv-dn${isToday?' cv-today':''}">${dayNum}</div>${chipsHtml}</td>`;
+          const invBadge=invMap[ds]?`<span class="cv-inv-badge">£ ${esc(invMap[ds])}</span>`:'';
+          row+=`<td class="${isWeekend?'cv-we':''}${(chips.length||invMap[ds])?' cv-has-work':''}">
+            <div class="cv-dn${isToday?' cv-today':''}">${dayNum}</div>${chipsHtml}${invBadge}</td>`;
         }
         tbody+=row+'</tr>';
       }
@@ -4865,29 +4866,6 @@ function renderClientView(data){
       </div>`;
     } else {
       actionsEl.innerHTML='';
-    }
-  }
-
-  // Invoices section
-  const invoicesEl=document.getElementById('cv-invoices');
-  if(invoicesEl){
-    const invEntries=(data.invoices||[]);
-    if(invEntries.length){
-      const SMON3=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-      const fmtD3=d=>{const p=new Date(d+'T12:00:00');return p.getDate()+' '+SMON3[p.getMonth()]+' '+p.getFullYear();};
-      const fmtR3=(s,e)=>s?(s===e||!e)?fmtD3(s):fmtD3(s)+' – '+fmtD3(e):'';
-      invoicesEl.innerHTML=`<div class="cv-invoices">
-        <div class="cv-invoices-title">🧾 Invoices</div>
-        ${invEntries.map(inv=>`<div class="cv-inv-row">
-          <div class="cv-inv-icon">£</div>
-          <div class="cv-inv-body">
-            <div class="cv-inv-text">${esc(inv.text)}</div>
-            ${inv.start?`<div class="cv-inv-date">${fmtR3(inv.start,inv.end)}</div>`:''}
-          </div>
-        </div>`).join('')}
-      </div>`;
-    } else {
-      invoicesEl.innerHTML='';
     }
   }
 
