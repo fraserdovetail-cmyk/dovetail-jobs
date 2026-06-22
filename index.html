@@ -1157,6 +1157,12 @@ select.sem-input{cursor:pointer}
 .cv-notes-btn:hover{background:var(--sage-dark)}
 .cv-notes-btn:disabled{opacity:0.5;cursor:default}
 .cv-notes-sent{font-size:13px;color:var(--sage-dark);background:var(--sage-light);border:1px solid var(--green-border);border-radius:var(--radius-sm);padding:10px 14px;margin-top:8px}
+.cv-msg-history{margin-bottom:12px}
+.cv-msg-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:8px}
+.cv-msg-item:last-child{margin-bottom:0}
+.cv-msg-text{font-size:14px;color:var(--text);line-height:1.5;white-space:pre-wrap}
+.cv-msg-ts{font-size:11px;color:var(--hint);margin-top:4px}
+.cv-msg-divider{border:none;border-top:1px solid var(--border);margin:14px 0 12px}
 
 /* ── CLIENT PORTAL: customer actions ── */
 .cv-actions{background:var(--amber-light);border:1px solid var(--amber-border);border-radius:var(--radius);padding:16px 18px;margin-top:16px}
@@ -4552,12 +4558,26 @@ async function cvSubmitNote(jobId){
   const ta=document.getElementById('cv-note-ta');
   const text=(ta?.value||'').trim(); if(!text) return;
   const btn=document.querySelector('.cv-notes-btn'); if(btn) btn.disabled=true;
+  const ts=Date.now();
   try{
-    await fetch(API,{method:'POST',body:JSON.stringify({action:'addClientNote',jobId,note:{text}})}).then(r=>r.json());
+    await fetch(API,{method:'POST',body:JSON.stringify({action:'addClientNote',jobId,note:{text,ts}})}).then(r=>r.json());
     ta.value='';
+    // Append message to the visible history immediately
+    const histEl=document.getElementById('cv-msg-history');
+    if(histEl){
+      const SMON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      const d=new Date(ts);
+      const timeStr=d.getDate()+' '+SMON[d.getMonth()]+' '+d.getFullYear()+' at '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+      const item=document.createElement('div'); item.className='cv-msg-item';
+      item.innerHTML=`<div class="cv-msg-text">${esc(text)}</div><div class="cv-msg-ts">${timeStr}</div>`;
+      histEl.appendChild(item);
+      // Show the divider if it wasn't visible before (no prior history)
+      const divider=histEl.nextElementSibling;
+      if(divider&&divider.tagName==='HR') divider.style.display='';
+    }
     const sentEl=document.getElementById('cv-note-sent');
     if(sentEl) sentEl.style.display='block';
-    if(btn){ btn.textContent='Send another'; btn.disabled=false; btn.onclick=()=>{ sentEl.style.display='none'; cvSubmitNote(jobId); }; }
+    if(btn){ btn.textContent='Send another'; btn.disabled=false; btn.onclick=()=>{ sentEl.style.display='none'; ta.value=''; cvSubmitNote(jobId); }; }
   }catch(e){
     if(btn){ btn.disabled=false; btn.textContent='Send message'; }
     alert('Could not send message — please try again or contact Dovetail directly.');
@@ -4647,9 +4667,14 @@ async function loadClientViewLive(jobId){
     const usedColIds=[...new Set(schedEntries.map(e=>e.col))];
     const cols=contractorsAllCols().filter(c=>usedColIds.includes(c.id)&&c.id!=='notes'&&c.id!=='client-actions')
       .map(c=>({id:c.id,label:c.label,bg:c.bg,text:c.text}));
-    // Build client actions list from schedule entries
-    const clientActions=clientActionEntries.map(e=>({text:e.text||'',date:e.start||''}))
-      .filter(a=>a.text);
+    // Build client actions list from schedule entries — sorted chronologically
+    const clientActions=clientActionEntries
+      .filter(e=>e.text)
+      .map(e=>({text:e.text||'',start:e.start||'',end:e.end||e.start||''}))
+      .sort((a,b)=>a.start.localeCompare(b.start));
+    const clientNotesHistory=(Array.isArray(job.clientNotes)?job.clientNotes:[])
+      .map(n=>({text:n.text||'',ts:n.ts||0}))
+      .sort((a,b)=>a.ts-b.ts);
     const payload={
       v:2,live:true,jobId,
       job:{name:job.name||'',client:job.client||'',address:job.address||'',value:job.value||''},
@@ -4659,6 +4684,7 @@ async function loadClientViewLive(jobId){
       paymentLinks:job.paymentLinks||null,
       invoiceDates:Array.isArray(job.paymentLinks?.invoiceDates)?job.paymentLinks.invoiceDates:[],
       clientActions,
+      clientNotesHistory,
       generated:schedDateStr(new Date())
     };
     renderClientView(payload);
@@ -4811,13 +4837,16 @@ function renderClientView(data){
     const actionEntries=(data.clientActions||[]);
     if(actionEntries.length){
       const SMON2=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      const fmtD=d=>{const p=new Date(d+'T12:00:00');return p.getDate()+' '+SMON2[p.getMonth()]+' '+p.getFullYear();};
+      const fmtRange=(s,e)=>s?(s===e||!e)?fmtD(s):fmtD(s)+' – '+fmtD(e):'';
+      // already sorted chronologically from the payload
       actionsEl.innerHTML=`<div class="cv-actions">
         <div class="cv-actions-title">⚡ Action required from you</div>
         ${actionEntries.map(a=>`<div class="cv-action-row">
           <div class="cv-action-icon">→</div>
           <div class="cv-action-body">
             <div class="cv-action-text">${esc(a.text)}</div>
-            ${a.date?`<div class="cv-action-date">By: ${(d=>{const p=new Date(d+'T12:00:00');return p.getDate()+' '+SMON2[p.getMonth()]+' '+p.getFullYear();})(a.date)}</div>`:''}
+            ${a.start?`<div class="cv-action-date">${fmtRange(a.start,a.end)}</div>`:''}
           </div>
         </div>`).join('')}
       </div>`;
@@ -4829,8 +4858,14 @@ function renderClientView(data){
   // Client notes submit form (only on live links)
   const notesFormEl=document.getElementById('cv-notes-form');
   if(notesFormEl&&data.live&&data.jobId){
+    const history=data.clientNotesHistory||[];
+    const fmtMsgTs=ts=>{const d=new Date(ts);const SMON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return d.getDate()+' '+SMON[d.getMonth()]+' '+d.getFullYear()+' at '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');};
+    const historyHtml=history.length
+      ?`<div class="cv-msg-history" id="cv-msg-history">${history.map(n=>`<div class="cv-msg-item"><div class="cv-msg-text">${esc(n.text)}</div><div class="cv-msg-ts">${fmtMsgTs(n.ts)}</div></div>`).join('')}</div><hr class="cv-msg-divider">`
+      :'<div id="cv-msg-history"></div>';
     notesFormEl.innerHTML=`<div class="cv-notes">
-      <div class="cv-notes-title">Message Dovetail</div>
+      <div class="cv-notes-title">Client project notes</div>
+      ${historyHtml}
       <textarea class="cv-notes-ta" id="cv-note-ta" placeholder="Leave a message or note for the Dovetail team — e.g. access info, questions, changes…" rows="3"></textarea>
       <button class="cv-notes-btn" onclick="cvSubmitNote('${data.jobId}')">Send message</button>
       <div id="cv-note-sent" style="display:none" class="cv-notes-sent">✓ Your message has been sent to the Dovetail team.</div>
