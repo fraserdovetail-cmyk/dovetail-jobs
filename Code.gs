@@ -161,9 +161,13 @@ function saveJob(job) {
     const sheet     = getJobsSheet();
     const lcHeaders = getAndEnsureHeaders(sheet); // adds missing columns
 
-    // Build the row using lowercase key lookup from the job object
+    // Normalise the incoming job to a lowercase-keyed map so camelCase fields
+    // (e.g. siteLog, activityLog) match the lowercased sheet headers.
+    const jobLc = {};
+    Object.keys(job).forEach(k => { jobLc[k.toLowerCase()] = job[k]; });
+
     const rowData = lcHeaders.map(h => {
-      const v = job[h];
+      const v = jobLc[h];
       return (v !== undefined && v !== null) ? v : '';
     });
 
