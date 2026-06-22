@@ -3215,6 +3215,7 @@ const SCHED_COLS = [
   {id:'flowscreed',label:'Flowscreed',      short:'FS',bg:'#FFF7ED', border:'#FED7AA', text:'#9A3412', avatar:'#C2410C', phone:'07974185799'},
   {id:'plasterer', label:'Plasterer',       short:'PL',bg:'#F0F9FF', border:'#BAE6FD', text:'#0369A1', avatar:'#0284C7', phone:'07860817415'},
   {id:'tonino',    label:'Tiling',          short:'TL',bg:'#FDF4FF', border:'#E9D5FF', text:'#7E22CE', avatar:'#9333EA', phone:'07803528957'},
+  {id:'steel',      label:'Steel Fabrication',short:'SF',bg:'#F1F5F9', border:'#94A3B8', text:'#1E293B', avatar:'#475569', phone:''},
   {id:'client-actions', label:'Client Actions', short:'CA', bg:'#FFFBEB', border:'#FDE68A', text:'#92400E', avatar:'#B45309', phone:''},
   {id:'notes',     label:'Notes/Orders',    short:'N', bg:'var(--surface)', border:'var(--border)', text:'var(--muted)', avatar:'#71717A', phone:''},
 ];
@@ -3239,7 +3240,7 @@ let schedViewWeeks= 16;  // chunk size rendered at a time (not user-selectable)
 let schedInfiniteStart = null; // earliest date currently rendered
 let schedInfiniteEnd = null;   // latest date currently rendered
 const SCHED_CHUNK = 16; // weeks per chunk
-let schedCols     = new Set(['tom','fraser','barnetts','sec','kbc','roofer','painter','flooring','flowscreed','plasterer','tonino','client-actions','notes']);
+let schedCols     = new Set(['tom','fraser','barnetts','sec','kbc','roofer','painter','flooring','flowscreed','plasterer','tonino','steel','client-actions','notes']);
 let schedEditId   = null;
 let schedEntryType= 'job';
 let schedDragId   = null;
