@@ -474,6 +474,11 @@ textarea.finput{resize:vertical;min-height:68px;line-height:1.5}
 .pmt-open{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--muted);cursor:pointer;font-family:'Inter',sans-serif;font-size:13px;text-decoration:none;flex-shrink:0;transition:all 0.12s}
 .pmt-open:hover{border-color:var(--green-mid);color:var(--green);background:var(--green-light)}
 .pmt-open:disabled,.pmt-open.disabled{opacity:0.25;pointer-events:none}
+.pmt-date-row{width:100%;display:flex;align-items:center;gap:6px;padding:2px 0 4px;margin-left:128px}
+.pmt-date-lbl{font-size:11px;color:var(--hint);white-space:nowrap}
+.pmt-date{padding:4px 8px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;font-family:'Inter',sans-serif;color:var(--text);background:var(--surface);outline:none;transition:border-color 0.15s}
+.pmt-date:focus{border-color:var(--green-mid)}
+.pmt-date.has-date{border-color:var(--amber-border);background:var(--amber-light)}
 /* Payment links — client view */
 .cv-payments{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-top:16px}
 .cv-payments-title{font-size:11px;font-weight:700;color:var(--sage-dark);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
@@ -485,6 +490,10 @@ textarea.finput{resize:vertical;min-height:68px;line-height:1.5}
 .cv-pmt-amt{font-size:12px;color:var(--muted)}
 .cv-pmt-btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;background:var(--green);color:#fff;border-radius:var(--radius-sm);font-size:12px;font-weight:600;font-family:'Inter',sans-serif;text-decoration:none;white-space:nowrap;transition:background 0.12s}
 .cv-pmt-btn:hover{background:var(--green-mid)}
+.cv-pmt-date{font-size:11px;font-weight:500;padding:2px 7px;border-radius:4px;width:fit-content;margin-top:3px;border:1px solid transparent}
+.cv-pmt-date-future{background:var(--blue-light);color:var(--blue);border-color:var(--blue-border)}
+.cv-pmt-date-upcoming{background:var(--amber-light);color:var(--amber);border-color:var(--amber-border)}
+.cv-pmt-date-overdue{background:var(--red-light);color:var(--red);border-color:var(--red-border)}
 
 /* Prompt history */
 .ph-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:8px}
@@ -1115,6 +1124,51 @@ select.sem-input{cursor:pointer}
 .bom-schedule-all{margin-top:10px;padding:9px 14px;background:var(--green);color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:background 0.12s;width:100%}
 .bom-schedule-all:hover{background:var(--green-mid)}
 
+/* ── SITE NOTES dash panel ── */
+.sn-form{display:none;gap:6px;padding:6px 16px 10px;background:var(--surface);border-bottom:1px solid var(--border);align-items:center}
+.sn-form.open{display:flex}
+.sn-inp{flex:1;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:'Inter',sans-serif;color:var(--text);background:var(--white);outline:none;min-width:0}
+.sn-inp:focus{border-color:var(--green-mid)}
+.sn-save{padding:7px 13px;background:var(--green);color:#fff;border:none;border-radius:var(--radius-sm);font-size:12px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:background 0.12s}
+.sn-save:hover{background:var(--green-mid)}
+.sn-cancel{padding:7px 10px;background:none;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;color:var(--muted);cursor:pointer;font-family:'Inter',sans-serif;flex-shrink:0}
+.sn-recent{font-size:12px;color:var(--hint);padding:2px 0 2px 2px;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px}
+
+/* ── CLIENT NOTES (admin view) ── */
+.cn-badge{display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;border-radius:8px;background:var(--amber);color:#fff;font-size:9px;font-weight:700;margin-left:5px;vertical-align:middle;padding:0 3px}
+.cn-item{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)}
+.cn-item:last-child{border-bottom:none}
+.cn-dot{width:8px;height:8px;border-radius:50%;background:var(--amber);flex-shrink:0;margin-top:5px}
+.cn-dot.read{background:var(--hint)}
+.cn-body{flex:1}
+.cn-text{font-size:13px;color:var(--text);line-height:1.45}
+.cn-time{font-size:11px;color:var(--hint);margin-top:2px}
+.cn-mark-read{font-size:11px;color:var(--blue);background:none;border:none;cursor:pointer;padding:0;font-family:'Inter',sans-serif;text-decoration:underline;margin-top:3px;display:block}
+.cn-empty{font-size:13px;color:var(--hint);font-style:italic;padding:4px 0}
+
+/* ── CLIENT PORTAL: submit note ── */
+.cv-notes{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-top:16px}
+.cv-notes-title{font-size:11px;font-weight:700;color:var(--sage-dark);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.cv-notes-ta{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Inter',sans-serif;color:var(--text);background:var(--surface);outline:none;resize:vertical;min-height:80px;line-height:1.5;transition:border-color 0.15s;box-sizing:border-box}
+.cv-notes-ta:focus{border-color:var(--sage)}
+.cv-notes-btn{margin-top:8px;padding:10px 20px;background:var(--sage);color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:background 0.12s}
+.cv-notes-btn:hover{background:var(--sage-dark)}
+.cv-notes-btn:disabled{opacity:0.5;cursor:default}
+.cv-notes-sent{font-size:13px;color:var(--sage-dark);background:var(--sage-light);border:1px solid var(--green-border);border-radius:var(--radius-sm);padding:10px 14px;margin-top:8px}
+
+/* ── CLIENT PORTAL: customer actions ── */
+.cv-actions{background:var(--amber-light);border:1px solid var(--amber-border);border-radius:var(--radius);padding:16px 18px;margin-top:16px}
+.cv-actions-title{font-size:11px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--amber-border)}
+.cv-action-row{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid rgba(245,158,11,0.25)}
+.cv-action-row:last-child{border-bottom:none}
+.cv-action-icon{font-size:15px;flex-shrink:0;margin-top:1px}
+.cv-action-body{flex:1}
+.cv-action-text{font-size:13px;color:var(--charcoal);line-height:1.4;font-weight:500}
+.cv-action-date{font-size:11px;color:var(--amber);margin-top:2px}
+
+/* ── SCHEDULE: customer actions column chip ── */
+.chip-client-action{background:var(--amber-light);border:1px solid var(--amber-border);border-radius:4px;font-size:10px;font-weight:600;color:var(--amber);padding:2px 6px;display:inline-block;margin-top:2px}
+
 </style>
 </head>
 <body>
@@ -1135,6 +1189,8 @@ select.sem-input{cursor:pointer}
     <div id="cv-months"></div>
     <div id="cv-extras"></div>
     <div id="cv-payments"></div>
+    <div id="cv-actions"></div>
+    <div id="cv-notes-form"></div>
     <div class="cv-footer" id="cv-footer"></div>
   </div>
 </div>
@@ -1230,6 +1286,15 @@ select.sem-input{cursor:pointer}
             <span id="dash-extras-total" style="font-size:12px;font-weight:600;font-family:'JetBrains Mono',monospace;color:var(--green)"></span>
           </div>
           <div class="dash-panel-body" id="dash-extras-body"><div class="dash-empty">No jobs currently in progress</div></div>
+        </div>
+      </div>
+      <div class="dash-row" style="grid-template-columns:1fr;margin-bottom:16px">
+        <div class="dash-panel" id="dash-notes-panel">
+          <div class="dash-panel-hd" style="background:#EFF6FF;border-color:#BFDBFE">
+            <span class="dash-panel-title" style="color:#1E40AF">Site notes · jobs in progress</span>
+            <span id="dash-notes-unread" style="font-size:11px;font-weight:600;color:var(--amber)"></span>
+          </div>
+          <div class="dash-panel-body" id="dash-notes-body"><div class="dash-empty">No jobs currently in progress</div></div>
         </div>
       </div>
       <div class="dash-row">
@@ -1711,7 +1776,7 @@ const MONTHS  = ['January','February','March','April','May','June','July','Augus
 const SMONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const CHASE_DAYS = 7;
 
-let jobs = [], saving = false, _durUnit = 'days', _gcalAdded = false, _depositReceived = false, _paymentLinks = {mode:'2',links:['','','',''],extrasLink:''};
+let jobs = [], saving = false, _durUnit = 'days', _gcalAdded = false, _depositReceived = false, _paymentLinks = {mode:'2',links:['','','',''],extrasLink:'',invoiceDates:['','','','']};
 let _ctvId=null, _ctvName=null;
 let currentStage = 0, _currentJobLog = [];
 let _pricingJobId = null, _ppSections = [];
@@ -1913,6 +1978,7 @@ function parseJob(j){
     keyCode:safeStr(j.keyCode),
     contractorNotes:safeStr(j.contractorNotes),
     bomFilename:safeStr(j.bomFilename||''),
+    clientNotes:(()=>{ try{ const v=j.clientnotes||j.clientNotes; if(!v||v==='') return []; return typeof v==='string'?JSON.parse(v):v; }catch(e){return [];} })(),
   };
 }
 
@@ -1921,7 +1987,7 @@ function parseJob(j){
 // The Code.gs ensureJobColumns() function adds missing columns automatically,
 // but you MUST redeploy the Apps Script after adding new fields here.
 async function pushJob(job){
-  const payload={action:'saveJob',job:{...job,activityLog:JSON.stringify(job.activityLog||[]),siteLog:JSON.stringify(job.siteLog||[]),promptHistory:JSON.stringify(job.promptHistory||[]),bom:job.bom?JSON.stringify(job.bom):'',bomFilename:job.bomFilename||'',extras:JSON.stringify(job.extras||[]),paymentLinks:job.paymentLinks?JSON.stringify(job.paymentLinks):''}};
+  const payload={action:'saveJob',job:{...job,activityLog:JSON.stringify(job.activityLog||[]),siteLog:JSON.stringify(job.siteLog||[]),promptHistory:JSON.stringify(job.promptHistory||[]),bom:job.bom?JSON.stringify(job.bom):'',bomFilename:job.bomFilename||'',extras:JSON.stringify(job.extras||[]),paymentLinks:job.paymentLinks?JSON.stringify(job.paymentLinks):'',clientNotes:JSON.stringify(job.clientNotes||[])}};
   if(!isOnline){
     // queue for later
     syncQueue=syncQueue.filter(q=>q.job.id!==job.id);
@@ -2039,6 +2105,37 @@ function renderDashboard(){
     }).join('');
   } else {
     extrasBody.innerHTML='<div class="dash-empty">No jobs currently in progress — set a job to "Work commenced" to track extras here</div>';
+  }
+
+  // Site notes panel
+  const notesBody=document.getElementById('dash-notes-body');
+  const notesUnreadEl=document.getElementById('dash-notes-unread');
+  const totalUnreadClient=inProgressJobs.reduce((t,j)=>t+((Array.isArray(j.clientNotes)?j.clientNotes:[]).filter(n=>!n.read).length),0);
+  if(notesUnreadEl) notesUnreadEl.textContent=totalUnreadClient?totalUnreadClient+' client message'+(totalUnreadClient!==1?'s':''):'';
+  if(notesBody){
+    if(inProgressJobs.length){
+      notesBody.innerHTML=inProgressJobs.map(j=>{
+        const slog=Array.isArray(j.siteLog)?j.siteLog:[];
+        const cn=Array.isArray(j.clientNotes)?j.clientNotes:[];
+        const unreadCn=cn.filter(n=>!n.read).length;
+        const lastNote=slog.length?slog[slog.length-1]:null;
+        const meta=slog.length?(slog.length+' note'+(slog.length!==1?'s':''))+(lastNote?' · '+lastNote.text.slice(0,30)+(lastNote.text.length>30?'…':''):''):'No notes yet';
+        return `<div class="dex-item">
+          <div class="dex-info" onclick="openJob('${j.id}')">
+            <div class="dex-name">${esc(j.name||'Untitled')} — ${esc(j.client||'—')}${unreadCn?`<span class="cn-badge" style="margin-left:6px">${unreadCn}</span>`:''}</div>
+            <div class="dex-meta">${meta}</div>
+          </div>
+          <button class="dex-btn" onclick="snToggleForm('${j.id}')">+ Note</button>
+        </div>
+        <div class="sn-form" id="sn-form-${j.id}">
+          <input class="sn-inp" id="sn-inp-${j.id}" placeholder="Quick site note…" onkeydown="if(event.key==='Enter')snAdd('${j.id}')"/>
+          <button class="sn-save" onclick="snAdd('${j.id}')">Add</button>
+          <button class="sn-cancel" onclick="snToggleForm('${j.id}')">✕</button>
+        </div>`;
+      }).join('');
+    } else {
+      notesBody.innerHTML='<div class="dash-empty">No jobs currently in progress</div>';
+    }
   }
 
   // Needs quoting panel
@@ -2274,15 +2371,16 @@ function openJob(id){
     startDate:'',startTime:'',prestartDate:'',prestartTime:'',
     durationNum:'',durationUnit:'days',notes:'',stage:0,declined:false,
     gcalAdded:false,depositReceived:false,
-    activityLog:[],siteLog:[],extras:[],promptHistory:[],keyCode:'',contractorNotes:'',paymentLinks:null,
+    activityLog:[],siteLog:[],extras:[],promptHistory:[],keyCode:'',contractorNotes:'',paymentLinks:null,clientNotes:[],
     created:String(Date.now()),updated:String(Date.now())
   };
   _durUnit=safeStr(d.durationUnit)||'days';
   _gcalAdded=safeBool(d.gcalAdded);
   _depositReceived=safeBool(d.depositReceived);
   const _pl=d.paymentLinks||{};
-  _paymentLinks={mode:_pl.mode||'2',links:Array.isArray(_pl.links)?[..._pl.links]:['','','',''],extrasLink:_pl.extrasLink||''};
+  _paymentLinks={mode:_pl.mode||'2',links:Array.isArray(_pl.links)?[..._pl.links]:['','','',''],extrasLink:_pl.extrasLink||'',invoiceDates:Array.isArray(_pl.invoiceDates)?[..._pl.invoiceDates]:['','','','']};
   while(_paymentLinks.links.length<4) _paymentLinks.links.push('');
+  while(_paymentLinks.invoiceDates.length<4) _paymentLinks.invoiceDates.push('');
   currentStage=d.stage;
   const log=Array.isArray(d.activityLog)?d.activityLog:[];
   _currentJobLog=log;
@@ -2360,6 +2458,27 @@ function openJob(id){
       </div>
     </div>`:''}
 
+    ${!isNew?(()=>{
+      const cn=Array.isArray(d.clientNotes)?d.clientNotes:[];
+      const unread=cn.filter(n=>!n.read).length;
+      if(!cn.length) return '';
+      const rows=cn.slice().reverse().map(n=>`<div class="cn-item">
+        <div class="cn-dot${n.read?' read':''}"></div>
+        <div class="cn-body">
+          <div class="cn-text">${esc(n.text)}</div>
+          <div class="cn-time">${fmtTs(n.ts)}</div>
+          ${!n.read?`<button class="cn-mark-read" onclick="markClientNoteRead('${d.id}','${n.id}')">Mark as read</button>`:''}
+        </div>
+      </div>`).join('');
+      return `<div class="modal-section">
+        <div class="sec-hd" style="display:flex;align-items:center;gap:6px">
+          Client messages
+          ${unread?`<span class="cn-badge">${unread}</span>`:''}
+        </div>
+        ${rows}
+      </div>`;
+    })():''}
+
     ${log.length?`<div class="modal-section">
       <div class="sec-hd">Activity log</div>
       <div class="activity-log">${log.slice().reverse().map(e=>`<div class="act-item"><div class="act-dot"></div><div><div class="act-stage">→ ${e.stageName||STAGES[e.stage]||'Stage '+(e.stage+1)}</div><div class="act-time">${fmtTs(e.ts)}</div></div></div>`).join('')}</div>
@@ -2377,6 +2496,10 @@ function openJob(id){
       ${!isNew?`<button class="btn-del" onclick="deleteJob('${d.id}')">Delete</button>`:''}
       ${!isNew&&!d.declined&&d.stage===10?`<button class="btn-unarchive" onclick="unarchiveJob('${d.id}')">↩ Unarchive</button>`:''}
       ${!isNew&&d.stage!==10?`<button class="btn-decline${d.declined?' btn-decline-active':''}" onclick="toggleDecline('${d.id}')">${d.declined?'↩ Reinstate':'✕ Decline'}</button>`:''}
+      ${!isNew?`<button class="gcal-export" onclick="copyClientLink('${d.id}')" title="Copy live client portal link to clipboard" style="margin-left:4px">
+        <svg width="11" height="11" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+        Client link
+      </button>`:''}
     </div>
     <div class="modal-ft-right">
       <button class="btn-cancel" onclick="closeModal()">Cancel</button>
@@ -2513,6 +2636,7 @@ function buildPaymentLinksSection(job){
   const pl=_paymentLinks;
   const mode=pl.mode||'2';
   const links=pl.links||['','','',''];
+  const invoiceDates=Array.isArray(pl.invoiceDates)?pl.invoiceDates:['','','',''];
   const val=parseFloat(job.value)||0;
   const slots=mode==='4'?[
     {pct:10,name:'Deposit'},{pct:30,name:'Stage 2'},{pct:30,name:'Stage 3'},{pct:30,name:'Final payment'}
@@ -2522,11 +2646,16 @@ function buildPaymentLinksSection(job){
   function fmtAmt(pct){ if(!val) return ''; const a=val*pct/100; return '£'+a.toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:2}); }
   const rows=slots.map((s,i)=>{
     const lnk=links[i]||'';
-    return `<div class="pmt-row">
+    const dt=invoiceDates[i]||'';
+    return `<div class="pmt-row" style="flex-wrap:wrap">
       <div class="pmt-row-label"><span class="pmt-name">${s.name}</span><span class="pmt-pct">${s.pct}%</span></div>
       <span class="pmt-amt" id="pmt-amt-${i}">${fmtAmt(s.pct)}</span>
       <input class="pmt-input${lnk?' has-link':''}" id="pmt-link-${i}" type="url" value="${esc(lnk)}" placeholder="Paste Monzo link…" oninput="this.classList.toggle('has-link',!!this.value.trim())"/>
       <button class="pmt-open${lnk?'':'  disabled'}" onclick="openPmtLink(${i})" title="Open link">↗</button>
+      <div class="pmt-date-row">
+        <span class="pmt-date-lbl">Forecast invoice:</span>
+        <input class="pmt-date${dt?' has-date':''}" id="pmt-date-${i}" type="date" value="${esc(dt)}" oninput="this.classList.toggle('has-date',!!this.value.trim())"/>
+      </div>
     </div>`;
   }).join('');
   const extrasLnk=pl.extrasLink||'';
@@ -2545,7 +2674,8 @@ function buildPaymentLinksSection(job){
 function setPaymentMode(mode){
   const links=[0,1,2,3].map(i=>(document.getElementById('pmt-link-'+i)||{}).value||'');
   const extrasLink=(document.getElementById('pmt-link-extras')||{}).value||'';
-  _paymentLinks={mode,links,extrasLink};
+  const invoiceDates=[0,1,2,3].map(i=>(document.getElementById('pmt-date-'+i)||{}).value||'');
+  _paymentLinks={mode,links,extrasLink,invoiceDates};
   const wrap=document.getElementById('pmt-links-wrap');
   const jobVal=(document.getElementById('f-value')||{}).value||'0';
   if(wrap) wrap.innerHTML=buildPaymentLinksSection({value:jobVal});
@@ -2608,7 +2738,8 @@ async function saveJob(id,isNew){
     depositReceived:existing.depositReceived||false,
     siteLog:Array.isArray(existing.siteLog)?existing.siteLog:[],
     extras:Array.isArray(existing.extras)?existing.extras:[],
-    paymentLinks:{mode:_paymentLinks.mode,links:[0,1,2,3].map(i=>(document.getElementById('pmt-link-'+i)||{}).value||''),extrasLink:(document.getElementById('pmt-link-extras')||{}).value||''},
+    clientNotes:Array.isArray(existing.clientNotes)?existing.clientNotes:[],
+    paymentLinks:{mode:_paymentLinks.mode,links:[0,1,2,3].map(i=>(document.getElementById('pmt-link-'+i)||{}).value||''),extrasLink:(document.getElementById('pmt-link-extras')||{}).value||'',invoiceDates:[0,1,2,3].map(i=>(document.getElementById('pmt-date-'+i)||{}).value||'')},
     keyCode:(document.getElementById('f-keycode')||{}).value||'',
     contractorNotes:(document.getElementById('f-contractor-notes')||{}).value||'',
     bom:existing.bom||null,
@@ -3036,6 +3167,7 @@ const SCHED_COLS = [
   {id:'flowscreed',label:'Flowscreed',      short:'FS',bg:'#FFF7ED', border:'#FED7AA', text:'#9A3412', avatar:'#C2410C', phone:'07974185799'},
   {id:'plasterer', label:'Plasterer',       short:'PL',bg:'#F0F9FF', border:'#BAE6FD', text:'#0369A1', avatar:'#0284C7', phone:'07860817415'},
   {id:'tonino',    label:'Tiling',          short:'TL',bg:'#FDF4FF', border:'#E9D5FF', text:'#7E22CE', avatar:'#9333EA', phone:'07803528957'},
+  {id:'client-actions', label:'Client Actions', short:'CA', bg:'#FFFBEB', border:'#FDE68A', text:'#92400E', avatar:'#B45309', phone:''},
   {id:'notes',     label:'Notes/Orders',    short:'N', bg:'var(--surface)', border:'var(--border)', text:'var(--muted)', avatar:'#71717A', phone:''},
 ];
 
@@ -3059,7 +3191,7 @@ let schedViewWeeks= 16;  // chunk size rendered at a time (not user-selectable)
 let schedInfiniteStart = null; // earliest date currently rendered
 let schedInfiniteEnd = null;   // latest date currently rendered
 const SCHED_CHUNK = 16; // weeks per chunk
-let schedCols     = new Set(['tom','fraser','barnetts','sec','kbc','roofer','painter','flooring','flowscreed','plasterer','tonino','notes']);
+let schedCols     = new Set(['tom','fraser','barnetts','sec','kbc','roofer','painter','flooring','flowscreed','plasterer','tonino','client-actions','notes']);
 let schedEditId   = null;
 let schedEntryType= 'job';
 let schedDragId   = null;
@@ -4343,21 +4475,79 @@ function requestNotifPermission(){
 async function generateClientLink(){
   if(!schedJobFilter) return;
   const j=jobs.find(x=>x.id===schedJobFilter); if(!j) return;
-  // Live link — customer sees up-to-date schedule and extras every time they open it
-  const longUrl=location.origin+location.pathname+'?client-live='+encodeURIComponent(j.id);
-  showToast('Generating link…');
+  await copyClientLink(j.id);
+}
+
+async function copyClientLink(jobId){
+  const longUrl=location.origin+location.pathname+'?client-live='+encodeURIComponent(jobId);
+  showToast('Copying link…');
   let url=longUrl;
   try{
     const result=await apiCall({action:'shortUrl',url:longUrl});
     if(result&&result.short&&result.short!==longUrl) url=result.short;
   }catch(e){}
-  const label=url===longUrl?'Live client link copied!':'Short live link copied!';
+  const label='Client link copied!';
   if(navigator.clipboard&&navigator.clipboard.writeText){
     navigator.clipboard.writeText(url).then(()=>showToast(label))
       .catch(()=>{ prompt('Copy this link:',url); });
   } else {
     prompt('Copy this link:',url);
   }
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+//  CLIENT PORTAL: submit note back to Dovetail
+// ══════════════════════════════════════════════════════════════════════════
+async function cvSubmitNote(jobId){
+  const ta=document.getElementById('cv-note-ta');
+  const text=(ta?.value||'').trim(); if(!text) return;
+  const btn=document.querySelector('.cv-notes-btn'); if(btn) btn.disabled=true;
+  try{
+    await fetch(API,{method:'POST',body:JSON.stringify({action:'addClientNote',jobId,note:{text}})}).then(r=>r.json());
+    ta.value='';
+    const sentEl=document.getElementById('cv-note-sent');
+    if(sentEl) sentEl.style.display='block';
+    if(btn){ btn.textContent='Send another'; btn.disabled=false; btn.onclick=()=>{ sentEl.style.display='none'; cvSubmitNote(jobId); }; }
+  }catch(e){
+    if(btn){ btn.disabled=false; btn.textContent='Send message'; }
+    alert('Could not send message — please try again or contact Dovetail directly.');
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+//  CLIENT NOTES (admin: mark as read)
+// ══════════════════════════════════════════════════════════════════════════
+async function markClientNoteRead(jobId, noteId){
+  const idx=jobs.findIndex(x=>x.id===jobId); if(idx<0) return;
+  const job={...jobs[idx]};
+  job.clientNotes=(Array.isArray(job.clientNotes)?job.clientNotes:[]).map(n=>n.id===noteId?{...n,read:true}:n);
+  job.updated=String(Date.now());
+  jobs[idx]=job;
+  await pushJob(job); renderAll(); openJob(jobId,'false');
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+//  SITE NOTES DASH PANEL
+// ══════════════════════════════════════════════════════════════════════════
+function snToggleForm(jobId){
+  const form=document.getElementById('sn-form-'+jobId); if(!form) return;
+  const opening=!form.classList.contains('open');
+  document.querySelectorAll('.sn-form.open').forEach(f=>f.classList.remove('open'));
+  if(opening){ form.classList.add('open'); setTimeout(()=>{ const d=document.getElementById('sn-inp-'+jobId); if(d) d.focus(); },40); }
+}
+
+async function snAdd(jobId){
+  const inp=document.getElementById('sn-inp-'+jobId);
+  const text=(inp?.value||'').trim(); if(!text) return;
+  const idx=jobs.findIndex(x=>x.id===jobId); if(idx<0) return;
+  const job={...jobs[idx]};
+  const slog=Array.isArray(job.siteLog)?[...job.siteLog]:[];
+  slog.push({text,ts:Date.now()});
+  job.siteLog=slog; job.updated=String(Date.now());
+  jobs[idx]=job;
+  document.getElementById('sn-form-'+jobId)?.classList.remove('open');
+  showToast('Note added');
+  await pushJob(job); renderAll();
 }
 
 function initClientView(){
@@ -4401,18 +4591,24 @@ async function loadClientViewLive(jobId){
       cvMonths.innerHTML='<p style="padding:20px;color:#888">Schedule not found. Please contact Dovetail for a new link.</p>';
       return;
     }
-    const entries=(schedData.entries||[])
-      .filter(e=>e.jobId===jobId&&!e.isPlaceholder&&e.col!=='notes');
-    const usedColIds=[...new Set(entries.map(e=>e.col))];
-    const cols=SCHED_COLS.filter(c=>usedColIds.includes(c.id))
+    const allEntries=(schedData.entries||[]).filter(e=>e.jobId===jobId&&!e.isPlaceholder);
+    const clientActionEntries=allEntries.filter(e=>e.col==='client-actions');
+    const schedEntries=allEntries.filter(e=>e.col!=='notes'&&e.col!=='client-actions');
+    const usedColIds=[...new Set(schedEntries.map(e=>e.col))];
+    const cols=contractorsAllCols().filter(c=>usedColIds.includes(c.id)&&c.id!=='notes'&&c.id!=='client-actions')
       .map(c=>({id:c.id,label:c.label,bg:c.bg,text:c.text}));
+    // Build client actions list from schedule entries
+    const clientActions=clientActionEntries.map(e=>({text:e.text||'',date:e.start||''}))
+      .filter(a=>a.text);
     const payload={
-      v:2,live:true,
+      v:2,live:true,jobId,
       job:{name:job.name||'',client:job.client||'',address:job.address||'',value:job.value||''},
-      entries:entries.map(e=>({col:e.col,start:e.start,end:e.end||e.start,confirmed:!!e.confirmed})),
+      entries:schedEntries.map(e=>({col:e.col,start:e.start,end:e.end||e.start,confirmed:!!e.confirmed})),
       cols,
       extras:Array.isArray(job.extras)?job.extras:[],
       paymentLinks:job.paymentLinks||null,
+      invoiceDates:Array.isArray(job.paymentLinks?.invoiceDates)?job.paymentLinks.invoiceDates:[],
+      clientActions,
       generated:schedDateStr(new Date())
     };
     renderClientView(payload);
@@ -4509,23 +4705,44 @@ function renderClientView(data){
   if(pmtEl){
     const pl=paymentLinks; const plLinks=Array.isArray(pl?.links)?pl.links:[];
     const extrasLnk=pl?.extrasLink||'';
+    const cvInvoiceDates=Array.isArray(data.invoiceDates)?data.invoiceDates:(Array.isArray(pl?.invoiceDates)?pl.invoiceDates:[]);
     const activeLinks=plLinks.filter(Boolean);
-    if(pl&&(activeLinks.length||extrasLnk)){
+    const activeInvoiceDates=cvInvoiceDates.filter(Boolean);
+    if(pl&&(activeLinks.length||extrasLnk||activeInvoiceDates.length)){
       const val=parseFloat(job.value)||0;
       const slots=pl.mode==='4'?[
         {pct:10,name:'Deposit'},{pct:30,name:'Stage 2'},{pct:30,name:'Stage 3'},{pct:30,name:'Final payment'}
       ]:[
         {pct:10,name:'Deposit'},{pct:90,name:'Final payment'}
       ];
+      const todayMs=new Date().setHours(0,0,0,0);
+      const SMON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      function fmtInvDate(ds){
+        if(!ds) return '';
+        const d=new Date(ds+'T12:00:00');
+        return d.getDate()+' '+SMON[d.getMonth()]+' '+d.getFullYear();
+      }
+      function invDateBadge(ds,i){
+        if(!ds) return '';
+        const dMs=new Date(ds+'T12:00:00').getTime();
+        const diff=dMs-todayMs;
+        let cls='cv-pmt-date-future', label='Invoice: '+fmtInvDate(ds);
+        if(diff<0){ cls='cv-pmt-date-overdue'; label='Invoice: '+fmtInvDate(ds)+' (overdue)'; }
+        else if(diff<=14*24*3600*1000){ cls='cv-pmt-date-upcoming'; label='Invoice: '+fmtInvDate(ds)+' (soon)'; }
+        return `<span class="cv-pmt-date ${cls}">${label}</span>`;
+      }
       const rows=slots.map((s,i)=>{
-        const lnk=plLinks[i]||''; if(!lnk) return '';
+        const lnk=plLinks[i]||'';
+        const invDate=cvInvoiceDates[i]||'';
+        if(!lnk&&!invDate) return '';
         const amt=val?'£'+(val*s.pct/100).toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:2}):'';
         return `<div class="cv-pmt-row">
           <div class="cv-pmt-info">
             <span class="cv-pmt-name">${s.name} (${s.pct}%)</span>
             ${amt?`<span class="cv-pmt-amt">${amt}</span>`:''}
+            ${invDateBadge(invDate,i)}
           </div>
-          <a class="cv-pmt-btn" href="${esc(lnk)}" target="_blank">Pay now ↗</a>
+          ${lnk?`<a class="cv-pmt-btn" href="${esc(lnk)}" target="_blank">Pay now ↗</a>`:''}
         </div>`;
       }).filter(Boolean).join('');
       const extrasRow=extrasLnk?`<div class="cv-pmt-row cv-pmt-row-extras">
@@ -4536,6 +4753,40 @@ function renderClientView(data){
       </div>`:'';
       pmtEl.innerHTML=`<div class="cv-payments"><div class="cv-payments-title">Payments</div>${rows}${extrasRow?'<div class="cv-pmt-divider"></div>'+extrasRow:''}</div>`;
     }else{ pmtEl.innerHTML=''; }
+  }
+
+  // Customer actions section
+  const actionsEl=document.getElementById('cv-actions');
+  if(actionsEl){
+    const actionEntries=(data.clientActions||[]);
+    if(actionEntries.length){
+      const SMON2=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      actionsEl.innerHTML=`<div class="cv-actions">
+        <div class="cv-actions-title">⚡ Action required from you</div>
+        ${actionEntries.map(a=>`<div class="cv-action-row">
+          <div class="cv-action-icon">→</div>
+          <div class="cv-action-body">
+            <div class="cv-action-text">${esc(a.text)}</div>
+            ${a.date?`<div class="cv-action-date">By: ${(d=>{const p=new Date(d+'T12:00:00');return p.getDate()+' '+SMON2[p.getMonth()]+' '+p.getFullYear();})(a.date)}</div>`:''}
+          </div>
+        </div>`).join('')}
+      </div>`;
+    } else {
+      actionsEl.innerHTML='';
+    }
+  }
+
+  // Client notes submit form (only on live links)
+  const notesFormEl=document.getElementById('cv-notes-form');
+  if(notesFormEl&&data.live&&data.jobId){
+    notesFormEl.innerHTML=`<div class="cv-notes">
+      <div class="cv-notes-title">Message Dovetail</div>
+      <textarea class="cv-notes-ta" id="cv-note-ta" placeholder="Leave a message or note for the Dovetail team — e.g. access info, questions, changes…" rows="3"></textarea>
+      <button class="cv-notes-btn" onclick="cvSubmitNote('${data.jobId}')">Send message</button>
+      <div id="cv-note-sent" style="display:none" class="cv-notes-sent">✓ Your message has been sent to the Dovetail team.</div>
+    </div>`;
+  } else if(notesFormEl){
+    notesFormEl.innerHTML='';
   }
 
   const SMONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];

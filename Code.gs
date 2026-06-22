@@ -23,6 +23,7 @@ function handleRequest(e) {
       case 'saveSchedule':    result = saveSchedule(body.entries);        break;
       case 'getContractors':  result = getContractors();                  break;
       case 'saveContractors': result = saveContractors(body.contractors); break;
+      case 'addClientNote':   result = addClientNote(body.jobId, body.note); break;
       case 'shortUrl':        result = { short: body.url || '' };        break;
       default:                result = { error: 'Unknown action: ' + body.action };
     }
@@ -79,6 +80,7 @@ const JOB_COLS = [
   'paymentLinks',    // JSON string  ← Monzo payment links
   'keyCode',
   'contractorNotes',
+  'clientNotes',    // JSON string — notes posted by client from the client portal
 ];
 
 // Find the Jobs sheet by name (tries common variants), falls back to first sheet.
@@ -295,6 +297,64 @@ function saveContractors(contractors) {
     return { success: true };
   } catch (err) {
     Logger.log('saveContractors error: ' + err.toString());
+    return { error: err.toString() };
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  CLIENT NOTES — appended by the client portal without a full job overwrite
+// ════════════════════════════════════════════════════════════════════════════
+
+function addClientNote(jobId, note) {
+  if (!jobId || !note || !note.text) return { error: 'Missing jobId or note text' };
+  try {
+    const sheet   = getJobsSheet();
+    const lastCol = sheet.getLastColumn();
+    if (lastCol === 0) return { error: 'Empty sheet' };
+
+    const headers  = sheet.getRange(1, 1, 1, lastCol).getValues()[0]
+                       .map(v => String(v).trim().toLowerCase());
+    const idIdx    = headers.indexOf('id') + 1;
+    const notesIdx = headers.indexOf('clientnotes') + 1;
+
+    if (idIdx === 0) return { error: 'No id column' };
+
+    // Find the job row
+    const lastRow = sheet.getLastRow();
+    if (lastRow < 2) return { error: 'No data' };
+    const ids = sheet.getRange(2, idIdx, lastRow - 1, 1).getValues();
+    let targetRow = -1;
+    for (let i = 0; i < ids.length; i++) {
+      if (String(ids[i][0]).trim() === String(jobId).trim()) { targetRow = i + 2; break; }
+    }
+    if (targetRow < 0) return { error: 'Job not found' };
+
+    // Read existing notes
+    let existing = [];
+    if (notesIdx > 0) {
+      const raw = String(sheet.getRange(targetRow, notesIdx).getValue() || '').trim();
+      try { existing = raw ? JSON.parse(raw) : []; } catch(e) { existing = []; }
+      if (!Array.isArray(existing)) existing = [];
+    }
+
+    // Append new note (unread by default)
+    existing.push({ id: Utilities.getUuid(), text: note.text, ts: Date.now(), read: false });
+    const json = JSON.stringify(existing);
+
+    if (notesIdx > 0) {
+      sheet.getRange(targetRow, notesIdx).setValue(json);
+    } else {
+      // Column doesn't exist yet — ensure headers then write
+      getAndEnsureHeaders(sheet);
+      const newHeaders = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0]
+                           .map(v => String(v).trim().toLowerCase());
+      const newIdx = newHeaders.indexOf('clientnotes') + 1;
+      if (newIdx > 0) sheet.getRange(targetRow, newIdx).setValue(json);
+    }
+
+    return { success: true };
+  } catch (err) {
+    Logger.log('addClientNote error: ' + err.toString());
     return { error: err.toString() };
   }
 }
