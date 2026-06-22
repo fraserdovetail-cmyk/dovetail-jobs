@@ -3226,6 +3226,7 @@ const SCHED_COLS = [
   {id:'scaffold',   label:'Scaffolding',       short:'SC',bg:'#FFF7ED', border:'#FDBA74', text:'#9A3412', avatar:'#EA580C', phone:''},
   {id:'steel',      label:'Steel Fabrication',short:'SF',bg:'#F1F5F9', border:'#94A3B8', text:'#1E293B', avatar:'#475569', phone:''},
   {id:'client-actions', label:'Client Actions', short:'CA', bg:'#FFFBEB', border:'#FDE68A', text:'#92400E', avatar:'#B45309', phone:''},
+  {id:'invoices',       label:'Invoices',       short:'INV',bg:'#F0FDF4', border:'#86EFAC', text:'#15803D', avatar:'#16A34A', phone:''},
   {id:'notes',     label:'Notes/Orders',    short:'N', bg:'var(--surface)', border:'var(--border)', text:'var(--muted)', avatar:'#71717A', phone:''},
 ];
 
@@ -3249,7 +3250,7 @@ let schedViewWeeks= 16;  // chunk size rendered at a time (not user-selectable)
 let schedInfiniteStart = null; // earliest date currently rendered
 let schedInfiniteEnd = null;   // latest date currently rendered
 const SCHED_CHUNK = 16; // weeks per chunk
-let schedCols     = new Set(['tom','fraser','barnetts','sec','kbc','roofer','painter','flooring','flowscreed','plasterer','tonino','scaffold','steel','client-actions','notes']);
+let schedCols     = new Set(['tom','fraser','barnetts','sec','kbc','roofer','painter','flooring','flowscreed','plasterer','tonino','scaffold','steel','client-actions','invoices','notes']);
 let schedEditId   = null;
 let schedEntryType= 'job';
 let schedDragId   = null;
@@ -3960,6 +3961,19 @@ function schedRender(){
     first.getDate()+' '+SMONTHS_S[first.getMonth()]+(first.getFullYear()!==last.getFullYear()?' '+first.getFullYear():'')+
     ' — '+last.getDate()+' '+SMONTHS_S[last.getMonth()]+' '+last.getFullYear();
 
+  // Build virtual invoice entries from each job's paymentLinks — no manual entry needed
+  const _invSlotNames={'4':['Deposit','Stage 2','Stage 3','Final payment'],'2':['Deposit','Final payment']};
+  const virtualInvEntries=[];
+  jobs.forEach(job=>{
+    const pl=job.paymentLinks;
+    if(!pl||!Array.isArray(pl.invoiceDates)) return;
+    const slotNames=_invSlotNames[pl.mode]||['Deposit','Final payment'];
+    pl.invoiceDates.forEach((ds,i)=>{
+      if(!ds) return;
+      virtualInvEntries.push({id:'vinv-'+job.id+'-'+i,col:'invoices',jobId:job.id,text:slotNames[i]||'Invoice '+(i+1),start:ds,end:ds,virtual:true});
+    });
+  });
+
   const activeCols=schedActiveCols();
   const colW=schedColWidth();
 
@@ -3987,12 +4001,29 @@ function schedRender(){
     </div>`;
     activeCols.forEach(col=>{
       const cellEntries=schedEntriesFor(col.id,ds);
+      // Merge in virtual invoice entries for the invoices column
+      const virtForCell=col.id==='invoices'
+        ?virtualInvEntries.filter(e=>e.start<=ds&&ds<=(e.end||e.start)&&(!schedJobFilter||e.jobId===schedJobFilter))
+        :[];
+      const allCellEntries=[...cellEntries,...virtForCell];
       html+=`<div class="sched-cell" style="width:${colW}px" data-col="${col.id}" data-date="${ds}"
         onclick="schedCellClick(event,'${col.id}','${ds}')"
         ondragover="schedIsDesktop()&&schedDragOver(event,'${col.id}','${ds}')"
         ondragleave="schedIsDesktop()&&schedDragLeave(event)"
         ondrop="schedIsDesktop()&&schedDrop(event,'${col.id}','${ds}')">`;
-      cellEntries.forEach(e=>{
+      allCellEntries.forEach(e=>{
+        if(e.virtual){
+          const job=jobs.find(x=>x.id===e.jobId);
+          const jobName=job?(job.name||job.client||''):'';
+          html+=`<div class="sched-chip" style="background:#F0FDF4;border-color:#86EFAC;color:#15803D;cursor:default" title="${esc(e.text+(jobName?' — '+jobName:''))} (from payment links)">
+            <div class="chip-dot" style="background:#16A34A"></div>
+            <div class="chip-txt">
+              <span class="chip-line-1">£ ${esc(e.text)}</span>
+              ${jobName&&!schedJobFilter?`<span class="chip-line-2">${esc(jobName)}</span>`:''}
+            </div>
+          </div>`;
+          return;
+        }
         const isFirst=ds===e.start;
         const isLast=ds===(e.end||e.start);
         const isSpan=e.end&&e.end!==e.start;
