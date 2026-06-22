@@ -4711,7 +4711,7 @@ async function loadClientViewLive(jobId){
     const payload={
       v:2,live:true,jobId,
       job:{name:job.name||'',client:job.client||'',address:job.address||'',value:job.value||''},
-      entries:schedEntries.map(e=>({col:e.col,start:e.start,end:e.end||e.start,confirmed:!!e.confirmed})),
+      entries:schedEntries.map(e=>({col:e.col,start:e.start,end:e.end||e.start,confirmed:!!e.confirmed,text:e.text||''})),
       cols,
       extras:Array.isArray(job.extras)?job.extras:[],
       paymentLinks:job.paymentLinks||null,
@@ -4746,7 +4746,7 @@ function renderClientView(data){
       if(dow!==0&&dow!==6){
         const ds=schedDateStr(cur);
         if(!dateMap[ds]) dateMap[ds]=[];
-        if(!dateMap[ds].some(x=>x.id===col.id)) dateMap[ds].push({...col,confirmed:e.confirmed});
+        if(!dateMap[ds].some(x=>x.id===col.id)) dateMap[ds].push({...col,confirmed:e.confirmed,entryText:e.text||''});
       }
       cur.setDate(cur.getDate()+1);
     }
@@ -4788,7 +4788,7 @@ function renderClientView(data){
           const isWeekend=c>=5, isToday=ds===todayStr, chips=dateMap[ds]||[];
           const chipsHtml=chips.map(ch=>
             `<div class="cv-chip" style="background:${ch.bg};color:${ch.text}">
-              ${ch.confirmed?'<i class="cv-chip-tick">✓</i>':''}<span>${esc(ch.label)}</span>
+              ${ch.confirmed?'<i class="cv-chip-tick">✓</i>':''}<span>${esc(ch.label)}</span>${ch.entryText?`<span style="display:block;font-size:7.5px;font-weight:500;opacity:0.8;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(ch.entryText)}</span>`:''}
             </div>`).join('');
           const invBadge=invMap[ds]?`<span class="cv-inv-badge">£ ${esc(invMap[ds])}</span>`:'';
           row+=`<td class="${isWeekend?'cv-we':''}${(chips.length||invMap[ds])?' cv-has-work':''}">
