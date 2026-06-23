@@ -377,6 +377,13 @@ function validatePasscode(entered) {
   return { valid: (entered || '').trim() === stored.trim() };
 }
 
+// Run this once from the Apps Script editor (▶ Run) to check what's stored
+function checkPasscode() {
+  const stored = PropertiesService.getScriptProperties().getProperty('PASSCODE');
+  Logger.log('Stored PASSCODE: [' + stored + ']');
+  Logger.log('Length: ' + (stored != null ? stored.length : 'NOT SET'));
+}
+
 // ════════════════════════════════════════════════════════════════════════════
 //  DIAGNOSTICS — run this from the Apps Script editor to check sheet state
 // ════════════════════════════════════════════════════════════════════════════
