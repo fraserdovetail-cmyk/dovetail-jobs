@@ -10,7 +10,29 @@ function getSpreadsheet() { return SpreadsheetApp.openById(SPREADSHEET_ID); }
 
 // ─── ENTRY POINTS ────────────────────────────────────────────────────────────
 
-function doGet(e)  { return handleRequest(e); }
+function doGet(e) {
+  if (e && e.parameter && e.parameter.ping) {
+    try {
+      const ss = getSpreadsheet();
+      const jobSheet = getJobsSheet();
+      const headers = jobSheet.getLastRow() > 0
+        ? jobSheet.getRange(1, 1, 1, jobSheet.getLastColumn()).getValues()[0].map(String)
+        : [];
+      return ContentService.createTextOutput(JSON.stringify({
+        ok: true,
+        spreadsheetName: ss.getName(),
+        sheets: ss.getSheets().map(s => s.getName() + '(' + s.getLastRow() + 'rows)'),
+        jobSheet: jobSheet.getName(),
+        jobRows: jobSheet.getLastRow(),
+        headers: headers
+      })).setMimeType(ContentService.MimeType.JSON);
+    } catch(err) {
+      return ContentService.createTextOutput(JSON.stringify({ ok: false, error: err.toString() }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+  }
+  return handleRequest(e);
+}
 function doPost(e) { return handleRequest(e); }
 
 function handleRequest(e) {
