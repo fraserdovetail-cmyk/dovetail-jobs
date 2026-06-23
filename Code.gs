@@ -384,6 +384,15 @@ function checkPasscode() {
   Logger.log('Length: ' + (stored != null ? stored.length : 'NOT SET'));
 }
 
+// Run once from editor to get the spreadsheet ID — paste result back to Claude
+function getSpreadsheetId() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  Logger.log('Spreadsheet ID: ' + ss.getId());
+  Logger.log('Spreadsheet name: ' + ss.getName());
+  Logger.log('Sheets: ' + ss.getSheets().map(s => s.getName()).join(', '));
+  Logger.log('Jobs row count: ' + (ss.getSheetByName('Jobs') || ss.getSheets()[0]).getLastRow());
+}
+
 // ════════════════════════════════════════════════════════════════════════════
 //  DIAGNOSTICS — run this from the Apps Script editor to check sheet state
 // ════════════════════════════════════════════════════════════════════════════
