@@ -2043,11 +2043,12 @@ async function loadJobs(){
   setSyncing('syncing','Loading…');
   try{
     const d=await apiCall({action:'getJobs'});
+    if(d.error){ setSyncing('error','Server: '+d.error); console.error('getJobs error:',d.error); return; }
     jobs=(d.jobs||[]).map(parseJob);
     const n=new Date(); setSyncing('synced',n.getHours()+':'+String(n.getMinutes()).padStart(2,'0'));
     renderAll();
     retrySyncQueue();
-  } catch(e){ setSyncing('error','Offline'); }
+  } catch(e){ setSyncing('error','Load failed: '+e.message); console.error('loadJobs catch:',e); }
 }
 
 function parseJob(j){
