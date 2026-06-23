@@ -23,9 +23,10 @@ function handleRequest(e) {
       case 'saveSchedule':    result = saveSchedule(body.entries);        break;
       case 'getContractors':  result = getContractors();                  break;
       case 'saveContractors': result = saveContractors(body.contractors); break;
-      case 'addClientNote':   result = addClientNote(body.jobId, body.note); break;
-      case 'shortUrl':        result = { short: body.url || '' };        break;
-      default:                result = { error: 'Unknown action: ' + body.action };
+      case 'addClientNote':     result = addClientNote(body.jobId, body.note); break;
+      case 'validatePasscode':  result = validatePasscode(body.passcode);    break;
+      case 'shortUrl':          result = { short: body.url || '' };          break;
+      default:                  result = { error: 'Unknown action: ' + body.action };
     }
 
     return ContentService
@@ -362,6 +363,18 @@ function addClientNote(jobId, note) {
     Logger.log('addClientNote error: ' + err.toString());
     return { error: err.toString() };
   }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  AUTH — passcode stored in Script Properties, never in source code
+//  To set/change: Apps Script editor → Project Settings → Script Properties
+//                 Add property  PASSCODE  with your chosen value
+// ════════════════════════════════════════════════════════════════════════════
+
+function validatePasscode(entered) {
+  const stored = PropertiesService.getScriptProperties().getProperty('PASSCODE');
+  if (!stored) return { error: 'Passcode not configured — set PASSCODE in Script Properties.' };
+  return { valid: entered === stored };
 }
 
 // ════════════════════════════════════════════════════════════════════════════

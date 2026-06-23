@@ -36,8 +36,8 @@ body{min-height:100vh;overflow-x:hidden}
   min-height:100vh;padding:env(safe-area-inset-top) 1.5rem 2rem;
   background:#6B7F5A;
 }
-.login-wrap{width:100%;max-width:400px;text-align:center}
-.login-brand{margin-bottom:2.5rem}
+.login-wrap{width:100%;max-width:320px;text-align:center}
+.login-brand{margin-bottom:2.2rem}
 .login-wordmark-dovetail{
   font-family:'Playfair Display',Georgia,serif;
   font-size:clamp(52px,14vw,86px);
@@ -73,41 +73,59 @@ body{min-height:100vh;overflow-x:hidden}
   text-transform:uppercase;
   opacity:0.9;
 }
-.login-card{
-  background:rgba(0,0,0,0.15);
-  border:1px solid rgba(255,255,255,0.2);
-  border-radius:10px;
-  padding:1.75rem;
-  margin-top:0;
-  backdrop-filter:blur(4px);
+/* ── PIN DOTS ── */
+.pin-dots{
+  display:flex;gap:20px;justify-content:center;
+  margin-bottom:2.2rem;
 }
-.login-card label{
-  display:block;font-size:11px;color:rgba(255,255,255,0.65);
-  margin-bottom:7px;font-weight:500;letter-spacing:0.1em;
-  text-transform:uppercase;font-family:'Inter',sans-serif;text-align:left;
+.pin-dot{
+  width:14px;height:14px;
+  border-radius:50%;
+  border:2px solid rgba(255,255,255,0.75);
+  background:transparent;
+  transition:background 0.12s,border-color 0.12s;
 }
-.login-card input{
-  width:100%;padding:12px 14px;
-  background:rgba(255,255,255,0.12);
-  border:1px solid rgba(255,255,255,0.25);
-  border-radius:7px;font-size:15px;
-  font-family:'Inter',sans-serif;color:#fff;outline:none;
-  transition:border-color 0.15s;
+.pin-dot.filled{background:#fff;border-color:#fff}
+.pin-dot.error{background:#FFD4D4;border-color:#FFD4D4}
+@keyframes pin-shake{
+  0%,100%{transform:translateX(0)}
+  18%{transform:translateX(-10px)}
+  36%{transform:translateX(10px)}
+  54%{transform:translateX(-7px)}
+  72%{transform:translateX(7px)}
+  90%{transform:translateX(-4px)}
 }
-.login-card input::placeholder{color:rgba(255,255,255,0.35)}
-.login-card input:focus{border-color:rgba(255,255,255,0.7);background:rgba(255,255,255,0.16)}
-.btn-login{
-  width:100%;margin-top:14px;padding:13px;
-  background:rgba(255,255,255,0.18);
-  border:1px solid rgba(255,255,255,0.4);
-  color:#fff;border-radius:7px;
-  font-size:13px;font-weight:600;
-  font-family:'Inter',sans-serif;cursor:pointer;
-  transition:all 0.15s;letter-spacing:0.12em;text-transform:uppercase;
+.pin-shake{animation:pin-shake 0.45s ease}
+/* ── PIN GRID ── */
+.pin-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px 16px;
+  max-width:260px;
+  margin:0 auto;
 }
-.btn-login:hover{background:rgba(255,255,255,0.28);border-color:rgba(255,255,255,0.6)}
-.login-error{font-size:13px;color:#FFD4D4;text-align:center;margin-top:10px;min-height:20px;font-family:'Inter',sans-serif}
-.login-stamp{text-align:center;margin-top:20px;font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:0.14em;text-transform:uppercase;font-family:'Inter',sans-serif}
+.pin-btn{
+  width:76px;height:76px;
+  border-radius:50%;
+  background:rgba(255,255,255,0.15);
+  border:1.5px solid rgba(255,255,255,0.28);
+  color:#fff;
+  cursor:pointer;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  transition:background 0.1s;
+  -webkit-tap-highlight-color:transparent;
+  user-select:none;
+}
+.pin-btn:active,.pin-btn.pressed{background:rgba(255,255,255,0.38)}
+.pin-btn:disabled{opacity:0.5}
+.pin-num{font-size:28px;font-weight:300;font-family:'Inter',sans-serif;line-height:1}
+.pin-sub{font-size:9px;letter-spacing:0.16em;font-weight:500;font-family:'Inter',sans-serif;opacity:0.65;margin-top:2px}
+.pin-btn.pin-del,.pin-btn.pin-empty{background:transparent;border-color:transparent}
+.pin-btn.pin-del{font-size:22px;font-family:'Inter',sans-serif}
+.pin-btn.pin-empty{pointer-events:none}
+.login-error{font-size:13px;color:#FFD4D4;text-align:center;margin-top:18px;min-height:20px;font-family:'Inter',sans-serif}
+.login-stamp{text-align:center;margin-top:18px;font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:0.14em;text-transform:uppercase;font-family:'Inter',sans-serif}
 
 /* ── TOPBAR ── */
 #main-screen{display:none;flex-direction:column;min-height:100vh}
@@ -1230,12 +1248,27 @@ select.sem-input{cursor:pointer}
         <div class="login-stamford-rule"></div>
       </div>
     </div>
-    <div class="login-card">
-      <label for="pwd">Access code</label>
-      <input type="password" id="pwd" placeholder="Enter access code" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/>
-      <button class="btn-login" onclick="doLogin()">Enter Portal</button>
-      <div class="login-error" id="login-err"></div>
+    <div id="pin-dots" class="pin-dots">
+      <div class="pin-dot" id="pd0"></div>
+      <div class="pin-dot" id="pd1"></div>
+      <div class="pin-dot" id="pd2"></div>
+      <div class="pin-dot" id="pd3"></div>
     </div>
+    <div class="pin-grid">
+      <button class="pin-btn" onclick="pinPress('1')"><span class="pin-num">1</span><span class="pin-sub">&nbsp;</span></button>
+      <button class="pin-btn" onclick="pinPress('2')"><span class="pin-num">2</span><span class="pin-sub">ABC</span></button>
+      <button class="pin-btn" onclick="pinPress('3')"><span class="pin-num">3</span><span class="pin-sub">DEF</span></button>
+      <button class="pin-btn" onclick="pinPress('4')"><span class="pin-num">4</span><span class="pin-sub">GHI</span></button>
+      <button class="pin-btn" onclick="pinPress('5')"><span class="pin-num">5</span><span class="pin-sub">JKL</span></button>
+      <button class="pin-btn" onclick="pinPress('6')"><span class="pin-num">6</span><span class="pin-sub">MNO</span></button>
+      <button class="pin-btn" onclick="pinPress('7')"><span class="pin-num">7</span><span class="pin-sub">PQRS</span></button>
+      <button class="pin-btn" onclick="pinPress('8')"><span class="pin-num">8</span><span class="pin-sub">TUV</span></button>
+      <button class="pin-btn" onclick="pinPress('9')"><span class="pin-num">9</span><span class="pin-sub">WXYZ</span></button>
+      <div class="pin-btn pin-empty"></div>
+      <button class="pin-btn" onclick="pinPress('0')"><span class="pin-num">0</span><span class="pin-sub">&nbsp;</span></button>
+      <button class="pin-btn pin-del" onclick="pinDel()">⌫</button>
+    </div>
+    <div class="login-error" id="login-err"></div>
     <div class="login-stamp">Job Management Portal</div>
   </div>
 </div>
@@ -1779,7 +1812,6 @@ const BOM_LEAD_DEFAULTS = [
 ];
 
 const API  = 'https://script.google.com/macros/s/AKfycbzDHa23j6af8oU1l8xX7LlvZDuZjYMqIXbzUxVVcEvtxrNeaGDxwrG3ORi7fBqQT_mp/exec';
-const PASS = 'Dovetail2025!';
 const STAGES = ['Initial contact','Viewed job','Quote submitted','Quote approved','Deposit issued','Deposit paid','Start date approved','Work commenced','Work completed','Invoice issued','Archived'];
 let showArchived = false;
 const MONTHS  = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -1797,22 +1829,68 @@ let syncQueue = []; // offline queue
 let isOnline = navigator.onLine;
 
 // ══════════════════════════════════════════════════════════════════════════
-//  AUTH
+//  AUTH — passcode validated server-side; never stored in this file
 // ══════════════════════════════════════════════════════════════════════════
-function doLogin(){
-  const entered = (document.getElementById('pwd').value||'').trim();
-  if(entered===PASS){
-    sessionStorage.setItem('dtv','1');
-    document.getElementById('login-screen').style.display='none';
-    document.getElementById('main-screen').style.display='flex';
-    init();
-  } else {
-    const v = document.getElementById('pwd').value||'';
-    document.getElementById('login-err').textContent='Incorrect access code ('+(v.length)+' chars entered)';
-    document.getElementById('pwd').value='';
+let _pin = '';
+
+function pinPress(d){
+  if(_pin.length >= 4) return;
+  _pin += d;
+  _updatePinDots();
+  if(_pin.length === 4) doLogin();
+}
+
+function pinDel(){
+  _pin = _pin.slice(0, -1);
+  _updatePinDots();
+  document.getElementById('login-err').textContent = '';
+}
+
+function _updatePinDots(errState){
+  for(let i=0;i<4;i++){
+    const el = document.getElementById('pd'+i);
+    el.classList.toggle('filled', !errState && i < _pin.length);
+    el.classList.toggle('error', !!errState && i < 4);
   }
 }
-document.getElementById('pwd').addEventListener('keydown',e=>{ if(e.key==='Enter') doLogin(); });
+
+async function doLogin(){
+  const entered = _pin;
+  document.querySelectorAll('.pin-btn').forEach(b=>b.disabled=true);
+  document.getElementById('login-err').textContent = '';
+  try {
+    const r = await fetch(API,{method:'POST',body:JSON.stringify({action:'validatePasscode',passcode:entered})});
+    const d = await r.json();
+    if(d.valid){
+      sessionStorage.setItem('dtv','1');
+      document.getElementById('login-screen').style.display='none';
+      document.getElementById('main-screen').style.display='flex';
+      init();
+    } else {
+      _updatePinDots(true);
+      const dots = document.getElementById('pin-dots');
+      dots.classList.add('pin-shake');
+      setTimeout(()=>{
+        dots.classList.remove('pin-shake');
+        _pin = '';
+        _updatePinDots();
+        document.getElementById('login-err').textContent = 'Incorrect passcode';
+      }, 500);
+    }
+  } catch(e){
+    _pin = '';
+    _updatePinDots();
+    document.getElementById('login-err').textContent = 'Connection error — please try again';
+  } finally {
+    document.querySelectorAll('.pin-btn').forEach(b=>b.disabled=false);
+  }
+}
+
+// Physical keyboard support (desktop)
+document.addEventListener('keydown', e=>{
+  if(e.key>='0'&&e.key<='9') pinPress(e.key);
+  else if(e.key==='Backspace') pinDel();
+});
 function logout(){
   sessionStorage.removeItem('dtv');
   document.getElementById('main-screen').style.display='none';
