@@ -1866,6 +1866,10 @@ async function doLogin(){
       document.getElementById('login-screen').style.display='none';
       document.getElementById('main-screen').style.display='flex';
       init();
+    } else if(d.error){
+      _pin = '';
+      _updatePinDots();
+      document.getElementById('login-err').textContent = d.error;
     } else {
       _updatePinDots(true);
       const dots = document.getElementById('pin-dots');
