@@ -266,18 +266,15 @@ function deleteJob(id) {
 function getScheduleSheet() {
   const ss = getSpreadsheet();
   let sheet = ss.getSheetByName('Schedule');
-  if (!sheet) {
-    sheet = ss.insertSheet('Schedule');
-    sheet.getRange(1, 1).setValue('entries_json');
-  }
+  if (!sheet) sheet = ss.insertSheet('Schedule');
   return sheet;
 }
 
 function getSchedule() {
   try {
     const sheet = getScheduleSheet();
-    // Try cell B2 first (header in A1, data in A2)
-    const raw = String(sheet.getRange(2, 1).getValue() || '').trim();
+    // Data is stored as JSON in A1
+    const raw = String(sheet.getRange(1, 1).getValue() || '').trim();
     if (raw) {
       const entries = JSON.parse(raw);
       return { entries: Array.isArray(entries) ? entries : [] };
@@ -292,7 +289,7 @@ function getSchedule() {
 function saveSchedule(entries) {
   try {
     const sheet = getScheduleSheet();
-    sheet.getRange(2, 1).setValue(JSON.stringify(Array.isArray(entries) ? entries : []));
+    sheet.getRange(1, 1).setValue(JSON.stringify(Array.isArray(entries) ? entries : []));
     return { success: true };
   } catch (err) {
     Logger.log('saveSchedule error: ' + err.toString());
