@@ -4,6 +4,10 @@
 //         → edit existing → New version → Deploy  (URL stays the same)
 // ════════════════════════════════════════════════════════════════════════════
 
+// ─── SPREADSHEET ─────────────────────────────────────────────────────────────
+const SPREADSHEET_ID = '1H40bB1iTibRGz5ZyxLvypPiXd8B7une83Pz87qt0R6E';
+function getSpreadsheet() { return SpreadsheetApp.openById(SPREADSHEET_ID); }
+
 // ─── ENTRY POINTS ────────────────────────────────────────────────────────────
 
 function doGet(e)  { return handleRequest(e); }
@@ -85,13 +89,13 @@ const JOB_COLS = [
   'bomDropboxUrl',
 ];
 
-// Find the Jobs sheet by name (tries common variants), falls back to first sheet.
+// Find the Jobs sheet — prefers a named sheet that has data, falls back to any sheet with data.
 function getJobsSheet() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  return ss.getSheetByName('Jobs')
-      || ss.getSheetByName('jobs')
-      || ss.getSheetByName('Sheet1')
-      || ss.getSheets()[0];
+  const ss = getSpreadsheet();
+  const named = ss.getSheetByName('Jobs') || ss.getSheetByName('jobs');
+  if (named && named.getLastRow() > 1) return named;
+  // Named sheet empty or missing — find Sheet1 or the first sheet that has data
+  return ss.getSheetByName('Sheet1') || ss.getSheets().find(s => s.getLastRow() > 1) || ss.getSheets()[0];
 }
 
 // Return lowercase header array, automatically appending any columns from
@@ -231,7 +235,7 @@ function deleteJob(id) {
 // ════════════════════════════════════════════════════════════════════════════
 
 function getScheduleSheet() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = getSpreadsheet();
   let sheet = ss.getSheetByName('Schedule');
   if (!sheet) {
     sheet = ss.insertSheet('Schedule');
@@ -272,7 +276,7 @@ function saveSchedule(entries) {
 // ════════════════════════════════════════════════════════════════════════════
 
 function getContractorsSheet() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = getSpreadsheet();
   let sheet = ss.getSheetByName('Contractors');
   if (!sheet) {
     sheet = ss.insertSheet('Contractors');
