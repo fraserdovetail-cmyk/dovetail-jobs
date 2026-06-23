@@ -374,7 +374,7 @@ function addClientNote(jobId, note) {
 function validatePasscode(entered) {
   const stored = PropertiesService.getScriptProperties().getProperty('PASSCODE');
   if (!stored) return { error: 'Passcode not configured — set PASSCODE in Script Properties.' };
-  return { valid: entered === stored };
+  return { valid: (entered || '').trim() === stored.trim() };
 }
 
 // ════════════════════════════════════════════════════════════════════════════
