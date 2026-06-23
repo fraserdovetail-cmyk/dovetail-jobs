@@ -152,7 +152,7 @@ function getJobs() {
     if (lastCol === 0) return { jobs: [] };
 
     const allData  = sheet.getRange(1, 1, lastRow, lastCol).getValues();
-    const lcHeaders = allData[0].map(v => String(v).trim().toLowerCase());
+    const lcHeaders = allData[0].map(v => String(v).trim().toLowerCase().replace(/\s+/g,''));
     const idIdx    = lcHeaders.indexOf('id');
 
     if (idIdx === -1) {
@@ -168,7 +168,14 @@ function getJobs() {
 
       const job = {};
       lcHeaders.forEach((h, i) => {
-        if (h) job[h] = (row[i] === null || row[i] === undefined) ? '' : String(row[i]);
+        const v = row[i];
+        if (!h) return;
+        // Format Date objects as YYYY-MM-DD so the client never has to guess
+        if (v instanceof Date) {
+          job[h] = isNaN(v.getTime()) ? '' : Utilities.formatDate(v, Session.getScriptTimeZone(), 'yyyy-MM-dd');
+        } else {
+          job[h] = (v === null || v === undefined) ? '' : String(v);
+        }
       });
       // Fill any fields not yet in the sheet with empty string
       JOB_COLS.forEach(col => { if (job[col] === undefined) job[col] = ''; });

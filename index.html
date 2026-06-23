@@ -1962,11 +1962,19 @@ function fmtVal(v){ const n=safeNum(v); if(n<=0) return ''; return '£'+n.toLoca
 function depositAmt(v){ const n=safeNum(v); if(n<=0) return ''; return '£'+(n*0.1).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}); }
 function parseDate(val){
   const s=safeStr(val).trim(); if(!s) return '';
+  // YYYY-MM-DD
   if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  // DD/MM/YYYY
   const dmy=/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(s);
   if(dmy) return dmy[3]+'-'+dmy[2].padStart(2,'0')+'-'+dmy[1].padStart(2,'0');
+  // Google Sheets / Apps Script Date.toString() e.g. "Mon Jun 23 2026 00:00:00 GMT+0100 (GMT+01:00)"
+  const mdy=/^[A-Za-z]{3}\s+([A-Za-z]{3})\s+(\d{1,2})\s+(\d{4})/.exec(s);
+  if(mdy){
+    const months={Jan:'01',Feb:'02',Mar:'03',Apr:'04',May:'05',Jun:'06',Jul:'07',Aug:'08',Sep:'09',Oct:'10',Nov:'11',Dec:'12'};
+    const m=months[mdy[1]]; if(m) return mdy[3]+'-'+m+'-'+mdy[2].padStart(2,'0');
+  }
   try{ const d=new Date(s); if(!isNaN(d.getTime())) return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }catch(e){}
-  return s;
+  return '';
 }
 function toDateStr(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function isWeekend(d){ const dow=d.getDay(); return dow===0||dow===6; }
@@ -2051,7 +2059,10 @@ async function loadJobs(){
   } catch(e){ setSyncing('error','Load failed: '+e.message); console.error('loadJobs catch:',e); }
 }
 
-function parseJob(j){
+function parseJob(raw){
+  // Normalise keys: strip whitespace so 'start date' === 'startdate'
+  const j={};
+  Object.keys(raw).forEach(k=>{ j[k.replace(/\s+/g,'')]=raw[k]; });
   return {
     id:safeStr(j.id),ref:safeStr(j.ref),name:safeStr(j.name),client:safeStr(j.client),
     phone:safeStr(j.phone||''),email:safeStr(j.email),address:safeStr(j.address),value:safeStr(j.value),
