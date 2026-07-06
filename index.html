@@ -47,7 +47,10 @@ body{min-height:100vh;overflow-x:hidden}
   line-height:1;
   margin:0;
   text-align:center;
-  width:100%;
+  width:100vw;
+  position:relative;
+  left:50%;
+  transform:translateX(-50%);
 }
 .login-wordmark-sub{
   font-family:'Playfair Display',Georgia,serif;
@@ -2768,7 +2771,7 @@ function buildPaymentLinksSection(job){
   const invoiceDates=Array.isArray(pl.invoiceDates)?pl.invoiceDates:['','','',''];
   const val=parseFloat(job.value)||0;
   const slots=mode==='4'?[
-    {pct:10,name:'Deposit'},{pct:30,name:'Stage 2'},{pct:30,name:'Stage 3'},{pct:30,name:'Final payment'}
+    {pct:10,name:'Deposit'},{pct:40,name:'Stage 2'},{pct:40,name:'Stage 3'},{pct:10,name:'Final payment'}
   ]:[
     {pct:10,name:'Deposit'},{pct:90,name:'Final payment'}
   ];
@@ -2796,7 +2799,7 @@ function buildPaymentLinksSection(job){
   </div>`;
   return `<div class="pmt-mode-row">
     <button class="pmt-mode-btn${mode==='2'?' active':''}" onclick="setPaymentMode('2')">10 / 90%</button>
-    <button class="pmt-mode-btn${mode==='4'?' active':''}" onclick="setPaymentMode('4')">10 / 30 / 30 / 30%</button>
+    <button class="pmt-mode-btn${mode==='4'?' active':''}" onclick="setPaymentMode('4')">10 / 40 / 40 / 10%</button>
   </div>${rows}<div class="pmt-extras-divider"></div>${extrasRow}`;
 }
 
@@ -2817,7 +2820,7 @@ function openExtrasLink(){
 
 function refreshPaymentAmounts(jobVal){
   const val=parseFloat(jobVal)||0;
-  const pcts=_paymentLinks.mode==='4'?[10,30,30,30]:[10,90];
+  const pcts=_paymentLinks.mode==='4'?[10,40,40,10]:[10,90];
   pcts.forEach((pct,i)=>{
     const el=document.getElementById('pmt-amt-'+i); if(!el) return;
     el.textContent=val?'£'+(val*pct/100).toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:2}):'';
@@ -4926,7 +4929,7 @@ function renderClientView(data){
     if(pl&&(activeLinks.length||extrasLnk||activeInvoiceDates.length)){
       const val=parseFloat(job.value)||0;
       const slots=pl.mode==='4'?[
-        {pct:10,name:'Deposit'},{pct:30,name:'Stage 2'},{pct:30,name:'Stage 3'},{pct:30,name:'Final payment'}
+        {pct:10,name:'Deposit'},{pct:40,name:'Stage 2'},{pct:40,name:'Stage 3'},{pct:10,name:'Final payment'}
       ]:[
         {pct:10,name:'Deposit'},{pct:90,name:'Final payment'}
       ];
