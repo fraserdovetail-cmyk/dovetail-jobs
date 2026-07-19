@@ -260,7 +260,18 @@ function deleteJob(id) {
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-//  SCHEDULE  — stored as a JSON blob (all entries sent/received as one array)
+//  SCHEDULE  — stored one row per ISO week to avoid the 50k-char cell limit
+//
+//  Sheet layout (after migration):
+//    A1         = "SCHEDULE_V2"  (sentinel — distinguishes new from old format)
+//    A2, A3 … = ISO week key e.g. "2026-W27"  (or "unscheduled" for no date)
+//    B2, B3 … = JSON array of entries for that week
+//
+//  Old format (A1 = raw JSON array) is auto-migrated on first getSchedule()
+//  call — no data is lost and no manual action is needed.
+//
+//  The getSchedule / saveSchedule API contract is unchanged: the frontend
+//  always sends and receives a flat array of all entries.
 // ════════════════════════════════════════════════════════════════════════════
 
 function getScheduleSheet() {
@@ -270,16 +281,82 @@ function getScheduleSheet() {
   return sheet;
 }
 
+// Returns an ISO week key like "2026-W27" for a YYYY-MM-DD string.
+// Entries with no start date are stored under "unscheduled".
+function isoWeekKey(dateStr) {
+  if (!dateStr) return 'unscheduled';
+  const d = new Date(dateStr + 'T12:00:00Z'); // noon UTC avoids DST edge cases
+  if (isNaN(d.getTime())) return 'unscheduled';
+  // ISO week: shift to the Thursday of the week, then compute week number
+  const thu = new Date(d);
+  thu.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+  const yearStart = new Date(Date.UTC(thu.getUTCFullYear(), 0, 1));
+  const week = Math.ceil(((thu - yearStart) / 86400000 + 1) / 7);
+  return thu.getUTCFullYear() + '-W' + String(week).padStart(2, '0');
+}
+
+// One-time migration: reads old A1 JSON blob, rewrites sheet in the new format.
+// Returns the full entries array so the caller can return it immediately.
+// Safe: if the write fails the sheet is restored to its original state.
+function _migrateSchedule(sheet, oldJson) {
+  // Parse — if A1 wasn't valid JSON, treat as empty but do NOT clear the sheet
+  let entries;
+  try { entries = JSON.parse(oldJson); } catch(e) { entries = null; }
+  if (!Array.isArray(entries)) {
+    Logger.log('_migrateSchedule: A1 was not a JSON array — skipping migration');
+    return [];
+  }
+
+  const weeks = {};
+  entries.forEach(function(e) {
+    const key = isoWeekKey(e.start);
+    if (!weeks[key]) weeks[key] = [];
+    weeks[key].push(e);
+  });
+
+  const rows = Object.keys(weeks).sort().map(function(key) {
+    return [key, JSON.stringify(weeks[key])];
+  });
+
+  // Write week rows FIRST (A1 still holds old JSON), then overwrite A1 with
+  // the sentinel — so if setValues throws, A1 is untouched and migration
+  // retries cleanly on the next load.
+  if (rows.length > 0) sheet.getRange(2, 1, rows.length, 2).setValues(rows);
+  sheet.getRange(1, 1).setValue('SCHEDULE_V2'); // commit point
+
+  Logger.log('Schedule migrated: ' + entries.length + ' entries → ' + rows.length + ' week rows');
+  return entries;
+}
+
 function getSchedule() {
   try {
     const sheet = getScheduleSheet();
-    // Data is stored as JSON in A1
-    const raw = String(sheet.getRange(1, 1).getValue() || '').trim();
-    if (raw) {
-      const entries = JSON.parse(raw);
-      return { entries: Array.isArray(entries) ? entries : [] };
+    const a1 = String(sheet.getRange(1, 1).getValue() || '').trim();
+    if (!a1) return { entries: [] };
+
+    // Old format — A1 holds the raw JSON array; migrate on the way out
+    if (a1 !== 'SCHEDULE_V2') {
+      return { entries: _migrateSchedule(sheet, a1) };
     }
-    return { entries: [] };
+
+    // New format — read all week rows (row 2 onwards)
+    const lastRow = sheet.getLastRow();
+    if (lastRow < 2) return { entries: [] };
+
+    const rows = sheet.getRange(2, 1, lastRow - 1, 2).getValues();
+    const entries = [];
+    rows.forEach(function(row) {
+      const json = String(row[1] || '').trim();
+      if (!json) return;
+      try {
+        const week = JSON.parse(json);
+        if (Array.isArray(week)) week.forEach(function(e) { entries.push(e); });
+      } catch(e) {
+        Logger.log('getSchedule: bad row for week ' + row[0] + ': ' + e);
+      }
+    });
+
+    return { entries: entries };
   } catch (err) {
     Logger.log('getSchedule error: ' + err.toString());
     return { entries: [] };
@@ -289,7 +366,33 @@ function getSchedule() {
 function saveSchedule(entries) {
   try {
     const sheet = getScheduleSheet();
-    sheet.getRange(1, 1).setValue(JSON.stringify(Array.isArray(entries) ? entries : []));
+    if (!Array.isArray(entries)) entries = [];
+
+    // Group by ISO week
+    const weeks = {};
+    entries.forEach(function(e) {
+      const key = isoWeekKey(e.start);
+      if (!weeks[key]) weeks[key] = [];
+      weeks[key].push(e);
+    });
+
+    const rows = Object.keys(weeks).sort().map(function(key) {
+      return [key, JSON.stringify(weeks[key])];
+    });
+
+    // Write week rows to rows 2+ FIRST — A1 is untouched until this succeeds.
+    // Sentinel written last is the commit point; a failure before it leaves
+    // A1 intact so the next load can retry or fall back to old-format migration.
+    if (rows.length > 0) sheet.getRange(2, 1, rows.length, 2).setValues(rows);
+    sheet.getRange(1, 1).setValue('SCHEDULE_V2'); // commit point
+
+    // Clear any surplus rows left over from a previous save with more weeks.
+    const lastRow = sheet.getLastRow();
+    const firstSurplus = rows.length + 2; // row 1 = sentinel, rows 2..N = data
+    if (lastRow >= firstSurplus) {
+      sheet.getRange(firstSurplus, 1, lastRow - firstSurplus + 1, 2).clearContent();
+    }
+
     return { success: true };
   } catch (err) {
     Logger.log('saveSchedule error: ' + err.toString());
