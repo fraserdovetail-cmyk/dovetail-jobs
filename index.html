@@ -1357,16 +1357,6 @@ select.sem-input{cursor:pointer}
           <div class="dash-panel-body" id="dash-chase-body"><div class="dash-empty">All quotes up to date</div></div>
         </div>
       </div>
-      <div class="dash-row" style="margin-top:0">
-        <div class="dash-panel" id="dash-starts-panel">
-          <div class="dash-panel-hd"><span class="dash-panel-title">Upcoming starts · 14 days</span></div>
-          <div class="dash-panel-body" id="dash-starts-body"><div class="dash-empty">No starts scheduled</div></div>
-        </div>
-        <div class="dash-panel" id="dash-declined-panel" style="border-color:var(--border-strong)">
-          <div class="dash-panel-hd" style="background:#F4F4F5"><span class="dash-panel-title" style="color:var(--hint)">Declined jobs</span><span id="dash-declined-count" style="font-size:11px;color:var(--hint)"></span></div>
-          <div class="dash-panel-body" id="dash-declined-body"><div class="dash-empty">None</div></div>
-        </div>
-      </div>
     </div>
 
     <!-- CREW SCHEDULE (replaces old calendar) -->
@@ -2156,16 +2146,7 @@ function renderDashboard(){
   const needsQuoting=jobs.filter(j=>!j.declined&&(j.stage===0||j.stage===1))
     .sort((a,b)=>safeNum(b.created)-safeNum(a.created));
 
-  // Upcoming starts
-  const soon=new Date(today); soon.setDate(today.getDate()+14);
-  const upcomingStarts=jobs.filter(j=>{
-    if(!j.startDate||j.declined) return false;
-    const d=new Date(j.startDate+'T12:00:00');
-    return d>=today&&d<=soon;
-  }).sort((a,b)=>a.startDate.localeCompare(b.startDate));
-
   const chaseList=jobs.filter(j=>!j.declined&&isChaseNeeded(j));
-  const declinedList=jobs.filter(j=>j.declined).sort((a,b)=>safeNum(b.updated)-safeNum(a.updated));
 
   // KPI tiles — replace "starts this week" with "needs quoting"
   document.getElementById('dash-kpis').innerHTML=`
@@ -2271,27 +2252,6 @@ function renderDashboard(){
     quotesBody.innerHTML='<div class="dash-empty">No jobs awaiting quote</div>';
   }
 
-  // Upcoming starts panel
-  const startsBody=document.getElementById('dash-starts-body');
-  if(upcomingStarts.length){
-    startsBody.innerHTML=upcomingStarts.map(j=>{
-      const d=new Date(j.startDate+'T12:00:00');
-      const diff=Math.round((d-today)/86400000);
-      const away=diff===0?'Today':diff===1?'Tomorrow':diff+'d';
-      const timeStr=j.startTime?` · ${j.startTime}`:'';
-      return `<div class="dash-item" onclick="openJob('${j.id}')">
-        <div class="dash-item-date"><div class="dash-item-day">${d.getDate()}</div><div class="dash-item-mon">${SMONTHS[d.getMonth()]}</div></div>
-        <div class="dash-item-info">
-          <div class="dash-item-name">${esc(j.name||'Untitled')}</div>
-          <div class="dash-item-sub">${esc(j.client||'—')}${durLabel(j)?' · '+durLabel(j):''}${timeStr}</div>
-        </div>
-        <div class="dash-item-right"><span class="stage-pill s${j.stage}" style="font-size:10px;padding:3px 8px">${away}</span></div>
-      </div>`;
-    }).join('');
-  } else {
-    startsBody.innerHTML='<div class="dash-empty">No starts in next 14 days</div>';
-  }
-
   // Chase up panel
   const chaseBody=document.getElementById('dash-chase-body');
   if(chaseList.length){
@@ -2307,23 +2267,6 @@ function renderDashboard(){
     }).join('');
   } else {
     chaseBody.innerHTML='<div class="dash-empty">All quotes up to date</div>';
-  }
-
-  // Declined panel
-  const decBody=document.getElementById('dash-declined-body');
-  const decCount=document.getElementById('dash-declined-count');
-  if(declinedList.length){
-    if(decCount) decCount.textContent=declinedList.length+' job'+(declinedList.length!==1?'s':'');
-    decBody.innerHTML=declinedList.map(j=>`<div class="declined-item" onclick="openJob('${j.id}')">
-      <div class="declined-dot"></div>
-      <div class="declined-info">
-        <div class="declined-name">${esc(j.name||'Untitled')} — ${esc(j.client||'—')}</div>
-        <div class="declined-meta">${STAGES[j.stage]}${j.value?' · '+fmtVal(j.value):''}</div>
-      </div>
-    </div>`).join('');
-  } else {
-    if(decCount) decCount.textContent='';
-    decBody.innerHTML='<div class="dash-empty">None</div>';
   }
 }
 
