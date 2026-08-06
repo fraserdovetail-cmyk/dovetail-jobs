@@ -658,6 +658,9 @@ textarea.pp-input{resize:vertical;min-height:80px}
 .cv-extra-row:last-child{border-bottom:none}
 .cv-extra-desc{flex:1;font-size:13px;color:var(--text);line-height:1.4}
 .cv-extra-amount{font-size:13px;font-weight:600;color:var(--green);font-family:'JetBrains Mono',monospace;white-space:nowrap}
+.cv-extras-total-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0 0;margin-top:2px;border-top:2px solid var(--border)}
+.cv-extras-total-lbl{font-size:12px;font-weight:700;color:var(--text)}
+.cv-extras-total-val{font-size:14px;font-weight:700;color:var(--green);font-family:'JetBrains Mono',monospace}
 .cv-live-badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:600;padding:3px 8px;background:var(--green-light);color:var(--green);border:1px solid var(--green-border);border-radius:8px;letter-spacing:0.04em;text-transform:uppercase}
 
 @media(max-width:600px){
@@ -1092,6 +1095,9 @@ select.sem-input{cursor:pointer}
 .cv-extra-row:last-child{border-bottom:none}
 .cv-extra-desc{flex:1;font-size:13px;color:var(--text);line-height:1.4}
 .cv-extra-amount{font-size:13px;font-weight:600;color:var(--green);font-family:'JetBrains Mono',monospace;white-space:nowrap}
+.cv-extras-total-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0 0;margin-top:2px;border-top:2px solid var(--border)}
+.cv-extras-total-lbl{font-size:12px;font-weight:700;color:var(--text)}
+.cv-extras-total-val{font-size:14px;font-weight:700;color:var(--green);font-family:'JetBrains Mono',monospace}
 .cv-live-badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:600;padding:3px 8px;background:var(--green-light);color:var(--green);border:1px solid var(--green-border);border-radius:8px;letter-spacing:0.04em;text-transform:uppercase}
 
 /* ── BILL OF MATERIALS ── */
@@ -4886,6 +4892,7 @@ function renderClientView(data){
   const extrasEl=document.getElementById('cv-extras');
   if(extrasEl){
     if(extras.length){
+      const extrasSum=extras.reduce((t,e)=>t+(parseFloat(e.value)||0),0);
       extrasEl.innerHTML=`<div class="cv-extras">
         <div class="cv-extras-title">Additional Works / Extras</div>
         ${extras.map(e=>`<div class="cv-extra-row">
@@ -4893,6 +4900,10 @@ function renderClientView(data){
           ${e.value?`<span class="cv-extra-amount">£${parseFloat(e.value).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>`
             :'<span class="cv-extra-amount" style="color:var(--hint);font-size:12px">To be agreed</span>'}
         </div>`).join('')}
+        ${extrasSum>0?`<div class="cv-extras-total-row">
+          <span class="cv-extras-total-lbl">Total extras</span>
+          <span class="cv-extras-total-val">£${extrasSum.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
+        </div>`:''}
       </div>`;
     }else{
       extrasEl.innerHTML='';
