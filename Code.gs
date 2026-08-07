@@ -50,6 +50,7 @@ function handleRequest(e) {
       case 'getContractors':  result = getContractors();                  break;
       case 'saveContractors': result = saveContractors(body.contractors); break;
       case 'addClientNote':     result = addClientNote(body.jobId, body.note); break;
+      case 'approveExtra':      result = approveExtra(body.jobId, body.extraId, body.ts); break;
       case 'validatePasscode':  result = validatePasscode(body.passcode);    break;
       case 'shortUrl':          result = { short: body.url || '' };          break;
       default:                  result = { error: 'Unknown action: ' + body.action };
@@ -494,6 +495,53 @@ function addClientNote(jobId, note) {
     return { success: true };
   } catch (err) {
     Logger.log('addClientNote error: ' + err.toString());
+    return { error: err.toString() };
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  EXTRA APPROVAL — client portal marks a single extra as customer-approved
+//  without a full job overwrite (mirrors addClientNote above).
+// ════════════════════════════════════════════════════════════════════════════
+
+function approveExtra(jobId, extraId, ts) {
+  if (!jobId || !extraId) return { error: 'Missing jobId or extraId' };
+  try {
+    const sheet   = getJobsSheet();
+    const lastCol = sheet.getLastColumn();
+    if (lastCol === 0) return { error: 'Empty sheet' };
+
+    const headers   = sheet.getRange(1, 1, 1, lastCol).getValues()[0]
+                         .map(v => String(v).trim().toLowerCase());
+    const idIdx     = headers.indexOf('id') + 1;
+    const extrasIdx = headers.indexOf('extras') + 1;
+
+    if (idIdx === 0) return { error: 'No id column' };
+    if (extrasIdx === 0) return { error: 'No extras column' };
+
+    const lastRow = sheet.getLastRow();
+    if (lastRow < 2) return { error: 'No data' };
+    const ids = sheet.getRange(2, idIdx, lastRow - 1, 1).getValues();
+    let targetRow = -1;
+    for (let i = 0; i < ids.length; i++) {
+      if (String(ids[i][0]).trim() === String(jobId).trim()) { targetRow = i + 2; break; }
+    }
+    if (targetRow < 0) return { error: 'Job not found' };
+
+    const raw = String(sheet.getRange(targetRow, extrasIdx).getValue() || '').trim();
+    let extras = [];
+    try { extras = raw ? JSON.parse(raw) : []; } catch(e) { extras = []; }
+    if (!Array.isArray(extras)) extras = [];
+
+    const idx = extras.findIndex(x => String(x.id) === String(extraId));
+    if (idx === -1) return { error: 'Extra not found' };
+
+    extras[idx].customerApprovedAt = ts || Date.now();
+    sheet.getRange(targetRow, extrasIdx).setValue(JSON.stringify(extras));
+
+    return { success: true };
+  } catch (err) {
+    Logger.log('approveExtra error: ' + err.toString());
     return { error: err.toString() };
   }
 }

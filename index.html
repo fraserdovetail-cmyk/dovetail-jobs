@@ -1100,6 +1100,17 @@ select.sem-input{cursor:pointer}
 .cv-extras-total-val{font-size:14px;font-weight:700;color:var(--green);font-family:'JetBrains Mono',monospace}
 .cv-live-badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:600;padding:3px 8px;background:var(--green-light);color:var(--green);border:1px solid var(--green-border);border-radius:8px;letter-spacing:0.04em;text-transform:uppercase}
 
+/* ── EXTRAS: added-on timestamp + customer approval ── */
+.extra-meta{font-size:11px;color:var(--hint);margin-top:2px}
+.extra-approved-tag{font-size:11px;color:var(--green);font-weight:600;margin-top:2px;display:flex;align-items:center;gap:4px}
+.cv-extra-main{flex:1;min-width:0}
+.cv-extra-added{font-size:11px;color:var(--hint);margin-top:3px}
+.cv-extra-approve-row{margin-top:8px}
+.cv-extra-approve-btn{padding:7px 14px;background:var(--sage);color:#fff;border:none;border-radius:var(--radius-sm);font-size:12px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:background 0.12s}
+.cv-extra-approve-btn:hover{background:var(--sage-dark)}
+.cv-extra-approve-btn:disabled{opacity:0.5;cursor:default}
+.cv-extra-approved{font-size:12px;color:var(--green);font-weight:600;display:flex;align-items:center;gap:5px}
+
 /* ── BILL OF MATERIALS ── */
 .bom-upload-area{border:2px dashed var(--green-border);border-radius:var(--radius-sm);padding:18px 14px;text-align:center;cursor:pointer;transition:all 0.15s;background:var(--green-light);position:relative}
 .bom-upload-area:hover,.bom-upload-area.drag-hover{border-color:var(--green-mid);background:#D4EDBA}
@@ -2926,11 +2937,18 @@ function extrasTotal(extras){
   return sum>0?'£'+sum.toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:2}):'';
 }
 
+function fmtExtraTs(ts){
+  if(!ts) return '';
+  const d=new Date(Number(ts)); if(isNaN(d.getTime())) return '';
+  const SMON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return d.getDate()+' '+SMON[d.getMonth()]+' '+d.getFullYear()+' at '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+}
+
 function buildExtrasList(jobId, extras){
   if(!extras||!extras.length) return '<div class="extras-empty">No extras yet — use the form below to add one.</div>';
   const rows=extras.slice().reverse().map(e=>`
-    <div class="extra-row" id="extra-${e.id}">
-      <span class="extra-desc">${esc(e.desc)}</span>
+    <div class="extra-row" id="extra-${e.id}" style="align-items:flex-start;flex-wrap:wrap">
+      <span class="extra-desc">${esc(e.desc)}${e.ts?`<div class="extra-meta">Added ${fmtExtraTs(e.ts)}</div>`:''}${e.customerApprovedAt?`<div class="extra-approved-tag">✓ Customer approved ${fmtExtraTs(e.customerApprovedAt)}</div>`:''}</span>
       <span class="extra-val${e.value?'':' extra-val-empty'}" id="extra-val-${e.id}" onclick="editExtraValue('${jobId}','${e.id}')" title="Click to ${e.value?'edit':'add'} cost">${e.value?'£'+parseFloat(e.value).toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:2}):'+ Add cost'}</span>
       <button class="extra-status s-${e.status||'pending'}" onclick="cycleExtraStatus('${jobId}','${e.id}')">${EXTRA_STATUS_LABELS[e.status||'pending']}</button>
       <button class="extra-del" onclick="deleteExtra('${jobId}','${e.id}')" title="Remove">&#215;</button>
@@ -4701,6 +4719,21 @@ async function cvSubmitNote(jobId){
   }
 }
 
+async function cvApproveExtra(jobId,extraId){
+  const btn=document.getElementById('cv-extra-approve-'+extraId);
+  if(btn){ btn.disabled=true; btn.textContent='Confirming…'; }
+  const ts=Date.now();
+  try{
+    const res=await fetch(API,{method:'POST',body:JSON.stringify({action:'approveExtra',jobId,extraId,ts})}).then(r=>r.json());
+    if(res&&res.error) throw new Error(res.error);
+    const row=btn?.closest('.cv-extra-approve-row');
+    if(row) row.innerHTML=`<span class="cv-extra-approved">✓ Approved by you on ${fmtExtraTs(ts)}</span>`;
+  }catch(e){
+    if(btn){ btn.disabled=false; btn.textContent='Confirm customer approved'; }
+    alert('Could not record your approval — please try again or contact Dovetail directly.');
+  }
+}
+
 // ══════════════════════════════════════════════════════════════════════════
 //  CLIENT NOTES (admin: mark as read)
 // ══════════════════════════════════════════════════════════════════════════
@@ -4893,10 +4926,17 @@ function renderClientView(data){
   if(extrasEl){
     if(extras.length){
       const extrasSum=extras.reduce((t,e)=>t+(parseFloat(e.value)||0),0);
+      const canApprove=!!(data.live&&data.jobId);
       extrasEl.innerHTML=`<div class="cv-extras">
         <div class="cv-extras-title">Additional Works / Extras</div>
         ${extras.map(e=>`<div class="cv-extra-row">
-          <span class="cv-extra-desc">${esc(e.desc||e.description||'')}</span>
+          <div class="cv-extra-main">
+            <span class="cv-extra-desc">${esc(e.desc||e.description||'')}</span>
+            ${e.ts?`<div class="cv-extra-added">Added ${fmtExtraTs(e.ts)}</div>`:''}
+            ${e.customerApprovedAt
+              ?`<div class="cv-extra-approve-row"><span class="cv-extra-approved">✓ Approved by you on ${fmtExtraTs(e.customerApprovedAt)}</span></div>`
+              :(canApprove?`<div class="cv-extra-approve-row"><button class="cv-extra-approve-btn" id="cv-extra-approve-${e.id}" onclick="cvApproveExtra('${data.jobId}','${e.id}')">Confirm customer approved</button></div>`:'')}
+          </div>
           ${e.value?`<span class="cv-extra-amount">£${parseFloat(e.value).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>`
             :'<span class="cv-extra-amount" style="color:var(--hint);font-size:12px">To be agreed</span>'}
         </div>`).join('')}
