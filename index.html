@@ -502,6 +502,8 @@ textarea.finput{resize:vertical;min-height:68px;line-height:1.5}
 .pmt-date{padding:4px 8px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;font-family:'Inter',sans-serif;color:var(--text);background:var(--surface);outline:none;transition:border-color 0.15s}
 .pmt-date:focus{border-color:var(--green-mid)}
 .pmt-date.has-date{border-color:var(--amber-border);background:var(--amber-light)}
+.pmt-exinv-row{width:100%;display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-left:128px;margin-top:6px;padding-top:6px;border-top:1px dashed var(--border)}
+.pmt-exinv-lbl{font-size:11px;color:var(--muted);white-space:nowrap;min-width:110px;flex-shrink:0}
 /* Payment links — client view */
 .cv-payments{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-top:16px}
 .cv-payments-title{font-size:11px;font-weight:700;color:var(--sage-dark);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
@@ -517,6 +519,9 @@ textarea.finput{resize:vertical;min-height:68px;line-height:1.5}
 .cv-pmt-date-future{background:var(--blue-light);color:var(--blue);border-color:var(--blue-border)}
 .cv-pmt-date-upcoming{background:var(--amber-light);color:var(--amber);border-color:var(--amber-border)}
 .cv-pmt-date-overdue{background:var(--red-light);color:var(--red);border-color:var(--red-border)}
+.cv-pmt-exinv-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0 8px 18px;border-bottom:1px solid var(--border)}
+.cv-pmt-exinv-row:last-child{border-bottom:none}
+.cv-pmt-exinv-name{font-size:12px;font-weight:500;color:var(--muted)}
 
 /* Prompt history */
 .ph-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:8px}
@@ -1349,7 +1354,7 @@ select.sem-input{cursor:pointer}
       <div class="dash-row" style="grid-template-columns:1fr;margin-bottom:16px">
         <div class="dash-panel" id="dash-extras-panel">
           <div class="dash-panel-hd" style="background:var(--green-light);border-color:var(--green-border)">
-            <span class="dash-panel-title" style="color:var(--green-dark)">Extras · jobs in progress</span>
+            <span class="dash-panel-title" style="color:var(--green-dark)">Extras · jobs in progress <span style="text-transform:none;letter-spacing:0;font-weight:500;color:var(--hint)">(ex VAT)</span></span>
             <span id="dash-extras-total" style="font-size:12px;font-weight:600;font-family:'JetBrains Mono',monospace;color:var(--green)"></span>
           </div>
           <div class="dash-panel-body" id="dash-extras-body"><div class="dash-empty">No jobs currently in progress</div></div>
@@ -1832,7 +1837,7 @@ const MONTHS  = ['January','February','March','April','May','June','July','Augus
 const SMONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const CHASE_DAYS = 7;
 
-let jobs = [], saving = false, _durUnit = 'days', _gcalAdded = false, _depositReceived = false, _paymentLinks = {mode:'2',links:['','','',''],extrasLink:'',invoiceDates:['','','','']};
+let jobs = [], saving = false, _durUnit = 'days', _gcalAdded = false, _depositReceived = false, _paymentLinks = {mode:'2',links:['','','',''],invoiceDates:['','','',''],extraLinks:['','','',''],extraDates:['','','','']};
 let _ctvId=null, _ctvName=null;
 let currentStage = 0, _currentJobLog = [];
 let _pricingJobId = null, _ppSections = [];
@@ -2185,7 +2190,7 @@ function renderDashboard(){
     <div class="kpi-card clickable${inProgressJobs.length?' accent-green':''}" onclick="document.getElementById('dash-extras-panel').scrollIntoView({behavior:'smooth',block:'nearest'})">
       <div class="kpi-label">Extras</div>
       <div class="kpi-val">${inProgressJobs.length}</div>
-      <div class="kpi-sub">${allExtrasVal>0?'£'+allExtrasVal.toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:2})+' tracked':'jobs in progress'}</div>
+      <div class="kpi-sub">${allExtrasVal>0?'£'+allExtrasVal.toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:2})+' tracked (ex VAT)':'jobs in progress'}</div>
     </div>
   `;
 
@@ -2450,9 +2455,21 @@ function openJob(id){
   _gcalAdded=safeBool(d.gcalAdded);
   _depositReceived=safeBool(d.depositReceived);
   const _pl=d.paymentLinks||{};
-  _paymentLinks={mode:_pl.mode||'2',links:Array.isArray(_pl.links)?[..._pl.links]:['','','',''],extrasLink:_pl.extrasLink||'',invoiceDates:Array.isArray(_pl.invoiceDates)?[..._pl.invoiceDates]:['','','','']};
+  _paymentLinks={
+    mode:_pl.mode||'2',
+    links:Array.isArray(_pl.links)?[..._pl.links]:['','','',''],
+    invoiceDates:Array.isArray(_pl.invoiceDates)?[..._pl.invoiceDates]:['','','',''],
+    extraLinks:Array.isArray(_pl.extraLinks)?[..._pl.extraLinks]:['','','',''],
+    extraDates:Array.isArray(_pl.extraDates)?[..._pl.extraDates]:['','','','']
+  };
   while(_paymentLinks.links.length<4) _paymentLinks.links.push('');
   while(_paymentLinks.invoiceDates.length<4) _paymentLinks.invoiceDates.push('');
+  while(_paymentLinks.extraLinks.length<4) _paymentLinks.extraLinks.push('');
+  while(_paymentLinks.extraDates.length<4) _paymentLinks.extraDates.push('');
+  // Legacy migration: jobs saved before the per-stage extra-invoice fields
+  // existed had a single generic "Agreed extras" link — carry it into the
+  // Deposit slot so it isn't lost.
+  if(!Array.isArray(_pl.extraLinks) && _pl.extrasLink) _paymentLinks.extraLinks[0]=_pl.extrasLink;
   currentStage=d.stage;
   const log=Array.isArray(d.activityLog)?d.activityLog:[];
   _currentJobLog=log;
@@ -2519,7 +2536,7 @@ function openJob(id){
 
     ${!isNew?`<div class="modal-section" id="extras-section">
       <div class="sec-hd" style="display:flex;align-items:center;justify-content:space-between">
-        <span>Extras</span>
+        <span>Extras <span style="text-transform:none;letter-spacing:0;font-weight:500;color:var(--hint)">(ex VAT)</span></span>
         ${(d.extras||[]).length?`<span id="extras-sec-total" style="font-size:12px;color:var(--green);font-weight:600;font-family:'JetBrains Mono',monospace;text-transform:none;letter-spacing:0">${extrasTotal(d.extras)}</span>`:''}
       </div>
       <div id="extras-list-wrap">${buildExtrasList(d.id, d.extras||[])}</div>
@@ -2733,6 +2750,8 @@ function buildPaymentLinksSection(job){
   const mode=pl.mode||'2';
   const links=pl.links||['','','',''];
   const invoiceDates=Array.isArray(pl.invoiceDates)?pl.invoiceDates:['','','',''];
+  const extraLinks=Array.isArray(pl.extraLinks)?pl.extraLinks:['','','',''];
+  const extraDates=Array.isArray(pl.extraDates)?pl.extraDates:['','','',''];
   const val=parseFloat(job.value)||0;
   const slots=mode==='4'?[
     {pct:10,name:'Deposit'},{pct:40,name:'Stage 2'},{pct:40,name:'Stage 3'},{pct:10,name:'Final payment'}
@@ -2743,6 +2762,8 @@ function buildPaymentLinksSection(job){
   const rows=slots.map((s,i)=>{
     const lnk=links[i]||'';
     const dt=invoiceDates[i]||'';
+    const exLnk=extraLinks[i]||'';
+    const exDt=extraDates[i]||'';
     return `<div class="pmt-row" style="flex-wrap:wrap">
       <div class="pmt-row-label"><span class="pmt-name">${s.name}</span><span class="pmt-pct">${s.pct}%</span></div>
       <span class="pmt-amt" id="pmt-amt-${i}">${fmtAmt(s.pct)}</span>
@@ -2752,33 +2773,36 @@ function buildPaymentLinksSection(job){
         <span class="pmt-date-lbl">Forecast invoice:</span>
         <input class="pmt-date${dt?' has-date':''}" id="pmt-date-${i}" type="date" value="${esc(dt)}" oninput="this.classList.toggle('has-date',!!this.value.trim())"/>
       </div>
+      <div class="pmt-exinv-row">
+        <span class="pmt-exinv-lbl">↳ Extra invoice <span style="color:var(--hint)">(optional, ex VAT)</span></span>
+        <input class="pmt-input${exLnk?' has-link':''}" id="pmt-exlink-${i}" type="url" value="${esc(exLnk)}" placeholder="Paste Monzo link for an extras invoice at this stage…" oninput="this.classList.toggle('has-link',!!this.value.trim())"/>
+        <button class="pmt-open${exLnk?'':'  disabled'}" onclick="openPmtExtraLink(${i})" title="Open link">↗</button>
+        <div class="pmt-date-row" style="margin-left:0">
+          <span class="pmt-date-lbl">Sent:</span>
+          <input class="pmt-date${exDt?' has-date':''}" id="pmt-exdate-${i}" type="date" value="${esc(exDt)}" oninput="this.classList.toggle('has-date',!!this.value.trim())"/>
+        </div>
+      </div>
     </div>`;
   }).join('');
-  const extrasLnk=pl.extrasLink||'';
-  const extrasRow=`<div class="pmt-row pmt-row-extras">
-    <div class="pmt-row-label"><span class="pmt-name">Agreed extras</span><span class="pmt-pct" style="color:var(--hint)">optional</span></div>
-    <span class="pmt-amt"></span>
-    <input class="pmt-input${extrasLnk?' has-link':''}" id="pmt-link-extras" type="url" value="${esc(extrasLnk)}" placeholder="Paste Monzo link for extras…" oninput="this.classList.toggle('has-link',!!this.value.trim())"/>
-    <button class="pmt-open${extrasLnk?'':'  disabled'}" onclick="openExtrasLink()" title="Open link">↗</button>
-  </div>`;
   return `<div class="pmt-mode-row">
     <button class="pmt-mode-btn${mode==='2'?' active':''}" onclick="setPaymentMode('2')">10 / 90%</button>
     <button class="pmt-mode-btn${mode==='4'?' active':''}" onclick="setPaymentMode('4')">10 / 40 / 40 / 10%</button>
-  </div>${rows}<div class="pmt-extras-divider"></div>${extrasRow}`;
+  </div>${rows}`;
 }
 
 function setPaymentMode(mode){
   const links=[0,1,2,3].map(i=>(document.getElementById('pmt-link-'+i)||{}).value||'');
-  const extrasLink=(document.getElementById('pmt-link-extras')||{}).value||'';
   const invoiceDates=[0,1,2,3].map(i=>(document.getElementById('pmt-date-'+i)||{}).value||'');
-  _paymentLinks={mode,links,extrasLink,invoiceDates};
+  const extraLinks=[0,1,2,3].map(i=>(document.getElementById('pmt-exlink-'+i)||{}).value||'');
+  const extraDates=[0,1,2,3].map(i=>(document.getElementById('pmt-exdate-'+i)||{}).value||'');
+  _paymentLinks={mode,links,invoiceDates,extraLinks,extraDates};
   const wrap=document.getElementById('pmt-links-wrap');
   const jobVal=(document.getElementById('f-value')||{}).value||'0';
   if(wrap) wrap.innerHTML=buildPaymentLinksSection({value:jobVal});
 }
 
-function openExtrasLink(){
-  const url=(document.getElementById('pmt-link-extras')||{}).value||'';
+function openPmtExtraLink(i){
+  const url=(document.getElementById('pmt-exlink-'+i)||{}).value||'';
   if(url.trim()) window.open(url.trim(),'_blank');
 }
 
@@ -2835,7 +2859,13 @@ async function saveJob(id,isNew){
     siteLog:Array.isArray(existing.siteLog)?existing.siteLog:[],
     extras:Array.isArray(existing.extras)?existing.extras:[],
     clientNotes:Array.isArray(existing.clientNotes)?existing.clientNotes:[],
-    paymentLinks:{mode:_paymentLinks.mode,links:[0,1,2,3].map(i=>(document.getElementById('pmt-link-'+i)||{}).value||''),extrasLink:(document.getElementById('pmt-link-extras')||{}).value||'',invoiceDates:[0,1,2,3].map(i=>(document.getElementById('pmt-date-'+i)||{}).value||'')},
+    paymentLinks:{
+      mode:_paymentLinks.mode,
+      links:[0,1,2,3].map(i=>(document.getElementById('pmt-link-'+i)||{}).value||''),
+      invoiceDates:[0,1,2,3].map(i=>(document.getElementById('pmt-date-'+i)||{}).value||''),
+      extraLinks:[0,1,2,3].map(i=>(document.getElementById('pmt-exlink-'+i)||{}).value||''),
+      extraDates:[0,1,2,3].map(i=>(document.getElementById('pmt-exdate-'+i)||{}).value||'')
+    },
     keyCode:(document.getElementById('f-keycode')||{}).value||'',
     contractorNotes:(document.getElementById('f-contractor-notes')||{}).value||'',
     bom:existing.bom||null,
@@ -2954,7 +2984,7 @@ function buildExtrasList(jobId, extras){
       <button class="extra-del" onclick="deleteExtra('${jobId}','${e.id}')" title="Remove">&#215;</button>
     </div>`).join('');
   const total=extrasTotal(extras);
-  return rows+(total?`<div class="extras-total-row"><span class="extras-total-lbl">Total extras</span><span class="extras-total-val">${total}</span></div>`:'');
+  return rows+(total?`<div class="extras-total-row"><span class="extras-total-lbl">Total extras (ex VAT)</span><span class="extras-total-val">${total}</span></div>`:'');
 }
 
 function refreshExtrasUI(jobId, extras){
@@ -4928,7 +4958,7 @@ function renderClientView(data){
       const extrasSum=extras.reduce((t,e)=>t+(parseFloat(e.value)||0),0);
       const canApprove=!!(data.live&&data.jobId);
       extrasEl.innerHTML=`<div class="cv-extras">
-        <div class="cv-extras-title">Additional Works / Extras</div>
+        <div class="cv-extras-title">Additional Works / Extras <span style="text-transform:none;letter-spacing:0;font-weight:500;color:var(--hint)">(ex VAT)</span></div>
         ${extras.map(e=>`<div class="cv-extra-row">
           <div class="cv-extra-main">
             <span class="cv-extra-desc">${esc(e.desc||e.description||'')}</span>
@@ -4941,7 +4971,7 @@ function renderClientView(data){
             :'<span class="cv-extra-amount" style="color:var(--hint);font-size:12px">To be agreed</span>'}
         </div>`).join('')}
         ${extrasSum>0?`<div class="cv-extras-total-row">
-          <span class="cv-extras-total-lbl">Total extras</span>
+          <span class="cv-extras-total-lbl">Total extras (ex VAT)</span>
           <span class="cv-extras-total-val">£${extrasSum.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
         </div>`:''}
       </div>`;
@@ -4954,11 +4984,13 @@ function renderClientView(data){
   const pmtEl=document.getElementById('cv-payments');
   if(pmtEl){
     const pl=paymentLinks; const plLinks=Array.isArray(pl?.links)?pl.links:[];
-    const extrasLnk=pl?.extrasLink||'';
+    const extraLinks=Array.isArray(pl?.extraLinks)?pl.extraLinks:[];
+    const extraDates=Array.isArray(pl?.extraDates)?pl.extraDates:[];
     const cvInvoiceDates=Array.isArray(data.invoiceDates)?data.invoiceDates:(Array.isArray(pl?.invoiceDates)?pl.invoiceDates:[]);
     const activeLinks=plLinks.filter(Boolean);
     const activeInvoiceDates=cvInvoiceDates.filter(Boolean);
-    if(pl&&(activeLinks.length||extrasLnk||activeInvoiceDates.length)){
+    const activeExtraLinks=extraLinks.filter(Boolean);
+    if(pl&&(activeLinks.length||activeInvoiceDates.length||activeExtraLinks.length)){
       const val=parseFloat(job.value)||0;
       const slots=pl.mode==='4'?[
         {pct:10,name:'Deposit'},{pct:40,name:'Stage 2'},{pct:40,name:'Stage 3'},{pct:10,name:'Final payment'}
@@ -4972,36 +5004,39 @@ function renderClientView(data){
         const d=new Date(ds+'T12:00:00');
         return d.getDate()+' '+SMON[d.getMonth()]+' '+d.getFullYear();
       }
-      function invDateBadge(ds,i){
+      function invDateBadge(ds,label){
         if(!ds) return '';
         const dMs=new Date(ds+'T12:00:00').getTime();
         const diff=dMs-todayMs;
-        let cls='cv-pmt-date-future', label='Invoice: '+fmtInvDate(ds);
-        if(diff<0){ cls='cv-pmt-date-overdue'; label='Invoice: '+fmtInvDate(ds)+' (overdue)'; }
-        else if(diff<=14*24*3600*1000){ cls='cv-pmt-date-upcoming'; label='Invoice: '+fmtInvDate(ds)+' (soon)'; }
-        return `<span class="cv-pmt-date ${cls}">${label}</span>`;
+        let cls='cv-pmt-date-future', txt=label+': '+fmtInvDate(ds);
+        if(diff<0){ cls='cv-pmt-date-overdue'; txt=label+': '+fmtInvDate(ds)+' (overdue)'; }
+        else if(diff<=14*24*3600*1000){ cls='cv-pmt-date-upcoming'; txt=label+': '+fmtInvDate(ds)+' (soon)'; }
+        return `<span class="cv-pmt-date ${cls}">${txt}</span>`;
       }
       const rows=slots.map((s,i)=>{
         const lnk=plLinks[i]||'';
         const invDate=cvInvoiceDates[i]||'';
-        if(!lnk&&!invDate) return '';
+        const exLnk=extraLinks[i]||'';
+        const exDt=extraDates[i]||'';
+        if(!lnk&&!invDate&&!exLnk) return '';
         const amt=val?'£'+(val*s.pct/100).toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:2}):'';
+        const exRow=exLnk?`<div class="cv-pmt-exinv-row">
+          <div class="cv-pmt-info">
+            <span class="cv-pmt-exinv-name">Extra invoice — ${s.name} <span style="color:var(--hint);font-weight:400">(ex VAT)</span></span>
+            ${invDateBadge(exDt,'Sent')}
+          </div>
+          <a class="cv-pmt-btn" href="${esc(exLnk)}" target="_blank">Pay now ↗</a>
+        </div>`:'';
         return `<div class="cv-pmt-row">
           <div class="cv-pmt-info">
             <span class="cv-pmt-name">${s.name} (${s.pct}%)</span>
             ${amt?`<span class="cv-pmt-amt">${amt}</span>`:''}
-            ${invDateBadge(invDate,i)}
+            ${invDateBadge(invDate,'Invoice')}
           </div>
           ${lnk?`<a class="cv-pmt-btn" href="${esc(lnk)}" target="_blank">Pay now ↗</a>`:''}
-        </div>`;
+        </div>${exRow}`;
       }).filter(Boolean).join('');
-      const extrasRow=extrasLnk?`<div class="cv-pmt-row cv-pmt-row-extras">
-        <div class="cv-pmt-info">
-          <span class="cv-pmt-name">Agreed extras</span>
-        </div>
-        <a class="cv-pmt-btn" href="${esc(extrasLnk)}" target="_blank">Pay now ↗</a>
-      </div>`:'';
-      pmtEl.innerHTML=`<div class="cv-payments"><div class="cv-payments-title">Payments</div>${rows}${extrasRow?'<div class="cv-pmt-divider"></div>'+extrasRow:''}</div>`;
+      pmtEl.innerHTML=`<div class="cv-payments"><div class="cv-payments-title">Payments</div>${rows}</div>`;
     }else{ pmtEl.innerHTML=''; }
   }
 
