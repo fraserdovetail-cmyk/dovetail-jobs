@@ -1835,9 +1835,23 @@ const STAGES = ['Initial contact','Viewed job','Quote submitted','Quote approved
 let showArchived = false;
 const MONTHS  = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const SMONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+let schedEntries  = [];   // {id,col,jobId,text,colour,start,end,isPlaceholder}
+let schedViewStart= null;
+let schedViewWeeks= 16;  // chunk size rendered at a time (not user-selectable)
+let schedInfiniteStart = null; // earliest date currently rendered
+let schedInfiniteEnd = null;   // latest date currently rendered
+const SCHED_CHUNK = 16; // weeks per chunk
+let schedCols     = new Set(['tom','fraser','barnetts','sec','kbc','roofer','painter','flooring','flowscreed','plasterer','tonino','scaffold','steel','client-actions','invoices','notes']);
+let schedEditId   = null;
+let schedEntryType= 'job';
+let schedDragId   = null;
+let schedJobFilter = null; // jobId to isolate, or null for all
+let schedTouchDragId = null, schedTouchClone = null;
+let schedResizeId = null, schedResizeOrigEnd = null; // for bottom-handle resize
 const CHASE_DAYS = 7;
 
-let jobs = [], saving = false, _durUnit = 'days', _gcalAdded = false, _depositReceived = false, _paymentLinks = {mode:'2',links:['','','',''],invoiceDates:['','','',''],extraLinks:['','','',''],extraDates:['','','','']};
+let jobs = [], saving = false, _durUnit = 'days', _gcalAdded = false, _depositReceived = false, _paymentLinks = {mode:'2',links:['','','','',''],invoiceDates:['','','','',''],extraLinks:['','','','',''],extraDates:['','','','','']};
 let _ctvId=null, _ctvName=null;
 let currentStage = 0, _currentJobLog = [];
 let _pricingJobId = null, _ppSections = [];
@@ -2457,15 +2471,15 @@ function openJob(id){
   const _pl=d.paymentLinks||{};
   _paymentLinks={
     mode:_pl.mode||'2',
-    links:Array.isArray(_pl.links)?[..._pl.links]:['','','',''],
-    invoiceDates:Array.isArray(_pl.invoiceDates)?[..._pl.invoiceDates]:['','','',''],
-    extraLinks:Array.isArray(_pl.extraLinks)?[..._pl.extraLinks]:['','','',''],
-    extraDates:Array.isArray(_pl.extraDates)?[..._pl.extraDates]:['','','','']
+    links:Array.isArray(_pl.links)?[..._pl.links]:['','','','',''],
+    invoiceDates:Array.isArray(_pl.invoiceDates)?[..._pl.invoiceDates]:['','','','',''],
+    extraLinks:Array.isArray(_pl.extraLinks)?[..._pl.extraLinks]:['','','','',''],
+    extraDates:Array.isArray(_pl.extraDates)?[..._pl.extraDates]:['','','','','']
   };
-  while(_paymentLinks.links.length<4) _paymentLinks.links.push('');
-  while(_paymentLinks.invoiceDates.length<4) _paymentLinks.invoiceDates.push('');
-  while(_paymentLinks.extraLinks.length<4) _paymentLinks.extraLinks.push('');
-  while(_paymentLinks.extraDates.length<4) _paymentLinks.extraDates.push('');
+  while(_paymentLinks.links.length<5) _paymentLinks.links.push('');
+  while(_paymentLinks.invoiceDates.length<5) _paymentLinks.invoiceDates.push('');
+  while(_paymentLinks.extraLinks.length<5) _paymentLinks.extraLinks.push('');
+  while(_paymentLinks.extraDates.length<5) _paymentLinks.extraDates.push('');
   // Legacy migration: jobs saved before the per-stage extra-invoice fields
   // existed had a single generic "Agreed extras" link — carry it into the
   // Deposit slot so it isn't lost.
@@ -2748,13 +2762,13 @@ function fillAddrFromPcResult(res){
 function buildPaymentLinksSection(job){
   const pl=_paymentLinks;
   const mode=pl.mode||'2';
-  const links=pl.links||['','','',''];
-  const invoiceDates=Array.isArray(pl.invoiceDates)?pl.invoiceDates:['','','',''];
-  const extraLinks=Array.isArray(pl.extraLinks)?pl.extraLinks:['','','',''];
-  const extraDates=Array.isArray(pl.extraDates)?pl.extraDates:['','','',''];
+  const links=pl.links||['','','','',''];
+  const invoiceDates=Array.isArray(pl.invoiceDates)?pl.invoiceDates:['','','','',''];
+  const extraLinks=Array.isArray(pl.extraLinks)?pl.extraLinks:['','','','',''];
+  const extraDates=Array.isArray(pl.extraDates)?pl.extraDates:['','','','',''];
   const val=parseFloat(job.value)||0;
   const slots=mode==='4'?[
-    {pct:10,name:'Deposit'},{pct:40,name:'Stage 2'},{pct:40,name:'Stage 3'},{pct:10,name:'Final payment'}
+    {pct:10,name:'Deposit'},{pct:30,name:'Stage 2'},{pct:30,name:'Stage 3'},{pct:20,name:'Stage 4'},{pct:10,name:'Final payment'}
   ]:[
     {pct:10,name:'Deposit'},{pct:90,name:'Final payment'}
   ];
@@ -2786,15 +2800,15 @@ function buildPaymentLinksSection(job){
   }).join('');
   return `<div class="pmt-mode-row">
     <button class="pmt-mode-btn${mode==='2'?' active':''}" onclick="setPaymentMode('2')">10 / 90%</button>
-    <button class="pmt-mode-btn${mode==='4'?' active':''}" onclick="setPaymentMode('4')">10 / 40 / 40 / 10%</button>
+    <button class="pmt-mode-btn${mode==='4'?' active':''}" onclick="setPaymentMode('4')">10 / 30 / 30 / 20 / 10%</button>
   </div>${rows}`;
 }
 
 function setPaymentMode(mode){
-  const links=[0,1,2,3].map(i=>(document.getElementById('pmt-link-'+i)||{}).value||'');
-  const invoiceDates=[0,1,2,3].map(i=>(document.getElementById('pmt-date-'+i)||{}).value||'');
-  const extraLinks=[0,1,2,3].map(i=>(document.getElementById('pmt-exlink-'+i)||{}).value||'');
-  const extraDates=[0,1,2,3].map(i=>(document.getElementById('pmt-exdate-'+i)||{}).value||'');
+  const links=[0,1,2,3,4].map(i=>(document.getElementById('pmt-link-'+i)||{}).value||'');
+  const invoiceDates=[0,1,2,3,4].map(i=>(document.getElementById('pmt-date-'+i)||{}).value||'');
+  const extraLinks=[0,1,2,3,4].map(i=>(document.getElementById('pmt-exlink-'+i)||{}).value||'');
+  const extraDates=[0,1,2,3,4].map(i=>(document.getElementById('pmt-exdate-'+i)||{}).value||'');
   _paymentLinks={mode,links,invoiceDates,extraLinks,extraDates};
   const wrap=document.getElementById('pmt-links-wrap');
   const jobVal=(document.getElementById('f-value')||{}).value||'0';
@@ -2808,7 +2822,7 @@ function openPmtExtraLink(i){
 
 function refreshPaymentAmounts(jobVal){
   const val=parseFloat(jobVal)||0;
-  const pcts=_paymentLinks.mode==='4'?[10,40,40,10]:[10,90];
+  const pcts=_paymentLinks.mode==='4'?[10,30,30,20,10]:[10,90];
   pcts.forEach((pct,i)=>{
     const el=document.getElementById('pmt-amt-'+i); if(!el) return;
     el.textContent=val?'£'+(val*pct/100).toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:2}):'';
@@ -2861,10 +2875,10 @@ async function saveJob(id,isNew){
     clientNotes:Array.isArray(existing.clientNotes)?existing.clientNotes:[],
     paymentLinks:{
       mode:_paymentLinks.mode,
-      links:[0,1,2,3].map(i=>(document.getElementById('pmt-link-'+i)||{}).value||''),
-      invoiceDates:[0,1,2,3].map(i=>(document.getElementById('pmt-date-'+i)||{}).value||''),
-      extraLinks:[0,1,2,3].map(i=>(document.getElementById('pmt-exlink-'+i)||{}).value||''),
-      extraDates:[0,1,2,3].map(i=>(document.getElementById('pmt-exdate-'+i)||{}).value||'')
+      links:[0,1,2,3,4].map(i=>(document.getElementById('pmt-link-'+i)||{}).value||''),
+      invoiceDates:[0,1,2,3,4].map(i=>(document.getElementById('pmt-date-'+i)||{}).value||''),
+      extraLinks:[0,1,2,3,4].map(i=>(document.getElementById('pmt-exlink-'+i)||{}).value||''),
+      extraDates:[0,1,2,3,4].map(i=>(document.getElementById('pmt-exdate-'+i)||{}).value||'')
     },
     keyCode:(document.getElementById('f-keycode')||{}).value||'',
     contractorNotes:(document.getElementById('f-contractor-notes')||{}).value||'',
@@ -3375,20 +3389,6 @@ const JOB_COLOURS_S = [
 
 const SUG_JOB  = ['On site all day','Prep work','First fix','Second fix','Finishing','Snags','Measure up','Site visit','Delivery AM'];
 const SUG_NOTE = ['Order timber','Order fixings','Skip delivery','Scaffold up','Scaffold down','Inspector visit','Payment due','Material delivery','Call client'];
-
-let schedEntries  = [];   // {id,col,jobId,text,colour,start,end,isPlaceholder}
-let schedViewStart= null;
-let schedViewWeeks= 16;  // chunk size rendered at a time (not user-selectable)
-let schedInfiniteStart = null; // earliest date currently rendered
-let schedInfiniteEnd = null;   // latest date currently rendered
-const SCHED_CHUNK = 16; // weeks per chunk
-let schedCols     = new Set(['tom','fraser','barnetts','sec','kbc','roofer','painter','flooring','flowscreed','plasterer','tonino','scaffold','steel','client-actions','invoices','notes']);
-let schedEditId   = null;
-let schedEntryType= 'job';
-let schedDragId   = null;
-let schedJobFilter = null; // jobId to isolate, or null for all
-let schedTouchDragId = null, schedTouchClone = null;
-let schedResizeId = null, schedResizeOrigEnd = null; // for bottom-handle resize
 
 // ─── CUSTOM CONTRACTORS ───────────────────────────────────────────────────
 // Colour palette available when adding a custom contractor
@@ -4094,7 +4094,7 @@ function schedRender(){
     ' — '+last.getDate()+' '+SMONTHS_S[last.getMonth()]+' '+last.getFullYear();
 
   // Build virtual invoice entries from each job's paymentLinks — no manual entry needed
-  const _invSlotNames={'4':['Deposit','Stage 2','Stage 3','Final payment'],'2':['Deposit','Final payment']};
+  const _invSlotNames={'4':['Deposit','Stage 2','Stage 3','Stage 4','Final payment'],'2':['Deposit','Final payment']};
   const virtualInvEntries=[];
   jobs.forEach(job=>{
     const pl=job.paymentLinks;
@@ -4902,7 +4902,7 @@ function renderClientView(data){
   const invDates=Array.isArray(data.invoiceDates)?data.invoiceDates:[];
   const pl=data.paymentLinks;
   const invSlots=pl?.mode==='4'
-    ?['Deposit','Stage 2','Stage 3','Final payment']
+    ?['Deposit','Stage 2','Stage 3','Stage 4','Final payment']
     :['Deposit','Final payment'];
   const invMap={};
   invDates.forEach((ds,i)=>{ if(ds) invMap[ds]=invSlots[i]||('Invoice '+(i+1)); });
@@ -4993,7 +4993,7 @@ function renderClientView(data){
     if(pl&&(activeLinks.length||activeInvoiceDates.length||activeExtraLinks.length)){
       const val=parseFloat(job.value)||0;
       const slots=pl.mode==='4'?[
-        {pct:10,name:'Deposit'},{pct:40,name:'Stage 2'},{pct:40,name:'Stage 3'},{pct:10,name:'Final payment'}
+        {pct:10,name:'Deposit'},{pct:30,name:'Stage 2'},{pct:30,name:'Stage 3'},{pct:20,name:'Stage 4'},{pct:10,name:'Final payment'}
       ]:[
         {pct:10,name:'Deposit'},{pct:90,name:'Final payment'}
       ];
