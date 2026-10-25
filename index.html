@@ -908,6 +908,33 @@ textarea.pp-input{resize:vertical;min-height:80px}
 .sched-date{font-size:15px;font-weight:400;color:var(--text);line-height:1.1;font-family:'JetBrains Mono',monospace;margin-top:1px}
 .sched-mon{font-size:9px;color:var(--hint);text-transform:uppercase;letter-spacing:0.05em;margin-top:1px}
 .sched-month-marker{font-size:9px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:2px}
+.sched-day-label{cursor:pointer}
+.sched-day-label:hover{background:var(--surface)}
+.sched-todo-badge{display:inline-flex;align-items:center;gap:2px;margin-top:3px;padding:1px 5px;border-radius:8px;
+  font-size:9px;font-weight:700;line-height:1.4;background:var(--amber-light,#FEF3C7);color:#92400E;border:1px solid #FDE68A}
+.sched-todo-badge.done{background:#F0FDF4;color:#15803D;border-color:#86EFAC}
+.sched-day-row.is-today .sched-todo-badge{background:rgba(255,255,255,0.2);border-color:rgba(255,255,255,0.5)}
+/* day view modal */
+.dvm-box{max-width:460px;max-height:calc(100vh - 40px);display:flex;flex-direction:column}
+.dvm-box .sem-body{overflow-y:auto}
+.dvm-nav{background:none;border:none;color:rgba(255,255,255,0.7);font-size:20px;cursor:pointer;line-height:1;padding:0 6px}
+.dvm-nav:hover{color:#fff}
+.dvm-section-hd{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.dvm-count{font-weight:500;color:var(--hint);letter-spacing:0}
+.dvm-list{display:flex;flex-direction:column;gap:5px}
+.dvm-empty{font-size:12px;color:var(--hint);padding:6px 0}
+.dvm-item{display:flex;align-items:flex-start;gap:8px;padding:7px 9px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;line-height:1.35}
+.dvm-item.is-link{cursor:pointer}
+.dvm-item.is-link:hover{background:var(--surface)}
+.dvm-who{flex-shrink:0;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;padding:2px 6px;border-radius:4px;border:1px solid;margin-top:1px;white-space:nowrap}
+.dvm-what{flex:1;min-width:0;color:var(--text);word-wrap:break-word}
+.dvm-what small{display:block;color:var(--muted);font-size:11px;margin-top:1px}
+.dvm-todo input[type=checkbox]{width:16px;height:16px;margin:1px 0 0;flex-shrink:0;accent-color:var(--green);cursor:pointer}
+.dvm-todo.is-done .dvm-what{text-decoration:line-through;color:var(--hint)}
+.dvm-rm{background:none;border:none;color:var(--hint);font-size:16px;line-height:1;cursor:pointer;padding:0 2px;flex-shrink:0}
+.dvm-rm:hover{color:#B91C1C}
+.dvm-add-row{display:flex;gap:6px;margin-top:8px}
+.dvm-add-btn{padding:0 14px;border:none;border-radius:var(--radius-sm);background:var(--charcoal);color:#fff;font-size:12px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer}
 /* cells */
 .sched-cell{
   flex-shrink:0;padding:4px 5px;border-right:1px solid var(--border);
@@ -1553,6 +1580,36 @@ select.sem-input{cursor:pointer}
       <div class="sem-ft">
         <button class="btn-cancel" onclick="semClose()">Cancel</button>
         <button class="btn-save" onclick="semSave()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DAY VIEW / TO-DO MODAL -->
+  <div class="sem-bg" id="dvm-modal" onclick="if(event.target===this)dvmClose()">
+    <div class="sem-box dvm-box">
+      <div class="sem-hd">
+        <button class="dvm-nav" onclick="dvmShift(-1)" title="Previous day">&#8249;</button>
+        <span class="sem-title" id="dvm-title" style="flex:1;text-align:center">Day</span>
+        <button class="dvm-nav" onclick="dvmShift(1)" title="Next day">&#8250;</button>
+        <button class="sem-close" onclick="dvmClose()" style="margin-left:6px">&#215;</button>
+      </div>
+      <div class="sem-body">
+        <div>
+          <div class="dvm-section-hd">To-do <span class="dvm-count" id="dvm-todo-count"></span></div>
+          <div class="dvm-list" id="dvm-todos"></div>
+          <div class="dvm-add-row">
+            <input class="sem-input" id="dvm-todo-input" placeholder="Add a to-do for this day…"
+              onkeydown="if(event.key==='Enter'){event.preventDefault();dvmAddTodo();}"/>
+            <button class="dvm-add-btn" onclick="dvmAddTodo()">Add</button>
+          </div>
+        </div>
+        <div>
+          <div class="dvm-section-hd">On the schedule <span class="dvm-count" id="dvm-sched-count"></span></div>
+          <div class="dvm-list" id="dvm-sched"></div>
+        </div>
+      </div>
+      <div class="sem-ft">
+        <button class="btn-cancel" onclick="dvmClose()">Close</button>
       </div>
     </div>
   </div>
@@ -3683,6 +3740,148 @@ async function schedSaveToAPI(){
   }
 }
 
+// ─── DAY TO-DOS ───────────────────────────────────────────────────────────
+// Optional per-day checklist, stored separately from schedule entries:
+// { 'YYYY-MM-DD': [{id,text,done,created}] }
+let dayTodos = {};
+let dvmDate  = null; // date currently open in the day view
+
+function dayTodosLoadLocal(){
+  try{ const r=localStorage.getItem('dtv_day_todos'); if(r) dayTodos=JSON.parse(r)||{}; }catch(e){ dayTodos={}; }
+}
+function dayTodosSaveLocal(){
+  try{ localStorage.setItem('dtv_day_todos',JSON.stringify(dayTodos)); }catch(e){}
+}
+async function dayTodosLoadFromAPI(){
+  try{
+    const d=await apiCall({action:'getDayTodos'});
+    if(d&&d.todos&&typeof d.todos==='object'&&!Array.isArray(d.todos)){
+      dayTodos=d.todos;
+      dayTodosSaveLocal();
+      schedRender();
+      if(dvmDate) dvmRender();
+    }
+  }catch(e){ console.warn('Day to-dos load failed, using local cache',e); }
+}
+async function dayTodosSaveToAPI(){
+  dayTodosSaveLocal();
+  if(!isOnline){ showToast('Saved locally — will sync when back online'); return; }
+  try{ await apiCall({action:'saveDayTodos',todos:dayTodos}); }
+  catch(e){ console.warn('Day to-dos save failed',e); showToast('To-do save failed — stored locally'); }
+}
+
+function dayTodoBadge(ds){
+  const items=dayTodos[ds];
+  if(!items||!items.length) return '';
+  const open=items.filter(t=>!t.done).length;
+  if(!open) return `<div class="sched-todo-badge done" title="All to-dos done">&#10003; ${items.length}</div>`;
+  return `<div class="sched-todo-badge" title="${open} of ${items.length} to-dos open">&#9744; ${open}</div>`;
+}
+
+// Everything on the schedule for one day, across all columns (ignores
+// column toggles and job filter so nothing is hidden at a glance)
+function dvmScheduleItems(ds){
+  const items=[];
+  SCHED_COLS.forEach(col=>{
+    schedEntriesFor(col.id,ds,true).forEach(e=>items.push({e,col}));
+  });
+  // Invoice dates from job payment links (mirrors schedRender's virtual entries)
+  const slotNames={'4':['Deposit','Stage 2','Stage 3','Stage 4','Final payment'],'2':['Deposit','Final payment']};
+  const invCol=SCHED_COLS.find(c=>c.id==='invoices');
+  jobs.forEach(job=>{
+    const pl=job.paymentLinks;
+    if(!pl||!Array.isArray(pl.invoiceDates)) return;
+    const names=slotNames[pl.mode]||['Deposit','Final payment'];
+    pl.invoiceDates.forEach((d,i)=>{
+      if(d===ds) items.push({e:{jobId:job.id,text:'£ '+(names[i]||'Invoice '+(i+1)),virtual:true},col:invCol});
+    });
+  });
+  return items;
+}
+
+function dvmOpen(ds){
+  dvmDate=ds;
+  dvmRender();
+  document.getElementById('dvm-modal').classList.add('open');
+  if(schedIsDesktop()) setTimeout(()=>document.getElementById('dvm-todo-input').focus(),80);
+}
+function dvmClose(){
+  dvmDate=null;
+  document.getElementById('dvm-modal').classList.remove('open');
+}
+function dvmShift(dir){
+  const d=schedParseDate(dvmDate); d.setDate(d.getDate()+dir);
+  dvmDate=schedDateStr(d);
+  dvmRender();
+}
+
+function dvmRender(){
+  const ds=dvmDate; if(!ds) return;
+  const d=schedParseDate(ds);
+  document.getElementById('dvm-title').textContent=
+    d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+  // To-dos
+  const todos=dayTodos[ds]||[];
+  const open=todos.filter(t=>!t.done).length;
+  document.getElementById('dvm-todo-count').textContent=todos.length?`${todos.length-open}/${todos.length} done`:'';
+  document.getElementById('dvm-todos').innerHTML=todos.length?todos.map(t=>`
+    <label class="dvm-item dvm-todo${t.done?' is-done':''}">
+      <input type="checkbox" ${t.done?'checked':''} onchange="dvmToggleTodo('${t.id}')"/>
+      <span class="dvm-what">${esc(t.text)}</span>
+      <button class="dvm-rm" onclick="event.preventDefault();dvmDeleteTodo('${t.id}')" title="Remove">&#215;</button>
+    </label>`).join(''):'<div class="dvm-empty">Nothing on the list yet.</div>';
+
+  // Schedule entries
+  const items=dvmScheduleItems(ds);
+  document.getElementById('dvm-sched-count').textContent=items.length?`${items.length}`:'';
+  document.getElementById('dvm-sched').innerHTML=items.length?items.map(({e,col})=>{
+    const job=e.jobId?jobs.find(x=>x.id===e.jobId):null;
+    let main, sub='';
+    if(job){
+      main=e.text||job.name||'Untitled';
+      sub=[job.client,e.text?job.name:'',job.address].filter(Boolean).join(' · ');
+    } else {
+      main=e.text||'—';
+    }
+    if(e.end&&e.end!==e.start) sub=(sub?sub+' · ':'')+`Until ${schedParseDate(e.end).toLocaleDateString('en-GB',{day:'numeric',month:'short'})}`;
+    const click=e.virtual?'':`onclick="dvmEditEntry('${e.id}')"`;
+    return `<div class="dvm-item${e.virtual?'':' is-link'}" ${click}>
+      <span class="dvm-who" style="background:${col.bg};color:${col.text};border-color:${col.border}">${esc(col.label)}</span>
+      <span class="dvm-what">${esc(main)}${sub?`<small>${esc(sub)}</small>`:''}</span>
+    </div>`;
+  }).join(''):'<div class="dvm-empty">Nothing scheduled.</div>';
+}
+
+function dvmEditEntry(id){
+  dvmClose();
+  schedOpenEdit(id);
+}
+
+function dvmAddTodo(){
+  const input=document.getElementById('dvm-todo-input');
+  const text=input.value.trim();
+  if(!text||!dvmDate) return;
+  if(!dayTodos[dvmDate]) dayTodos[dvmDate]=[];
+  dayTodos[dvmDate].push({id:'td_'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),text,done:false,created:Date.now()});
+  input.value='';
+  dvmRender(); schedRender();
+  dayTodosSaveToAPI();
+  input.focus();
+}
+function dvmToggleTodo(id){
+  const t=(dayTodos[dvmDate]||[]).find(x=>x.id===id); if(!t) return;
+  t.done=!t.done;
+  dvmRender(); schedRender();
+  dayTodosSaveToAPI();
+}
+function dvmDeleteTodo(id){
+  const list=(dayTodos[dvmDate]||[]).filter(x=>x.id!==id);
+  if(list.length) dayTodos[dvmDate]=list; else delete dayTodos[dvmDate];
+  dvmRender(); schedRender();
+  dayTodosSaveToAPI();
+}
+
 function schedGetMonday(d){
   const c=new Date(d); const dow=c.getDay();
   c.setDate(c.getDate()+(dow===0?-6:1-dow)); c.setHours(0,0,0,0); return c;
@@ -3970,9 +4169,9 @@ function schedColWidth(){
   if(n<=2) return 160; if(n<=3) return 140; if(n<=5) return 120; return 100;
 }
 
-function schedEntriesFor(col,ds){
+function schedEntriesFor(col,ds,ignoreFilter){
   return schedEntries.filter(e=>{
-    if(schedJobFilter && e.jobId !== schedJobFilter) return false;
+    if(!ignoreFilter && schedJobFilter && e.jobId !== schedJobFilter) return false;
     if(e.col!==col) return false;
     const s=e.start,en=e.end||e.start;
     if(ds<s||ds>en) return false;
@@ -4125,11 +4324,12 @@ function schedRender(){
     const isToday=ds===today;
     const isMonthStart=d.getDate()===1;
     html+=`<div class="sched-day-row${isWE?' is-weekend':''}${isToday?' is-today':''}">`;
-    html+=`<div class="sched-day-label">
+    html+=`<div class="sched-day-label" onclick="dvmOpen('${ds}')" title="View day &amp; to-do list">
       ${isMonthStart?`<div class="sched-month-marker">${SMONTHS_S[d.getMonth()].toUpperCase()}</div>`:''}
       <div class="sched-dow">${SDOW_S[dow]}</div>
       <div class="sched-date">${d.getDate()}</div>
       ${!isMonthStart?`<div class="sched-mon">${SMONTHS_S[d.getMonth()]}</div>`:''}
+      ${dayTodoBadge(ds)}
     </div>`;
     activeCols.forEach(col=>{
       const cellEntries=schedEntriesFor(col.id,ds);
@@ -5326,12 +5526,14 @@ window.addEventListener('resize', updateSchedHeaderTop);
 function schedInit(){
   schedLoadLocal();
   contractorsLoadLocal();
+  dayTodosLoadLocal();
   schedViewStart=schedGetMonday(new Date());
   schedInitTouchDrag();
   schedRenderToggles();
   schedRenderDropdown();
   schedLoadFromAPI();
   contractorsLoadFromAPI();
+  dayTodosLoadFromAPI();
   // Infinite scroll: extend when user scrolls near bottom of page
   let schedScrollBusy=false;
   window.addEventListener('scroll',()=>{

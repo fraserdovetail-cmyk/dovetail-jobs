@@ -49,6 +49,8 @@ function handleRequest(e) {
       case 'saveSchedule':    result = saveSchedule(body.entries);        break;
       case 'getContractors':  result = getContractors();                  break;
       case 'saveContractors': result = saveContractors(body.contractors); break;
+      case 'getDayTodos':     result = getDayTodos();                     break;
+      case 'saveDayTodos':    result = saveDayTodos(body.todos);          break;
       case 'addClientNote':     result = addClientNote(body.jobId, body.note); break;
       case 'approveExtra':      result = approveExtra(body.jobId, body.extraId, body.ts); break;
       case 'validatePasscode':  result = validatePasscode(body.passcode);    break;
@@ -437,6 +439,82 @@ function saveContractors(contractors) {
     return { success: true };
   } catch (err) {
     Logger.log('saveContractors error: ' + err.toString());
+    return { error: err.toString() };
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  DAY TO-DOS — optional per-day checklist shown from the crew schedule
+//
+//  Sheet layout ("DayTodos"):
+//    A1        = header 'date'   B1 = 'todos_json'
+//    row 2+    = YYYY-MM-DD      | JSON array [{id,text,done,created}]
+//
+//  The frontend sends and receives a single object keyed by date.
+//  Days with no items are not stored.
+// ════════════════════════════════════════════════════════════════════════════
+
+function getDayTodosSheet() {
+  const ss = getSpreadsheet();
+  let sheet = ss.getSheetByName('DayTodos');
+  if (!sheet) {
+    sheet = ss.insertSheet('DayTodos');
+    sheet.getRange(1, 1, 1, 2).setValues([['date', 'todos_json']]);
+  }
+  return sheet;
+}
+
+function getDayTodos() {
+  try {
+    const sheet = getDayTodosSheet();
+    const lastRow = sheet.getLastRow();
+    if (lastRow < 2) return { todos: {} };
+    const rows = sheet.getRange(2, 1, lastRow - 1, 2).getDisplayValues();
+    const todos = {};
+    rows.forEach(function(row) {
+      const date = String(row[0] || '').trim();
+      const json = String(row[1] || '').trim();
+      if (!date || !json) return;
+      try {
+        const items = JSON.parse(json);
+        if (Array.isArray(items) && items.length) todos[date] = items;
+      } catch(e) {
+        Logger.log('getDayTodos: bad row for ' + date + ': ' + e);
+      }
+    });
+    return { todos: todos };
+  } catch (err) {
+    Logger.log('getDayTodos error: ' + err.toString());
+    return { todos: {} };
+  }
+}
+
+function saveDayTodos(todos) {
+  try {
+    const sheet = getDayTodosSheet();
+    if (!todos || typeof todos !== 'object' || Array.isArray(todos)) todos = {};
+
+    const rows = Object.keys(todos).sort()
+      .filter(function(date) { return Array.isArray(todos[date]) && todos[date].length; })
+      .map(function(date) { return [date, JSON.stringify(todos[date])]; });
+
+    // Date column stored as plain text so Sheets doesn't convert it to a Date
+    if (rows.length > 0) {
+      const range = sheet.getRange(2, 1, rows.length, 2);
+      range.setNumberFormat('@');
+      range.setValues(rows);
+    }
+
+    // Clear any surplus rows left over from a previous save with more days
+    const lastRow = sheet.getLastRow();
+    const firstSurplus = rows.length + 2;
+    if (lastRow >= firstSurplus) {
+      sheet.getRange(firstSurplus, 1, lastRow - firstSurplus + 1, 2).clearContent();
+    }
+
+    return { success: true };
+  } catch (err) {
+    Logger.log('saveDayTodos error: ' + err.toString());
     return { error: err.toString() };
   }
 }
