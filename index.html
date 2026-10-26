@@ -1060,6 +1060,106 @@ select.sem-input{cursor:pointer}
 /* colour swatches */
 .colour-swatches{display:flex;gap:5px;flex-wrap:wrap}
 .cs-dot{width:22px;height:22px;border-radius:4px;cursor:pointer;transition:all 0.12s;display:flex;align-items:center;justify-content:center;border:2px solid transparent}
+/* ── DAY PANEL (per-day summary + to-do list) ── */
+.sched-day-label{cursor:pointer}
+.sched-day-label:hover .sched-date{color:var(--green)}
+.day-todo-badge{
+  margin-top:3px;display:inline-flex;align-items:center;gap:2px;padding:0 4px;height:13px;
+  border-radius:7px;font-size:9px;font-weight:700;font-family:'Inter',sans-serif;
+  background:var(--amber-light);color:var(--amber);border:1px solid #FDE68A;line-height:1;
+}
+.day-todo-badge.all-done{background:var(--green-light);color:var(--green);border-color:var(--green-border)}
+.dayp-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.32);z-index:400;backdrop-filter:blur(2px)}
+.dayp-bg.open{display:block}
+.dayp{
+  position:fixed;top:0;right:0;bottom:0;width:392px;max-width:100%;background:var(--white);
+  z-index:401;display:none;flex-direction:column;box-shadow:var(--shadow-lg);
+}
+.dayp-bg.open .dayp{display:flex}
+.dayp-hd{display:flex;align-items:center;gap:8px;padding:12px 14px;background:var(--sage);flex-shrink:0}
+.dayp-hd-txt{flex:1;min-width:0}
+.dayp-title{font-size:14px;font-weight:600;color:#fff;letter-spacing:-0.2px}
+.dayp-sub{font-size:11px;color:rgba(255,255,255,0.55);margin-top:1px}
+.dayp-today-pill{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:9px;background:rgba(255,255,255,0.2);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;vertical-align:1px}
+.dayp-nav{width:26px;height:26px;border-radius:var(--radius-xs);border:1px solid rgba(255,255,255,0.18);background:none;color:rgba(255,255,255,0.7);font-size:15px;line-height:1;cursor:pointer;flex-shrink:0;transition:all 0.12s}
+.dayp-nav:hover{background:rgba(255,255,255,0.1);color:#fff}
+.dayp-close{background:none;border:none;color:rgba(255,255,255,0.5);font-size:21px;line-height:1;cursor:pointer;padding:0 2px;flex-shrink:0}
+.dayp-close:hover{color:#fff}
+.dayp-body{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:16px}
+.dayp-sec-hd{display:flex;align-items:center;gap:7px;margin-bottom:8px}
+.dayp-sec-title{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em}
+.dayp-sec-count{font-size:10px;color:var(--hint);font-family:'JetBrains Mono',monospace}
+.dayp-hint{font-size:11px;color:var(--amber);background:var(--amber-light);border:1px solid #FDE68A;border-radius:var(--radius-xs);padding:5px 8px;margin-bottom:8px}
+.dayp-group{margin-bottom:10px}
+.dayp-group-hd{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.dayp-group-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.dayp-group-lbl{font-size:11px;font-weight:600;color:var(--text)}
+.dayp-item{
+  display:flex;gap:8px;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);
+  background:var(--white);cursor:pointer;transition:border-color 0.12s,background 0.12s;margin-bottom:4px;
+}
+.dayp-item:hover{border-color:var(--green-mid);background:var(--green-light)}
+.dayp-item-bar{width:3px;border-radius:2px;flex-shrink:0;background:var(--border-strong)}
+.dayp-item-main{flex:1;min-width:0}
+.dayp-item-name{font-size:13px;font-weight:600;color:var(--text);line-height:1.35;word-break:break-word}
+.dayp-item-label{font-size:12px;color:var(--text);line-height:1.4;margin-top:2px;word-break:break-word}
+.dayp-item-meta{font-size:11px;color:var(--muted);line-height:1.4;margin-top:3px;word-break:break-word}
+.dayp-item-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+.dayp-tag{font-size:9px;font-weight:600;padding:1px 6px;border-radius:9px;background:var(--surface);color:var(--muted);border:1px solid var(--border);text-transform:uppercase;letter-spacing:0.04em}
+.dayp-tag.ok{background:var(--green-light);color:var(--green);border-color:var(--green-border)}
+.dayp-tag.warn{background:var(--amber-light);color:var(--amber);border-color:#FDE68A}
+.dayp-td-row{display:flex;align-items:flex-start;gap:8px;padding:7px 9px;border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:4px;background:var(--white)}
+.dayp-td-row.done{background:var(--surface)}
+.dayp-td-check{
+  width:17px;height:17px;border-radius:4px;border:1.5px solid var(--border-strong);background:var(--white);
+  flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;margin-top:1px;transition:all 0.12s;
+}
+.dayp-td-check:hover{border-color:var(--green-mid)}
+.dayp-td-check.on{background:var(--green-mid);border-color:var(--green-mid)}
+.dayp-td-text{flex:1;min-width:0;font-size:13px;color:var(--text);line-height:1.4;word-break:break-word;cursor:pointer}
+.dayp-td-row.done .dayp-td-text{color:var(--hint);text-decoration:line-through}
+.dayp-td-del{background:none;border:none;color:var(--hint);font-size:16px;line-height:1;cursor:pointer;padding:0 2px;flex-shrink:0}
+.dayp-td-del:hover{color:var(--red)}
+.dayp-td-add{display:flex;gap:6px;margin-top:8px}
+.dayp-td-inp{
+  flex:1;min-width:0;padding:8px 11px;border:1px solid var(--border);border-radius:var(--radius-sm);
+  font-size:13px;font-family:'Inter',sans-serif;color:var(--text);background:var(--white);outline:none;transition:border-color 0.15s;
+}
+.dayp-td-inp:focus{border-color:var(--green-mid)}
+.dayp-td-btn{
+  padding:8px 14px;border:none;border-radius:var(--radius-sm);background:var(--charcoal);color:#fff;
+  font-size:12px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;flex-shrink:0;transition:opacity 0.12s;
+}
+.dayp-td-btn:hover{opacity:0.85}
+.dayp-empty{font-size:12px;color:var(--hint);padding:10px 2px;line-height:1.5}
+.dayp-ft{display:flex;gap:8px;padding:11px 14px;border-top:1px solid var(--border);background:var(--surface);flex-shrink:0}
+.dayp-ft-btn{
+  flex:1;padding:9px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--white);
+  font-size:12px;font-weight:500;font-family:'Inter',sans-serif;color:var(--text);cursor:pointer;transition:all 0.12s;
+}
+.dayp-ft-btn:hover{border-color:var(--green-mid);color:var(--green)}
+/* to-do chip on Tom/Fraser grid tiles — full text, never truncated */
+.sched-chip-todo{
+  display:flex;align-items:flex-start;gap:5px;padding:4px 6px;border-radius:4px;
+  border:1px dashed var(--border-strong);background:var(--surface);cursor:pointer;
+  font-size:10px;line-height:1.35;transition:border-color 0.12s,background 0.12s;
+}
+.sched-chip-todo:hover{border-color:var(--green-mid);background:var(--green-light)}
+.sched-chip-todo.done{opacity:0.6}
+.todo-chip-check{
+  width:12px;height:12px;border-radius:3px;border:1.3px solid var(--border-strong);background:var(--white);
+  flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;margin-top:1.5px;transition:all 0.12s;
+}
+.todo-chip-check:hover{border-color:var(--green-mid)}
+.todo-chip-check.on{background:var(--green-mid);border-color:var(--green-mid)}
+.todo-chip-text{flex:1;min-width:0;color:var(--text);font-weight:500;white-space:normal;word-break:break-word}
+.sched-chip-todo.done .todo-chip-text{color:var(--hint);text-decoration:line-through}
+.todo-chip-del{background:none;border:none;color:var(--hint);font-size:11px;line-height:1;cursor:pointer;padding:0 1px;flex-shrink:0}
+.todo-chip-del:hover{color:var(--red)}
+@media(max-width:600px){
+  .dayp{width:100%}
+  .day-todo-badge{font-size:8px;padding:0 3px;height:12px}
+}
 @media(max-width:600px){
   .sch-day-spacer,.sched-day-label{width:44px}
   .sched-controls{padding:8px 12px}
@@ -1557,6 +1657,26 @@ select.sem-input{cursor:pointer}
     </div>
   </div>
 
+  <!-- DAY PANEL — everything on one day, in full, plus that day's to-do list -->
+  <div class="dayp-bg" id="dayp-bg" onclick="daypBgClick(event)">
+    <div class="dayp">
+      <div class="dayp-hd">
+        <button class="dayp-nav" onclick="daypShift(-1)" title="Previous day">&#8249;</button>
+        <button class="dayp-nav" onclick="daypShift(1)" title="Next day">&#8250;</button>
+        <div class="dayp-hd-txt">
+          <div class="dayp-title" id="dayp-title">Day</div>
+          <div class="dayp-sub" id="dayp-sub"></div>
+        </div>
+        <button class="dayp-close" onclick="daypClose()">&#215;</button>
+      </div>
+      <div class="dayp-body" id="dayp-body"></div>
+      <div class="dayp-ft">
+        <button class="dayp-ft-btn" onclick="daypAddEntry()">+ Add calendar entry</button>
+        <button class="dayp-ft-btn" onclick="daypCopy()">Copy day</button>
+      </div>
+    </div>
+  </div>
+
 </div><!-- /main-screen -->
 
 
@@ -1842,7 +1962,7 @@ let schedViewWeeks= 16;  // chunk size rendered at a time (not user-selectable)
 let schedInfiniteStart = null; // earliest date currently rendered
 let schedInfiniteEnd = null;   // latest date currently rendered
 const SCHED_CHUNK = 16; // weeks per chunk
-let schedCols     = new Set(['tom','fraser','barnetts','sec','kbc','roofer','painter','flooring','flowscreed','plasterer','tonino','scaffold','steel','client-actions','invoices','notes']);
+let schedCols     = new Set(['tom','fraser','barnetts','sec','kbc','roofer','painter','flooring','flowscreed','plasterer','tonino','scaffold','steel','groundworker','windowfitter','client-actions','invoices','notes']);
 let schedEditId   = null;
 let schedEntryType= 'job';
 let schedDragId   = null;
@@ -3365,12 +3485,14 @@ const SCHED_COLS = [
   {id:'kbc',       label:'Bricklayer',      short:'BL',bg:'#EFF6FF', border:'#BFDBFE', text:'#1E40AF', avatar:'#1E40AF', phone:'07548787885'},
   {id:'roofer',    label:'Roofer',          short:'R', bg:'#F5F3FF', border:'#DDD6FE', text:'#5B21B6', avatar:'#5B21B6', phone:'07930529905'},
   {id:'painter',   label:'Painter',         short:'P', bg:'#FDF2F8', border:'#F9A8D4', text:'#9D174D', avatar:'#9D174D', phone:'07849508188'},
-  {id:'flooring',  label:'Carpets/flooring',short:'FL',bg:'#F0FDFA', border:'#99F6E4', text:'#0F766E', avatar:'#0F766E', phone:'07803436643'},
+  {id:'flooring',  label:'Flooring',        short:'FL',bg:'#F0FDFA', border:'#99F6E4', text:'#0F766E', avatar:'#0F766E', phone:'07803436643'},
   {id:'flowscreed',label:'Flowscreed',      short:'FS',bg:'#FFF7ED', border:'#FED7AA', text:'#9A3412', avatar:'#C2410C', phone:'07974185799'},
   {id:'plasterer', label:'Plasterer',       short:'PL',bg:'#F0F9FF', border:'#BAE6FD', text:'#0369A1', avatar:'#0284C7', phone:'07860817415'},
   {id:'tonino',    label:'Tiling',          short:'TL',bg:'#FDF4FF', border:'#E9D5FF', text:'#7E22CE', avatar:'#9333EA', phone:'07803528957'},
   {id:'scaffold',   label:'Scaffolding',       short:'SC',bg:'#FFF7ED', border:'#FDBA74', text:'#9A3412', avatar:'#EA580C', phone:''},
-  {id:'steel',      label:'Steel Fabrication',short:'SF',bg:'#F1F5F9', border:'#94A3B8', text:'#1E293B', avatar:'#475569', phone:''},
+  {id:'steel',      label:'Steels',          short:'SF',bg:'#F1F5F9', border:'#94A3B8', text:'#1E293B', avatar:'#475569', phone:''},
+  {id:'groundworker', label:'Groundwork',     short:'GW',bg:'#FAFAF9', border:'#D6D3D1', text:'#44403C', avatar:'#78716C', phone:''},
+  {id:'windowfitter', label:'Windows',        short:'WF',bg:'#ECFEFF', border:'#67E8F9', text:'#155E75', avatar:'#0E7490', phone:''},
   {id:'client-actions', label:'Client Actions', short:'CA', bg:'#FFFBEB', border:'#FDE68A', text:'#92400E', avatar:'#B45309', phone:''},
   {id:'invoices',       label:'Invoices',       short:'INV',bg:'#F0FDF4', border:'#86EFAC', text:'#15803D', avatar:'#16A34A', phone:''},
   {id:'notes',     label:'Notes/Orders',    short:'N', bg:'var(--surface)', border:'var(--border)', text:'var(--muted)', avatar:'#71717A', phone:''},
@@ -3970,22 +4092,28 @@ function schedColWidth(){
   if(n<=2) return 160; if(n<=3) return 140; if(n<=5) return 120; return 100;
 }
 
+// Does this entry show on this date? Shared by the grid and the day panel so
+// both agree about weekend bridging.
+function schedEntryOnDate(e,ds){
+  const s=e.start,en=e.end||e.start;
+  if(ds<s||ds>en) return false;
+  // For multi-day spanning entries, skip weekends — they bridge over silently
+  // But if the entry was deliberately placed ON this weekend day (start===ds or single day), show it
+  const dow=schedParseDate(ds).getDay();
+  if(dow===0||dow===6){
+    // Only show if this entry was explicitly set to include this exact weekend day
+    // i.e. it starts on this day, or it's a single-day entry on this day
+    const isDeliberate = s===ds || (s===ds&&en===ds);
+    if(!isDeliberate) return false;
+  }
+  return true;
+}
+
 function schedEntriesFor(col,ds){
   return schedEntries.filter(e=>{
     if(schedJobFilter && e.jobId !== schedJobFilter) return false;
     if(e.col!==col) return false;
-    const s=e.start,en=e.end||e.start;
-    if(ds<s||ds>en) return false;
-    // For multi-day spanning entries, skip weekends — they bridge over silently
-    // But if the entry was deliberately placed ON this weekend day (start===ds or single day), show it
-    const dow=schedParseDate(ds).getDay();
-    if(dow===0||dow===6){
-      // Only show if this entry was explicitly set to include this exact weekend day
-      // i.e. it starts on this day, or it's a single-day entry on this day
-      const isDeliberate = s===ds || (s===ds&&en===ds);
-      if(!isDeliberate) return false;
-    }
-    return true;
+    return schedEntryOnDate(e,ds);
   });
 }
 
@@ -4075,6 +4203,23 @@ function schedRenderUnscheduled(dates){
   }
 }
 
+// Virtual invoice entries derived from each job's paymentLinks — never stored,
+// rebuilt on every render so they always match the job's payment dates.
+const _INV_SLOT_NAMES={'4':['Deposit','Stage 2','Stage 3','Stage 4','Final payment'],'2':['Deposit','Final payment']};
+function schedVirtualInvoices(){
+  const out=[];
+  jobs.forEach(job=>{
+    const pl=job.paymentLinks;
+    if(!pl||!Array.isArray(pl.invoiceDates)) return;
+    const slotNames=_INV_SLOT_NAMES[pl.mode]||['Deposit','Final payment'];
+    pl.invoiceDates.forEach((ds,i)=>{
+      if(!ds) return;
+      out.push({id:'vinv-'+job.id+'-'+i,col:'invoices',jobId:job.id,text:slotNames[i]||'Invoice '+(i+1),start:ds,end:ds,virtual:true});
+    });
+  });
+  return out;
+}
+
 function schedRender(){
   if(!schedViewStart) return;
   document.documentElement.style.setProperty('--sched-row-h', '52px');
@@ -4094,17 +4239,7 @@ function schedRender(){
     ' — '+last.getDate()+' '+SMONTHS_S[last.getMonth()]+' '+last.getFullYear();
 
   // Build virtual invoice entries from each job's paymentLinks — no manual entry needed
-  const _invSlotNames={'4':['Deposit','Stage 2','Stage 3','Stage 4','Final payment'],'2':['Deposit','Final payment']};
-  const virtualInvEntries=[];
-  jobs.forEach(job=>{
-    const pl=job.paymentLinks;
-    if(!pl||!Array.isArray(pl.invoiceDates)) return;
-    const slotNames=_invSlotNames[pl.mode]||['Deposit','Final payment'];
-    pl.invoiceDates.forEach((ds,i)=>{
-      if(!ds) return;
-      virtualInvEntries.push({id:'vinv-'+job.id+'-'+i,col:'invoices',jobId:job.id,text:slotNames[i]||'Invoice '+(i+1),start:ds,end:ds,virtual:true});
-    });
-  });
+  const virtualInvEntries=schedVirtualInvoices();
 
   const activeCols=schedActiveCols();
   const colW=schedColWidth();
@@ -4125,11 +4260,13 @@ function schedRender(){
     const isToday=ds===today;
     const isMonthStart=d.getDate()===1;
     html+=`<div class="sched-day-row${isWE?' is-weekend':''}${isToday?' is-today':''}">`;
-    html+=`<div class="sched-day-label">
+    const tdc=daypTodoCounts(ds);
+    html+=`<div class="sched-day-label" onclick="daypOpen('${ds}')" title="Open day view">
       ${isMonthStart?`<div class="sched-month-marker">${SMONTHS_S[d.getMonth()].toUpperCase()}</div>`:''}
       <div class="sched-dow">${SDOW_S[dow]}</div>
       <div class="sched-date">${d.getDate()}</div>
       ${!isMonthStart?`<div class="sched-mon">${SMONTHS_S[d.getMonth()]}</div>`:''}
+      ${tdc.total?`<div class="day-todo-badge${tdc.open?'':' all-done'}" title="${tdc.open?tdc.open+' to-do item'+(tdc.open!==1?'s':'')+' outstanding':'All '+tdc.total+' to-dos done'}">${tdc.open?tdc.open+'&#9744;':'&#10003;'}</div>`:''}
     </div>`;
     activeCols.forEach(col=>{
       const cellEntries=schedEntriesFor(col.id,ds);
@@ -4193,6 +4330,11 @@ html+=`<div class="chip-resize-wrap" data-id="${e.id}">
           </button>`:''}
         </div>`;
       });
+      // Day to-dos aren't tied to a trade — show them in full on both Tom's
+      // and Fraser's tiles so they're visible without opening the day panel.
+      if(col.id==='tom'||col.id==='fraser'){
+        daypTodos(ds).forEach(t=>{ html+=schedTodoChipHtml(t); });
+      }
       html+=`<button class="sched-cell-add" onclick="event.stopPropagation();schedOpenModal('${col.id}','${ds}')" title="Add">+</button>`;
       html+='</div>';
     });
@@ -4220,7 +4362,7 @@ function schedRenderFooter(dates){
   const dateSet=new Set(dates.map(d=>schedDateStr(d)));
   const counts={};
   schedEntries.forEach(e=>{
-    if(e.col==='notes') return;
+    if(e.col==='notes'||e.col===TODO_COL) return;
     if(schedJobFilter && e.jobId !== schedJobFilter) return;
     const c=new Date(e.start+'T12:00:00');
     const en=e.end||e.start;
@@ -4237,7 +4379,7 @@ function schedRenderFooter(dates){
       <div class="sf-dot" style="background:${c.avatar}"></div>
       <span>${c.label}: ${counts[c.id]||0} day${(counts[c.id]||0)!==1?'s':''}</span>
     </div>`).join('')+
-    `<span style="margin-left:auto;color:var(--hint);font-size:11px">${schedEntries.filter(e=>!e.isPlaceholder).length} entries · Drag to reschedule</span>`;
+    `<span style="margin-left:auto;color:var(--hint);font-size:11px">${schedEntries.filter(e=>!e.isPlaceholder&&e.col!==TODO_COL).length} entries · Drag to reschedule</span>`;
 }
 
 // ─── DRAG & DROP ───
@@ -4602,6 +4744,286 @@ function semSave(){
 function semClose(){ document.getElementById('sem-modal').classList.remove('open'); schedEditId=null; }
 function semBgClick(ev){ if(ev.target===document.getElementById('sem-modal')) semClose(); }
 
+// ══════════════════════════════════════════════════════════════════════════
+//  DAY PANEL — one day in full, plus that day's to-do list
+//
+//  To-dos live in schedEntries with col/type 'todo' so they ride the existing
+//  getSchedule/saveSchedule sync (no sheet or Code.gs change). 'todo' is not a
+//  grid column, so they never render as chips — only here and as the small
+//  count badge on the day number.
+// ══════════════════════════════════════════════════════════════════════════
+const TODO_COL='todo';
+let daypDate=null;
+
+const DAYP_DOW=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const DAYP_MON=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAYP_MON_S=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function daypTodos(ds){
+  return schedEntries.filter(e=>e.col===TODO_COL&&e.start===ds);
+}
+function daypTodoCounts(ds){
+  const t=daypTodos(ds);
+  const done=t.filter(e=>e.done).length;
+  return {total:t.length, done, open:t.length-done};
+}
+
+// Full-text to-do chip rendered directly on Tom's and Fraser's grid tiles —
+// unlike a normal sched-chip it never truncates, since the whole point is
+// to be readable at a glance without opening the day panel.
+function schedTodoChipHtml(t){
+  return `<div class="sched-chip-todo${t.done?' done':''}" onclick="event.stopPropagation();daypOpen('${t.start}')" title="Click to open day view">
+    <button class="todo-chip-check${t.done?' on':''}" onclick="event.stopPropagation();daypToggleTodo('${t.id}')" title="${t.done?'Mark not done':'Mark done'}">
+      ${t.done?'<svg width="7" height="6" viewBox="0 0 7 6" fill="none"><polyline points="0.8 3 2.5 4.7 6.2 0.8" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>':''}
+    </button>
+    <span class="todo-chip-text">${esc(t.text||'')}</span>
+    <button class="todo-chip-del" onclick="event.stopPropagation();daypDeleteTodo('${t.id}')" title="Delete">&#215;</button>
+  </div>`;
+}
+
+// Everything scheduled on this date, ignoring the job filter and the column
+// toggles — the point of the panel is the complete picture of the day.
+function daypEntriesOn(ds){
+  const real=schedEntries.filter(e=>e.col!==TODO_COL&&schedEntryOnDate(e,ds));
+  const virt=schedVirtualInvoices().filter(e=>schedEntryOnDate(e,ds));
+  return [...real,...virt];
+}
+
+function daypOpen(ds){
+  daypDate=ds;
+  daypRender();
+  document.getElementById('dayp-bg').classList.add('open');
+}
+function daypClose(){ document.getElementById('dayp-bg').classList.remove('open'); daypDate=null; }
+function daypBgClick(ev){ if(ev.target===document.getElementById('dayp-bg')) daypClose(); }
+function daypShift(dir){
+  if(!daypDate) return;
+  const d=schedParseDate(daypDate);
+  d.setDate(d.getDate()+dir);
+  daypDate=schedDateStr(d);
+  daypRender();
+}
+function daypAddEntry(){ const ds=daypDate; daypClose(); schedOpenModal(null,ds); }
+
+function daypFmtShort(ds){
+  const d=schedParseDate(ds);
+  return d.getDate()+' '+DAYP_MON_S[d.getMonth()];
+}
+// "Day 2 of 4" for a spanning entry, plus its date range
+function daypSpanInfo(e,ds){
+  const start=e.start, end=e.end||e.start;
+  if(start===end) return '';
+  const total=Math.round((schedParseDate(end)-schedParseDate(start))/86400000)+1;
+  const idx=Math.round((schedParseDate(ds)-schedParseDate(start))/86400000)+1;
+  return 'Day '+idx+' of '+total+' · '+daypFmtShort(start)+' – '+daypFmtShort(end);
+}
+
+function daypRender(){
+  if(!daypDate) return;
+  const ds=daypDate;
+  const d=schedParseDate(ds);
+  const isToday=ds===schedDateStr(new Date());
+  const entries=daypEntriesOn(ds);
+  const todos=daypTodos(ds);
+  const tdc=daypTodoCounts(ds);
+
+  document.getElementById('dayp-title').innerHTML=
+    DAYP_DOW[d.getDay()]+' '+d.getDate()+' '+DAYP_MON[d.getMonth()]+
+    (isToday?'<span class="dayp-today-pill">Today</span>':'');
+  document.getElementById('dayp-sub').textContent=
+    d.getFullYear()+' · '+entries.length+' scheduled'+(tdc.total?' · '+tdc.open+' to-do outstanding':'');
+
+  // ── Scheduled: grouped by column, in grid order ──
+  const allCols=contractorsAllCols();
+  const order={}; allCols.forEach((c,i)=>order[c.id]=i);
+  const groups={};
+  entries.forEach(e=>{ (groups[e.col]=groups[e.col]||[]).push(e); });
+  const groupIds=Object.keys(groups).sort((a,b)=>(order[a]??99)-(order[b]??99));
+
+  let schedHtml='';
+  if(!entries.length){
+    schedHtml=`<div class="dayp-empty">Nothing on the calendar for this day.</div>`;
+  } else {
+    groupIds.forEach(colId=>{
+      const col=allCols.find(c=>c.id===colId);
+      const label=col?col.label:colId;
+      const dot=col?col.avatar:'var(--border-strong)';
+      schedHtml+=`<div class="dayp-group">
+        <div class="dayp-group-hd">
+          <div class="dayp-group-dot" style="background:${dot}"></div>
+          <span class="dayp-group-lbl">${esc(label)}</span>
+          <span class="dayp-sec-count">${groups[colId].length}</span>
+        </div>`;
+      groups[colId].forEach(e=>{ schedHtml+=daypItemHtml(e,ds,col); });
+      schedHtml+=`</div>`;
+    });
+  }
+
+  // ── To-do list ──
+  let todoHtml=todos.map(t=>`
+    <div class="dayp-td-row${t.done?' done':''}">
+      <button class="dayp-td-check${t.done?' on':''}" onclick="daypToggleTodo('${t.id}')" title="${t.done?'Mark not done':'Mark done'}">
+        ${t.done?'<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><polyline points="1 4 3.6 6.6 9 1.2" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>':''}
+      </button>
+      <div class="dayp-td-text" onclick="daypToggleTodo('${t.id}')">${esc(t.text||'')}</div>
+      <button class="dayp-td-del" onclick="daypDeleteTodo('${t.id}')" title="Delete">&#215;</button>
+    </div>`).join('');
+  if(!todos.length) todoHtml=`<div class="dayp-empty">No to-do items for this day yet — add one below.</div>`;
+
+  const draft=document.getElementById('dayp-td-inp')?.value||'';
+  const hadFocus=document.activeElement&&document.activeElement.id==='dayp-td-inp';
+
+  document.getElementById('dayp-body').innerHTML=`
+    <div>
+      <div class="dayp-sec-hd">
+        <span class="dayp-sec-title">Scheduled</span>
+        <span class="dayp-sec-count">${entries.length}</span>
+      </div>
+      ${schedJobFilter?`<div class="dayp-hint">A job filter is on in the calendar — this panel still shows every job for the day.</div>`:''}
+      ${schedHtml}
+    </div>
+    <div>
+      <div class="dayp-sec-hd">
+        <span class="dayp-sec-title">To-do</span>
+        <span class="dayp-sec-count">${tdc.total?tdc.done+' of '+tdc.total+' done':''}</span>
+      </div>
+      ${todoHtml}
+      <div class="dayp-td-add">
+        <input class="dayp-td-inp" id="dayp-td-inp" placeholder="Add a to-do for this day…" value="${esc(draft)}"
+          onkeydown="if(event.key==='Enter')daypAddTodo()"/>
+        <button class="dayp-td-btn" onclick="daypAddTodo()">Add</button>
+      </div>
+    </div>`;
+
+  if(hadFocus){
+    const inp=document.getElementById('dayp-td-inp');
+    if(inp){ inp.focus(); inp.setSelectionRange(inp.value.length,inp.value.length); }
+  }
+}
+
+function daypItemHtml(e,ds,col){
+  const job=e.jobId?jobs.find(x=>x.id===e.jobId):null;
+  const isNote=e.col==='notes'||e.type==='note';
+  const bar=(()=>{
+    if(e.colour){ const cl=JOB_COLOURS_S.find(c=>c.id===e.colour); if(cl) return cl.border; }
+    return col?col.avatar:'var(--border-strong)';
+  })();
+
+  if(e.virtual){
+    const jn=job?(job.name||job.client||''):'';
+    return `<div class="dayp-item" style="cursor:${job?'pointer':'default'}"
+      ${job?`onclick="daypClose();openJob('${job.id}')"`:''}>
+      <div class="dayp-item-bar" style="background:#16A34A"></div>
+      <div class="dayp-item-main">
+        <div class="dayp-item-name">&pound; ${esc(e.text||'Invoice')}</div>
+        ${jn?`<div class="dayp-item-meta">${esc(jn)}${job&&job.client?' · '+esc(job.client):''}</div>`:''}
+        <div class="dayp-item-tags"><span class="dayp-tag">from payment links</span></div>
+      </div>
+    </div>`;
+  }
+
+  const name=job?(job.name||job.client||'Untitled job'):(e.text||'—');
+  const label=(job&&e.text)?e.text:'';
+  const metaBits=[];
+  if(job){
+    if(job.client) metaBits.push(job.client);
+    if(job.address) metaBits.push(job.address);
+    if(job.ref) metaBits.push(job.ref);
+  }
+  const span=daypSpanInfo(e,ds);
+
+  const tags=[];
+  if(isNote) tags.push(`<span class="dayp-tag">note / order</span>`);
+  if(e.isPlaceholder) tags.push(`<span class="dayp-tag warn">auto from job start date</span>`);
+  const isContractor=e.col!=='tom'&&e.col!=='fraser'&&!isNote;
+  if(isContractor) tags.push(e.confirmed
+    ? `<span class="dayp-tag ok">dates confirmed</span>`
+    : `<span class="dayp-tag warn">not confirmed</span>`);
+
+  return `<div class="dayp-item" onclick="daypClose();schedOpenEdit('${e.id}')" title="Click to edit this entry">
+    <div class="dayp-item-bar" style="background:${bar}"></div>
+    <div class="dayp-item-main">
+      <div class="dayp-item-name">${esc(name)}</div>
+      ${label?`<div class="dayp-item-label">${esc(label)}</div>`:''}
+      ${metaBits.length?`<div class="dayp-item-meta">${esc(metaBits.join(' · '))}</div>`:''}
+      ${span?`<div class="dayp-item-meta">${esc(span)}</div>`:''}
+      ${tags.length?`<div class="dayp-item-tags">${tags.join('')}</div>`:''}
+    </div>
+  </div>`;
+}
+
+function daypAddTodo(){
+  const inp=document.getElementById('dayp-td-inp');
+  const text=(inp?.value||'').trim();
+  if(!daypDate) return;
+  if(!text){ showToast('Type a to-do first'); if(inp) inp.focus(); return; }
+  schedEntries.push({
+    id:genId(), col:TODO_COL, type:'todo', text, done:false,
+    start:daypDate, end:daypDate, jobId:'', updatedAt:Date.now()
+  });
+  if(inp) inp.value='';
+  schedSaveToAPI();
+  daypRender();
+  schedRender();
+  const inp2=document.getElementById('dayp-td-inp'); if(inp2) inp2.focus();
+}
+
+function daypToggleTodo(id){
+  const idx=schedEntries.findIndex(x=>x.id===id); if(idx<0) return;
+  const done=!schedEntries[idx].done;
+  schedEntries[idx]={...schedEntries[idx], done, doneAt:done?Date.now():null, updatedAt:Date.now()};
+  schedSaveToAPI();
+  daypRender();
+  schedRender();
+}
+
+function daypDeleteTodo(id){
+  schedEntries=schedEntries.filter(x=>x.id!==id);
+  schedSaveToAPI();
+  daypRender();
+  schedRender();
+  showToast('To-do removed');
+}
+
+// Plain-text summary of the day — for pasting into WhatsApp or an email
+function daypCopy(){
+  if(!daypDate) return;
+  const ds=daypDate, d=schedParseDate(ds);
+  const allCols=contractorsAllCols();
+  const entries=daypEntriesOn(ds);
+  const todos=daypTodos(ds);
+  let txt=DAYP_DOW[d.getDay()]+' '+d.getDate()+' '+DAYP_MON[d.getMonth()]+' '+d.getFullYear()+'\n';
+  if(entries.length){
+    txt+='\nSCHEDULED\n';
+    const order={}; allCols.forEach((c,i)=>order[c.id]=i);
+    [...entries].sort((a,b)=>(order[a.col]??99)-(order[b.col]??99)).forEach(e=>{
+      const col=allCols.find(c=>c.id===e.col);
+      const job=e.jobId?jobs.find(x=>x.id===e.jobId):null;
+      const name=e.virtual?(e.text||'Invoice'):(job?(job.name||job.client||'Untitled job'):(e.text||'—'));
+      const extra=[];
+      if(job&&e.text&&!e.virtual) extra.push(e.text);
+      if(job&&job.client) extra.push(job.client);
+      txt+='• '+(col?col.label:e.col)+' — '+name+(extra.length?' ('+extra.join(', ')+')':'')+'\n';
+    });
+  } else {
+    txt+='\nNothing scheduled\n';
+  }
+  if(todos.length){
+    txt+='\nTO-DO\n';
+    todos.forEach(t=>{ txt+=(t.done?'[x] ':'[ ] ')+(t.text||'')+'\n'; });
+  }
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(()=>showToast('Day copied!')).catch(()=>_fallbackCopy(txt));
+  } else {
+    _fallbackCopy(txt);
+  }
+}
+
+// Esc closes the day panel
+document.addEventListener('keydown', ev=>{
+  if(ev.key==='Escape'&&document.getElementById('dayp-bg')?.classList.contains('open')) daypClose();
+});
+
 // ─── INIT ───
 // ══════════════════════════════════════════════════════════════════════════
 //  NOTIFICATIONS
@@ -4843,7 +5265,7 @@ async function loadClientViewLive(jobId){
     }
     const allEntries=(schedData.entries||[]).filter(e=>e.jobId===jobId&&!e.isPlaceholder);
     const clientActionEntries=allEntries.filter(e=>e.col==='client-actions');
-    const schedEntries=allEntries.filter(e=>e.col!=='notes'&&e.col!=='client-actions');
+    const schedEntries=allEntries.filter(e=>e.col!=='notes'&&e.col!=='client-actions'&&e.col!=='todo');
     const usedColIds=[...new Set(schedEntries.map(e=>e.col))];
     const cols=contractorsAllCols().filter(c=>usedColIds.includes(c.id)&&c.id!=='notes'&&c.id!=='client-actions')
       .map(c=>({id:c.id,label:c.label,bg:c.bg,text:c.text}));
