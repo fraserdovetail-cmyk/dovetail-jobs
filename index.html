@@ -5005,18 +5005,36 @@ function daypBuildSummaryText(ds){
   if(entries.length){
     txt+='\nSCHEDULED\n';
     const order={}; allCols.forEach((c,i)=>order[c.id]=i);
-    const seenJobAddr=new Set(); // only print a job's site address the first time it comes up today
-    [...entries].sort((a,b)=>(order[a.col]??99)-(order[b.col]??99)).forEach(e=>{
+    const sorted=[...entries].sort((a,b)=>(order[a.col]??99)-(order[b.col]??99));
+
+    // Group by job so the job's title and address lead each block, with the
+    // trades/tasks for that site underneath — reads site by site rather than
+    // repeating the job name and address on every single line.
+    const jobBlocks=[]; const jobIdx={}; const looseLines=[];
+    sorted.forEach(e=>{
       const col=allCols.find(c=>c.id===e.col);
+      const colLabel=col?col.label:e.col;
       const job=e.jobId?jobs.find(x=>x.id===e.jobId):null;
-      const name=e.virtual?(e.text||'Invoice'):(job?(job.name||job.client||'Untitled job'):(e.text||'—'));
-      const extra=[];
-      if(job&&e.text&&!e.virtual) extra.push(e.text);
-      if(job&&job.client) extra.push(job.client);
-      const showAddr=job&&job.address&&!seenJobAddr.has(job.id);
-      if(showAddr) seenJobAddr.add(job.id);
-      txt+='• '+(col?col.label:e.col)+' — '+name+(extra.length?' ('+extra.join(', ')+')':'')+(showAddr?'\n   📍 '+job.address:'')+'\n';
+      if(!job){
+        looseLines.push('• '+colLabel+' — '+(e.text||'—'));
+        return;
+      }
+      let idx=jobIdx[job.id];
+      if(idx===undefined){ idx=jobBlocks.length; jobIdx[job.id]=idx; jobBlocks.push({job,lines:[]}); }
+      const line=e.virtual?('£ '+(e.text||'Invoice')):(e.text||'');
+      jobBlocks[idx].lines.push('• '+colLabel+(line?' — '+line:''));
     });
+
+    jobBlocks.forEach(b=>{
+      const title=b.job.name||b.job.client||'Untitled job';
+      txt+='\n*'+title+'*'+(b.job.client?' — '+b.job.client:'')+'\n';
+      if(b.job.address) txt+='📍 '+b.job.address+'\n';
+      b.lines.forEach(l=>{ txt+=l+'\n'; });
+    });
+    if(looseLines.length){
+      txt+='\n*Other*\n';
+      looseLines.forEach(l=>{ txt+=l+'\n'; });
+    }
   } else {
     txt+='\nNothing scheduled\n';
   }
