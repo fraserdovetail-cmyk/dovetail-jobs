@@ -178,6 +178,7 @@ body{min-height:100vh;overflow-x:hidden}
 .tab{padding:11px 16px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all 0.15s;user-select:none}
 .tab:hover{color:var(--sage)}
 .tab.active{color:var(--sage-dark);border-bottom-color:var(--sage)}
+@media(max-width:420px){.tab{padding:11px 11px}}
 .tab-badge{display:inline-block;background:var(--surface);color:var(--hint);border-radius:10px;padding:1px 6px;font-size:11px;margin-left:4px;font-family:'JetBrains Mono',monospace}
 .tab.active .tab-badge{background:var(--sage-light);color:var(--sage-dark)}
 
@@ -1150,6 +1151,36 @@ select.sem-input{cursor:pointer}
   font-size:12px;font-weight:500;font-family:'Inter',sans-serif;color:var(--text);cursor:pointer;transition:all 0.12s;white-space:nowrap;
 }
 .dayp-ft-btn:hover{border-color:var(--green-mid);color:var(--green)}
+/* ── FUN COUPONS TAB ── */
+.cp-wrap{max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+.cp-form{display:flex;flex-direction:column;gap:10px;padding:12px}
+.cp-inp{width:100%;box-sizing:border-box;padding:11px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:16px;font-family:'Inter',sans-serif;color:var(--text);background:var(--white);outline:none}
+.cp-inp:focus{border-color:var(--green-mid)}
+.cp-form-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.cp-qty{display:flex;align-items:center;border:1px solid var(--border);border-radius:22px;overflow:hidden;background:var(--white)}
+.cp-qty-btn{width:44px;height:40px;border:none;background:none;font-size:20px;color:var(--text);cursor:pointer}
+.cp-qty-btn:active{background:var(--surface)}
+.cp-qty-val{min-width:28px;text-align:center;font-size:16px;font-weight:600;font-family:'JetBrains Mono',monospace}
+.cp-to{display:flex;gap:6px}
+.cp-to .dayp-td-assign-btn{padding:8px 13px;font-size:13px;border-radius:18px}
+.cp-add{min-height:46px;border:none;border-radius:var(--radius-sm);background:var(--green-mid);color:#fff;font-size:15px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer}
+.cp-add:active{opacity:0.85}
+.cp-tally{display:flex;flex-wrap:wrap;gap:6px}
+.cp-tally:empty{display:none}
+.cp-tally-chip{padding:6px 12px;border-radius:16px;background:var(--amber-light);border:1px solid #FDE68A;color:var(--amber);font-size:13px;font-weight:500}
+.cp-tally-chip b{margin-left:3px;font-family:'JetBrains Mono',monospace}
+.cp-hd-count{font-size:12px;font-weight:600;color:var(--muted)}
+.cp-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--border)}
+.cp-row:last-child{border-bottom:none}
+.cp-qty-badge{width:38px;height:38px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--amber-light);border:1px dashed var(--amber-border);color:var(--amber);font-size:14px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.cp-main{flex:1;min-width:0}
+.cp-name{font-size:15px;font-weight:600;color:var(--text);word-break:break-word}
+.cp-reason{font-size:13px;color:var(--text);margin-top:1px;word-break:break-word}
+.cp-meta{font-size:11px;color:var(--hint);margin-top:3px}
+.cp-redeem{flex-shrink:0;padding:9px 12px;border:1px solid var(--green-border);border-radius:18px;background:var(--green-light);color:var(--green);font-size:12px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer}
+.cp-redeem.undo{background:var(--white);border-color:var(--border);color:var(--muted)}
+.cp-row.redeemed .cp-qty-badge{background:var(--surface);border-color:var(--border);color:var(--hint)}
+.cp-row.redeemed .cp-name,.cp-row.redeemed .cp-reason{color:var(--hint);text-decoration:line-through}
 /* ── TO-DO LIST (dashboard backlog) ── */
 .bl-count{display:inline-block;min-width:18px;padding:0 6px;margin-left:4px;border-radius:9px;background:var(--charcoal);color:#fff;font-size:10px;line-height:18px;text-align:center;letter-spacing:0}
 .bl-count:empty{display:none}
@@ -1505,6 +1536,7 @@ body.bl-lock{overflow:hidden}
     <div class="tab active" onclick="switchTab('dashboard',this)">Dashboard</div>
     <div class="tab" onclick="switchTab('jobs',this)">Jobs <span class="tab-badge" id="tb-jobs">0</span></div>
     <div class="tab" onclick="switchTab('pipeline',this)">Pipeline</div>
+    <div class="tab" onclick="switchTab('coupons',this)">Fun coupons <span class="tab-badge" id="tb-coupons">0</span></div>
   </div>
 
   <!-- DASHBOARD -->
@@ -1649,6 +1681,46 @@ body.bl-lock{overflow:hidden}
   <div id="tab-pipeline" style="display:none">
     <div class="pipeline-scroll">
       <div class="pipeline" id="pipeline"></div>
+    </div>
+  </div>
+
+  <!-- FUN COUPONS -->
+  <div class="content" id="tab-coupons" style="display:none">
+    <div class="cp-wrap">
+      <div class="dash-panel">
+        <div class="dash-panel-hd"><span class="dash-panel-title">Log a fun coupon owed</span></div>
+        <div class="cp-form">
+          <input class="cp-inp" id="cp-name" list="cp-names" placeholder="Who owes us?" autocomplete="off" enterkeyhint="next"
+            onkeydown="if(event.key==='Enter'){event.preventDefault();document.getElementById('cp-reason').focus()}"/>
+          <datalist id="cp-names"></datalist>
+          <input class="cp-inp" id="cp-reason" placeholder="What for? (optional)" autocomplete="off" enterkeyhint="done"
+            onkeydown="if(event.key==='Enter'){event.preventDefault();cpAdd()}"/>
+          <div class="cp-form-row">
+            <div class="cp-qty">
+              <button class="cp-qty-btn" onclick="cpQty(-1)" aria-label="Fewer">&minus;</button>
+              <span class="cp-qty-val" id="cp-qty-val">1</span>
+              <button class="cp-qty-btn" onclick="cpQty(1)" aria-label="More">+</button>
+            </div>
+            <div class="cp-to" id="cp-to"></div>
+          </div>
+          <button class="cp-add" onclick="cpAdd()">Add coupon</button>
+        </div>
+      </div>
+      <div class="cp-tally" id="cp-tally"></div>
+      <div class="dash-panel">
+        <div class="dash-panel-hd">
+          <span class="dash-panel-title">Owed</span>
+          <span class="cp-hd-count" id="cp-owed-count"></span>
+        </div>
+        <div class="dash-panel-body" id="cp-owed"></div>
+      </div>
+      <div class="dash-panel" id="cp-redeemed-panel">
+        <div class="dash-panel-hd" style="cursor:pointer" onclick="cpShowRedeemed=!cpShowRedeemed;cpRender()">
+          <span class="dash-panel-title">Redeemed</span>
+          <span class="cp-hd-count" id="cp-red-count"></span>
+        </div>
+        <div class="dash-panel-body" id="cp-redeemed"></div>
+      </div>
     </div>
   </div>
 
@@ -3313,8 +3385,9 @@ async function saveExtraValue(jobId,extraId,value){
 // ══════════════════════════════════════════════════════════════════════════
 function switchTab(name,el){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); el.classList.add('active');
-  ['dashboard','jobs','pipeline'].forEach(t=>{ document.getElementById('tab-'+t).style.display=t===name?'':'none'; });
+  ['dashboard','jobs','pipeline','coupons'].forEach(t=>{ document.getElementById('tab-'+t).style.display=t===name?'':'none'; });
   if(name==='pipeline') renderPipeline();
+  if(name==='coupons') cpRender();
   if(name==='dashboard'){ renderDashboard(); schedRender(); }
 }
 
@@ -4429,6 +4502,7 @@ html+=`<div class="chip-resize-wrap" data-id="${e.id}">
   schedRenderUnscheduled(dates);
   schedRenderFooter(dates);
   blRender();
+  cpRender();
   // Sync horizontal scroll between header and body
   setTimeout(schedSyncHeaderScroll, 0);
 }
@@ -4464,7 +4538,7 @@ function schedRenderFooter(dates){
       <div class="sf-dot" style="background:${c.avatar}"></div>
       <span>${c.label}: ${counts[c.id]||0} day${(counts[c.id]||0)!==1?'s':''}</span>
     </div>`).join('')+
-    `<span style="margin-left:auto;color:var(--hint);font-size:11px">${schedEntries.filter(e=>!e.isPlaceholder&&e.col!==TODO_COL).length} entries · Drag to reschedule</span>`;
+    `<span style="margin-left:auto;color:var(--hint);font-size:11px">${schedEntries.filter(e=>!e.isPlaceholder&&e.col!==TODO_COL&&e.col!==COUPON_COL).length} entries · Drag to reschedule</span>`;
 }
 
 // ─── DRAG & DROP ───
@@ -5230,6 +5304,101 @@ function blClearDone(){
   schedSaveToAPI();
   blRender();
   showToast('Cleared '+n+' done');
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+//  FUN COUPONS — who owes us a fun coupon, and when they paid up
+//
+//  Stored in schedEntries with col 'coupon' and no start date (like the
+//  to-do list), so they sync via getSchedule/saveSchedule with no Code.gs
+//  change and never appear on the calendar.
+// ══════════════════════════════════════════════════════════════════════════
+const COUPON_COL='coupon';
+let cpQtyVal=1;
+let cpTo='both';          // both | tom | fraser
+let cpShowRedeemed=false;
+
+function cpItems(){ return schedEntries.filter(e=>e.col===COUPON_COL); }
+function cpToName(t){ return t==='tom'?'Tom':t==='fraser'?'Fraser':'Both'; }
+function cpFmtDate(ts){
+  if(!ts) return '';
+  const d=new Date(ts);
+  return d.getDate()+' '+DAYP_MON_S[d.getMonth()]+(d.getFullYear()!==new Date().getFullYear()?' '+d.getFullYear():'');
+}
+
+function cpRender(){
+  const owedEl=document.getElementById('cp-owed'); if(!owedEl) return;
+  const all=cpItems();
+  const owed=all.filter(c=>!c.redeemed).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  const red=all.filter(c=>c.redeemed).sort((a,b)=>(b.redeemedAt||0)-(a.redeemedAt||0));
+  const sum=list=>list.reduce((n,c)=>n+(Number(c.qty)||1),0);
+
+  document.getElementById('tb-coupons').textContent=sum(owed);
+  document.getElementById('cp-owed-count').textContent=owed.length?sum(owed)+' coupon'+(sum(owed)!==1?'s':''):'';
+  document.getElementById('cp-red-count').textContent=(red.length?sum(red)+' · ':'')+(cpShowRedeemed?'hide':'show');
+
+  document.getElementById('cp-to').innerHTML=['both','tom','fraser']
+    .map(t=>`<button class="dayp-td-assign-btn${cpTo===t?' on':''}" onclick="cpTo='${t}';cpRender()">${t==='both'?'Us both':cpToName(t)}</button>`).join('');
+
+  // Who owes the most — biggest debtors first
+  const byName={};
+  owed.forEach(c=>{ const k=(c.name||'').trim(); byName[k]=(byName[k]||0)+(Number(c.qty)||1); });
+  document.getElementById('cp-tally').innerHTML=Object.entries(byName).sort((a,b)=>b[1]-a[1])
+    .map(([n,q])=>`<span class="cp-tally-chip">${esc(n)} <b>${q}</b></span>`).join('');
+
+  // Names already used, for the autocomplete
+  document.getElementById('cp-names').innerHTML=[...new Set(all.map(c=>(c.name||'').trim()).filter(Boolean))]
+    .map(n=>`<option value="${esc(n)}">`).join('');
+
+  const row=c=>`
+    <div class="cp-row${c.redeemed?' redeemed':''}">
+      <div class="cp-qty-badge">&times;${Number(c.qty)||1}</div>
+      <div class="cp-main">
+        <div class="cp-name">${esc(c.name||'')}</div>
+        ${c.text?`<div class="cp-reason">${esc(c.text)}</div>`:''}
+        <div class="cp-meta">${cpFmtDate(c.createdAt)} · to ${c.to==='both'?'us both':cpToName(c.to)}${c.createdBy?' · logged by '+todoOwnerName(c.createdBy):''}${c.redeemed?' · redeemed '+cpFmtDate(c.redeemedAt):''}</div>
+      </div>
+      <button class="cp-redeem${c.redeemed?' undo':''}" onclick="cpToggleRedeemed('${c.id}')">${c.redeemed?'Undo':'Redeemed'}</button>
+      <button class="bl-del" onclick="cpDelete('${c.id}')" aria-label="Delete">&#215;</button>
+    </div>`;
+  owedEl.innerHTML=owed.length?owed.map(row).join(''):'<div class="dash-empty">Nobody owes us a fun coupon… yet</div>';
+  document.getElementById('cp-redeemed').innerHTML=!cpShowRedeemed?'':(red.length?red.map(row).join(''):'<div class="dash-empty">None redeemed yet</div>');
+}
+
+function cpQty(d){ cpQtyVal=Math.max(1,Math.min(99,cpQtyVal+d)); document.getElementById('cp-qty-val').textContent=cpQtyVal; }
+
+function cpAdd(){
+  const nameEl=document.getElementById('cp-name'), reasonEl=document.getElementById('cp-reason');
+  const name=(nameEl.value||'').trim();
+  if(!name){ showToast('Who owes the coupon?'); nameEl.focus(); return; }
+  const now=Date.now();
+  schedEntries.push({
+    id:genId(), col:COUPON_COL, type:'coupon', name, text:(reasonEl.value||'').trim(),
+    qty:cpQtyVal, to:cpTo, createdBy:currentUser(), redeemed:false,
+    start:'', end:'', jobId:'', createdAt:now, updatedAt:now
+  });
+  schedSaveToAPI();
+  nameEl.value=''; reasonEl.value='';
+  cpQtyVal=1; document.getElementById('cp-qty-val').textContent='1';
+  nameEl.blur(); reasonEl.blur();
+  cpRender();
+  showToast(name+' owes us '+(schedEntries[schedEntries.length-1].qty)+' fun coupon'+(schedEntries[schedEntries.length-1].qty!==1?'s':'')+' 🎟️');
+}
+
+function cpToggleRedeemed(id){
+  const idx=schedEntries.findIndex(x=>x.id===id); if(idx<0) return;
+  const redeemed=!schedEntries[idx].redeemed;
+  schedEntries[idx]={...schedEntries[idx], redeemed, redeemedAt:redeemed?Date.now():null, updatedAt:Date.now()};
+  schedSaveToAPI();
+  cpRender();
+  showToast(redeemed?'Coupon redeemed 🎉':'Back on the owed list');
+}
+
+function cpDelete(id){
+  schedEntries=schedEntries.filter(x=>x.id!==id);
+  schedSaveToAPI();
+  cpRender();
+  showToast('Coupon removed');
 }
 
 // Plain-text summary of the day — for pasting into WhatsApp or an email
