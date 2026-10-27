@@ -1120,7 +1120,19 @@ select.sem-input{cursor:pointer}
 .dayp-td-row.done .dayp-td-text{color:var(--hint);text-decoration:line-through}
 .dayp-td-del{background:none;border:none;color:var(--hint);font-size:16px;line-height:1;cursor:pointer;padding:0 2px;flex-shrink:0}
 .dayp-td-del:hover{color:var(--red)}
-.dayp-td-add{display:flex;gap:6px;margin-top:8px}
+.dayp-td-add{display:flex;gap:6px;margin-top:6px}
+.dayp-td-owner{
+  font-size:9px;font-weight:600;padding:2px 7px;border-radius:9px;background:var(--surface);color:var(--muted);
+  border:1px solid var(--border);text-transform:uppercase;letter-spacing:0.04em;cursor:pointer;flex-shrink:0;margin-top:1px;font-family:'Inter',sans-serif;
+}
+.dayp-td-owner:hover{border-color:var(--green-mid);color:var(--green)}
+.dayp-td-assign{display:flex;align-items:center;gap:4px;margin-top:8px;font-size:11px;color:var(--muted)}
+.dayp-td-assign span{margin-right:2px}
+.dayp-td-assign-btn{
+  padding:3px 10px;border:1px solid var(--border);border-radius:12px;background:var(--white);color:var(--muted);
+  font-size:11px;font-weight:500;font-family:'Inter',sans-serif;cursor:pointer;transition:all 0.12s;
+}
+.dayp-td-assign-btn.on{background:var(--charcoal);border-color:var(--charcoal);color:#fff}
 .dayp-td-inp{
   flex:1;min-width:0;padding:8px 11px;border:1px solid var(--border);border-radius:var(--radius-sm);
   font-size:13px;font-family:'Inter',sans-serif;color:var(--text);background:var(--white);outline:none;transition:border-color 0.15s;
@@ -1146,6 +1158,7 @@ select.sem-input{cursor:pointer}
 }
 .sched-chip-todo:hover{border-color:var(--green-mid);background:var(--green-light)}
 .sched-chip-todo.done{opacity:0.6}
+.sched-chip-todo[draggable="true"]{cursor:grab}
 .todo-chip-check{
   width:12px;height:12px;border-radius:3px;border:1.3px solid var(--border-strong);background:var(--white);
   flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;margin-top:1.5px;transition:all 0.12s;
@@ -2021,6 +2034,7 @@ async function doLogin(){
     const d = await r.json();
     if(d.valid){
       sessionStorage.setItem('dtv','1');
+      sessionStorage.setItem('dtv_user', d.user==='fraser'?'fraser':'tom');
       document.getElementById('login-screen').style.display='none';
       document.getElementById('main-screen').style.display='flex';
       init();
@@ -2055,12 +2069,13 @@ document.addEventListener('keydown', e=>{
 });
 function logout(){
   sessionStorage.removeItem('dtv');
+  sessionStorage.removeItem('dtv_user');
   document.getElementById('main-screen').style.display='none';
   document.getElementById('login-screen').style.display='flex';
 }
 // Client / contractor share links — check before login
 if(!initClientView()&&!initContractorView()){
-  if(sessionStorage.getItem('dtv')==='1'){
+  if(sessionStorage.getItem('dtv')==='1'&&sessionStorage.getItem('dtv_user')){
     document.getElementById('login-screen').style.display='none';
     document.getElementById('main-screen').style.display='flex';
     init();
@@ -4335,10 +4350,11 @@ html+=`<div class="chip-resize-wrap" data-id="${e.id}">
           </button>`:''}
         </div>`;
       });
-      // Day to-dos aren't tied to a trade — show them in full on both Tom's
-      // and Fraser's tiles so they're visible without opening the day panel.
+      // Day to-dos show in full on their owner's tile (Tom or Fraser) so
+      // they're visible without opening the day panel. Older to-dos with no
+      // owner show on both.
       if(col.id==='tom'||col.id==='fraser'){
-        daypTodos(ds).forEach(t=>{ html+=schedTodoChipHtml(t); });
+        daypTodos(ds).filter(t=>!t.owner||t.owner===col.id).forEach(t=>{ html+=schedTodoChipHtml(t); });
       }
       html+=`<button class="sched-cell-add" onclick="event.stopPropagation();schedOpenModal('${col.id}','${ds}')" title="Add">+</button>`;
       html+='</div>';
@@ -4506,6 +4522,12 @@ function schedDrop(ev,col,date){
   if(!schedDragId) return;
   const idx=schedEntries.findIndex(x=>x.id===schedDragId); if(idx<0) return;
   const e=schedEntries[idx];
+  if(e.col===TODO_COL){
+    const owner=(col==='tom'||col==='fraser')?col:e.owner;
+    schedEntries[idx]={...e,start:date,end:date,owner,updatedAt:Date.now()};
+    schedSaveToAPI(); schedRender(); if(daypDate) daypRender(); showToast('To-do moved'); schedDragId=null;
+    return;
+  }
   const oldStart=schedParseDate(e.start), oldEnd=e.end?schedParseDate(e.end):oldStart;
   const span=Math.round((oldEnd-oldStart)/86400000);
   const newEnd=new Date(schedParseDate(date)); newEnd.setDate(newEnd.getDate()+span);
@@ -4526,8 +4548,8 @@ function schedInitTouchDrag(){
   }
 
   document.addEventListener('touchstart', ev => {
-    if(ev.target.closest('.chip-confirm,.chip-rm')) return; // let action buttons work
-    const chip = ev.target.closest('.sched-chip'); if(!chip) return;
+    if(ev.target.closest('.chip-confirm,.chip-rm,.todo-chip-check,.todo-chip-del')) return; // let action buttons work
+    const chip = ev.target.closest('.sched-chip,.sched-chip-todo'); if(!chip) return;
     const t = ev.touches[0];
     startX = t.clientX; startY = t.clientY;
     pendingChip = chip;
@@ -4759,6 +4781,20 @@ function semBgClick(ev){ if(ev.target===document.getElementById('sem-modal')) se
 // ══════════════════════════════════════════════════════════════════════════
 const TODO_COL='todo';
 let daypDate=null;
+let daypTodoOwner='tom'; // who a new to-do is for — defaults to whoever is logged in
+
+function currentUser(){ return sessionStorage.getItem('dtv_user')==='fraser'?'fraser':'tom'; }
+function todoOwnerName(u){ return u==='fraser'?'Fraser':'Tom'; }
+function daypSetTodoOwner(u){ daypTodoOwner=u; daypRender(); }
+function daypSwapTodoOwner(id){
+  const idx=schedEntries.findIndex(x=>x.id===id); if(idx<0) return;
+  const owner=schedEntries[idx].owner==='fraser'?'tom':'fraser';
+  schedEntries[idx]={...schedEntries[idx], owner, updatedAt:Date.now()};
+  schedSaveToAPI();
+  daypRender();
+  schedRender();
+  showToast('Assigned to '+todoOwnerName(owner));
+}
 
 const DAYP_DOW=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const DAYP_MON=['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -4777,7 +4813,10 @@ function daypTodoCounts(ds){
 // unlike a normal sched-chip it never truncates, since the whole point is
 // to be readable at a glance without opening the day panel.
 function schedTodoChipHtml(t){
-  return `<div class="sched-chip-todo${t.done?' done':''}" onclick="event.stopPropagation();daypOpen('${t.start}')" title="Click to open day view">
+  return `<div class="sched-chip-todo${t.done?' done':''}" data-id="${t.id}"
+    draggable="${schedIsDesktop()}"
+    ondragstart="event.stopPropagation();schedIsDesktop()&&schedDragStart(event,'${t.id}')"
+    onclick="event.stopPropagation();daypOpen('${t.start}')" title="Click to open day view · drag to move to another day">
     <button class="todo-chip-check${t.done?' on':''}" onclick="event.stopPropagation();daypToggleTodo('${t.id}')" title="${t.done?'Mark not done':'Mark done'}">
       ${t.done?'<svg width="7" height="6" viewBox="0 0 7 6" fill="none"><polyline points="0.8 3 2.5 4.7 6.2 0.8" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>':''}
     </button>
@@ -4796,6 +4835,7 @@ function daypEntriesOn(ds){
 
 function daypOpen(ds){
   daypDate=ds;
+  daypTodoOwner=currentUser();
   daypRender();
   document.getElementById('dayp-bg').classList.add('open');
 }
@@ -4871,6 +4911,7 @@ function daypRender(){
         ${t.done?'<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><polyline points="1 4 3.6 6.6 9 1.2" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>':''}
       </button>
       <div class="dayp-td-text" onclick="daypToggleTodo('${t.id}')">${esc(t.text||'')}</div>
+      ${t.owner?`<button class="dayp-td-owner" onclick="daypSwapTodoOwner('${t.id}')" title="Assigned to ${todoOwnerName(t.owner)} — click to reassign">${todoOwnerName(t.owner)}</button>`:''}
       <button class="dayp-td-del" onclick="daypDeleteTodo('${t.id}')" title="Delete">&#215;</button>
     </div>`).join('');
   if(!todos.length) todoHtml=`<div class="dayp-empty">No to-do items for this day yet — add one below.</div>`;
@@ -4893,6 +4934,10 @@ function daypRender(){
         <span class="dayp-sec-count">${tdc.total?tdc.done+' of '+tdc.total+' done':''}</span>
       </div>
       ${todoHtml}
+      <div class="dayp-td-assign">
+        <span>For</span>
+        ${['tom','fraser'].map(u=>`<button class="dayp-td-assign-btn${daypTodoOwner===u?' on':''}" onclick="daypSetTodoOwner('${u}')">${todoOwnerName(u)}</button>`).join('')}
+      </div>
       <div class="dayp-td-add">
         <input class="dayp-td-inp" id="dayp-td-inp" placeholder="Add a to-do for this day…" value="${esc(draft)}"
           onkeydown="if(event.key==='Enter')daypAddTodo()"/>
@@ -4964,6 +5009,7 @@ function daypAddTodo(){
   if(!text){ showToast('Type a to-do first'); if(inp) inp.focus(); return; }
   schedEntries.push({
     id:genId(), col:TODO_COL, type:'todo', text, done:false,
+    owner:daypTodoOwner, createdBy:currentUser(),
     start:daypDate, end:daypDate, jobId:'', updatedAt:Date.now()
   });
   if(inp) inp.value='';
@@ -5040,7 +5086,7 @@ function daypBuildSummaryText(ds){
   }
   if(todos.length){
     txt+='\nTO-DO\n';
-    todos.forEach(t=>{ txt+=(t.done?'✅ ':'⬜ ')+(t.text||'')+'\n'; });
+    todos.forEach(t=>{ txt+=(t.done?'✅ ':'⬜ ')+(t.text||'')+(t.owner?' ('+todoOwnerName(t.owner)+')':'')+'\n'; });
   }
   txt+='\nDovetail Carpentry & Building';
   return txt;

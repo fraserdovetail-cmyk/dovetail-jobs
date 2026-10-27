@@ -549,13 +549,19 @@ function approveExtra(jobId, extraId, ts) {
 // ════════════════════════════════════════════════════════════════════════════
 //  AUTH — passcode stored in Script Properties, never in source code
 //  To set/change: Apps Script editor → Project Settings → Script Properties
-//                 Add property  PASSCODE  with your chosen value
+//                 Add property  PASSCODE         (Tom's passcode)
+//                 Add property  PASSCODE_FRASER  (Fraser's passcode)
 // ════════════════════════════════════════════════════════════════════════════
 
 function validatePasscode(entered) {
-  const stored = PropertiesService.getScriptProperties().getProperty('PASSCODE');
-  if (!stored) return { error: 'Passcode not configured — set PASSCODE in Script Properties.' };
-  return { valid: (entered || '').trim() === stored.trim() };
+  const props  = PropertiesService.getScriptProperties();
+  const tom    = props.getProperty('PASSCODE');
+  const fraser = props.getProperty('PASSCODE_FRASER');
+  if (!tom) return { error: 'Passcode not configured — set PASSCODE in Script Properties.' };
+  const e = (entered || '').trim();
+  if (e === tom.trim())               return { valid: true, user: 'tom' };
+  if (fraser && e === fraser.trim())  return { valid: true, user: 'fraser' };
+  return { valid: false };
 }
 
 // Run this once from the Apps Script editor (▶ Run) to check what's stored
