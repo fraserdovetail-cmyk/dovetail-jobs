@@ -1150,6 +1150,56 @@ select.sem-input{cursor:pointer}
   font-size:12px;font-weight:500;font-family:'Inter',sans-serif;color:var(--text);cursor:pointer;transition:all 0.12s;white-space:nowrap;
 }
 .dayp-ft-btn:hover{border-color:var(--green-mid);color:var(--green)}
+/* ── TO-DO LIST (dashboard backlog) ── */
+.bl-count{display:inline-block;min-width:18px;padding:0 6px;margin-left:4px;border-radius:9px;background:var(--charcoal);color:#fff;font-size:10px;line-height:18px;text-align:center;letter-spacing:0}
+.bl-count:empty{display:none}
+.bl-hd-btn{padding:7px 12px;border:none;border-radius:16px;background:var(--charcoal);color:#fff;font-size:12px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;flex-shrink:0}
+.bl-filter{display:flex;flex-wrap:wrap;gap:6px;padding:10px 12px 4px}
+.bl-fbtn{padding:5px 11px;border:1px solid var(--border);border-radius:14px;background:var(--white);color:var(--muted);font-size:12px;font-weight:500;font-family:'Inter',sans-serif;cursor:pointer}
+.bl-fbtn.on{background:var(--charcoal);border-color:var(--charcoal);color:#fff}
+.bl-fbtn.bl-clear{margin-left:auto;border-style:dashed}
+#dash-backlog-body{max-height:420px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.bl-row{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--border);min-height:48px}
+.bl-row:last-child{border-bottom:none}
+.bl-row[draggable="true"]{cursor:grab}
+.bl-row.done .bl-text{color:var(--hint);text-decoration:line-through}
+.bl-check{width:24px;height:24px;border-radius:6px;border:1.5px solid var(--border-strong);background:var(--white);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+.bl-check.on{background:var(--green-mid);border-color:var(--green-mid)}
+.bl-text{flex:1;min-width:0;font-size:14px;color:var(--text);line-height:1.35;word-break:break-word}
+.bl-book{position:relative;overflow:hidden;flex-shrink:0;padding:7px 11px;border:1px solid var(--green-border);border-radius:16px;background:var(--green-light);color:var(--green);font-size:12px;font-weight:600;cursor:pointer}
+.bl-book input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:16px}
+.bl-del{background:none;border:none;color:var(--hint);font-size:20px;line-height:1;cursor:pointer;padding:6px 4px;flex-shrink:0}
+.bl-del:hover{color:var(--red)}
+.bl-quick{display:flex;gap:6px;padding:10px 12px;border-top:1px solid var(--border);background:var(--surface)}
+.bl-quick-inp{flex:1;min-width:0;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:16px;font-family:'Inter',sans-serif;color:var(--text);background:var(--white);outline:none}
+.bl-quick-inp:focus{border-color:var(--green-mid)}
+.bl-quick-btn{padding:10px 16px;border:none;border-radius:var(--radius-sm);background:var(--charcoal);color:#fff;font-size:14px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;flex-shrink:0}
+.dayp-td-unbook{background:none;border:none;color:var(--hint);font-size:14px;line-height:1;cursor:pointer;padding:0 2px;flex-shrink:0;margin-top:1px}
+.dayp-td-unbook:hover{color:var(--green)}
+/* quick-add sheet — centred card on desktop, full screen on phones. Save and
+   Cancel sit in the header so the iPhone keyboard can never hide them. */
+.bl-sheet-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.32);z-index:450;backdrop-filter:blur(2px)}
+.bl-sheet-bg.open{display:flex;align-items:center;justify-content:center}
+.bl-sheet{width:min(480px,94vw);max-height:80vh;display:flex;flex-direction:column;background:var(--white);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-lg)}
+.bl-sheet-hd{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border);background:var(--sage-light);flex-shrink:0}
+.bl-sheet-title{flex:1;text-align:center;font-size:15px;font-weight:600;color:var(--text)}
+.bl-sheet-cancel,.bl-sheet-save{min-width:72px;min-height:40px;padding:8px 12px;border-radius:20px;font-size:15px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer}
+.bl-sheet-cancel{border:1px solid var(--border);background:var(--white);color:var(--muted)}
+.bl-sheet-save{border:none;background:var(--green-mid);color:#fff}
+.bl-sheet-save:disabled{opacity:0.4}
+.bl-sheet-body{flex:1;min-height:0;display:flex;flex-direction:column;gap:10px;padding:12px}
+.bl-sheet-assign{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
+.bl-sheet-assign .dayp-td-assign-btn{padding:7px 16px;font-size:14px;border-radius:16px}
+.bl-sheet-ta{flex:1;min-height:180px;width:100%;box-sizing:border-box;resize:none;padding:12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:16px;line-height:1.5;font-family:'Inter',sans-serif;color:var(--text);background:var(--white);outline:none}
+.bl-sheet-ta:focus{border-color:var(--green-mid)}
+.bl-sheet-hint{font-size:12px;color:var(--hint)}
+body.bl-lock{overflow:hidden}
+@media(max-width:640px){
+  .bl-sheet-bg.open{align-items:stretch}
+  .bl-sheet{width:100%;max-height:none;height:100%;height:100dvh;border-radius:0;
+    padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+  .bl-book{padding:8px 12px}
+}
 /* to-do chip on Tom/Fraser grid tiles — full text, never truncated */
 .sched-chip-todo{
   display:flex;align-items:flex-start;gap:5px;padding:4px 6px;border-radius:4px;
@@ -1487,9 +1537,18 @@ select.sem-input{cursor:pointer}
           <div class="dash-panel-hd"><span class="dash-panel-title">Needs quoting</span></div>
           <div class="dash-panel-body" id="dash-quotes-body"><div class="dash-empty">No jobs awaiting quote</div></div>
         </div>
-        <div class="dash-panel" id="dash-chase-panel">
-          <div class="dash-panel-hd"><span class="dash-panel-title">Chase up · quotes 7+ days old</span></div>
-          <div class="dash-panel-body" id="dash-chase-body"><div class="dash-empty">All quotes up to date</div></div>
+        <div class="dash-panel" id="dash-backlog-panel">
+          <div class="dash-panel-hd">
+            <span class="dash-panel-title">To-do list <span id="bl-count" class="bl-count"></span></span>
+            <button class="bl-hd-btn" onclick="blOpenSheet()">+ Add list</button>
+          </div>
+          <div class="bl-filter" id="bl-filter"></div>
+          <div class="dash-panel-body" id="dash-backlog-body"><div class="dash-empty">Nothing on the list</div></div>
+          <div class="bl-quick">
+            <input class="bl-quick-inp" id="bl-quick-inp" placeholder="Quick add — press Enter" enterkeyhint="done" autocomplete="off"
+              onkeydown="if(event.key==='Enter'){event.preventDefault();blQuickAdd()}"/>
+            <button class="bl-quick-btn" onclick="blQuickAdd()">Add</button>
+          </div>
         </div>
       </div>
     </div>
@@ -1675,6 +1734,21 @@ select.sem-input{cursor:pointer}
   </div>
 
   <!-- DAY PANEL — everything on one day, in full, plus that day's to-do list -->
+  <div class="bl-sheet-bg" id="bl-sheet-bg" onclick="if(event.target===this)blCloseSheet()">
+    <div class="bl-sheet">
+      <div class="bl-sheet-hd">
+        <button class="bl-sheet-cancel" onclick="blCloseSheet()">Cancel</button>
+        <div class="bl-sheet-title">Add to-dos</div>
+        <button class="bl-sheet-save" onclick="blSaveSheet()">Save</button>
+      </div>
+      <div class="bl-sheet-body">
+        <div class="bl-sheet-assign" id="bl-sheet-assign"></div>
+        <textarea class="bl-sheet-ta" id="bl-sheet-ta" placeholder="One job per line…&#10;&#10;Fit skirting at no. 12&#10;Pick up hinges&#10;Measure up kitchen" oninput="blSheetCount()"></textarea>
+        <div class="bl-sheet-hint" id="bl-sheet-hint">One to-do per line. Book them onto a day later.</div>
+      </div>
+    </div>
+  </div>
+
   <div class="dayp-bg" id="dayp-bg" onclick="daypBgClick(event)">
     <div class="dayp">
       <div class="dayp-hd">
@@ -2064,6 +2138,7 @@ async function doLogin(){
 
 // Physical keyboard support (desktop)
 document.addEventListener('keydown', e=>{
+  if(document.getElementById('login-screen').style.display==='none') return; // typing in the app, not the PIN pad
   if(e.key>='0'&&e.key<='9') pinPress(e.key);
   else if(e.key==='Backspace') pinDel();
 });
@@ -2073,14 +2148,18 @@ function logout(){
   document.getElementById('main-screen').style.display='none';
   document.getElementById('login-screen').style.display='flex';
 }
-// Client / contractor share links — check before login
-if(!initClientView()&&!initContractorView()){
-  if(sessionStorage.getItem('dtv')==='1'&&sessionStorage.getItem('dtv_user')){
-    document.getElementById('login-screen').style.display='none';
-    document.getElementById('main-screen').style.display='flex';
-    init();
+// Client / contractor share links — check before login.
+// Wait for DOMContentLoaded so every script below has run first — otherwise
+// a refresh while logged in hits SCHED_COLS etc. before they're declared.
+document.addEventListener('DOMContentLoaded',()=>{
+  if(!initClientView()&&!initContractorView()){
+    if(sessionStorage.getItem('dtv')==='1'&&sessionStorage.getItem('dtv_user')){
+      document.getElementById('login-screen').style.display='none';
+      document.getElementById('main-screen').style.display='flex';
+      init();
+    }
   }
-}
+});
 
 // ══════════════════════════════════════════════════════════════════════════
 //  INIT
@@ -2322,7 +2401,6 @@ function renderDashboard(){
   const needsQuoting=jobs.filter(j=>!j.declined&&(j.stage===0||j.stage===1))
     .sort((a,b)=>safeNum(b.created)-safeNum(a.created));
 
-  const chaseList=jobs.filter(j=>!j.declined&&isChaseNeeded(j));
 
   // KPI tiles — replace "starts this week" with "needs quoting"
   document.getElementById('dash-kpis').innerHTML=`
@@ -2428,22 +2506,7 @@ function renderDashboard(){
     quotesBody.innerHTML='<div class="dash-empty">No jobs awaiting quote</div>';
   }
 
-  // Chase up panel
-  const chaseBody=document.getElementById('dash-chase-body');
-  if(chaseList.length){
-    chaseBody.innerHTML=chaseList.map(j=>{
-      const days=daysAtStage(j);
-      return `<div class="chase-item" onclick="openJob('${j.id}')">
-        <div class="chase-dot"></div>
-        <div class="chase-info">
-          <div class="chase-name">${esc(j.name||'Untitled')} — ${esc(j.client||'—')}</div>
-          <div class="chase-meta">${days} day${days!==1?'s':''} since quote${j.value?' · '+fmtVal(j.value):''}</div>
-        </div>
-      </div>`;
-    }).join('');
-  } else {
-    chaseBody.innerHTML='<div class="dash-empty">All quotes up to date</div>';
-  }
+  blRender();
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -4365,6 +4428,7 @@ html+=`<div class="chip-resize-wrap" data-id="${e.id}">
 
   schedRenderUnscheduled(dates);
   schedRenderFooter(dates);
+  blRender();
   // Sync horizontal scroll between header and body
   setTimeout(schedSyncHeaderScroll, 0);
 }
@@ -4911,6 +4975,7 @@ function daypRender(){
         ${t.done?'<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><polyline points="1 4 3.6 6.6 9 1.2" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>':''}
       </button>
       <div class="dayp-td-text" onclick="daypToggleTodo('${t.id}')">${esc(t.text||'')}</div>
+      <button class="dayp-td-unbook" onclick="blUnbook('${t.id}')" title="Not this day — move back to the to-do list">&#8617;</button>
       ${t.owner?`<button class="dayp-td-owner" onclick="daypSwapTodoOwner('${t.id}')" title="Assigned to ${todoOwnerName(t.owner)} — click to reassign">${todoOwnerName(t.owner)}</button>`:''}
       <button class="dayp-td-del" onclick="daypDeleteTodo('${t.id}')" title="Delete">&#215;</button>
     </div>`).join('');
@@ -5034,6 +5099,137 @@ function daypDeleteTodo(id){
   daypRender();
   schedRender();
   showToast('To-do removed');
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+//  TO-DO LIST (dashboard) — undated to-dos waiting to be booked onto a day
+//
+//  Same TODO_COL entries as the day to-dos, just with start/end ''. Code.gs
+//  already files entries with no start date under "unscheduled", so booking
+//  one is simply setting its date — it then shows on the calendar.
+// ══════════════════════════════════════════════════════════════════════════
+let blFilter='all';     // all | tom | fraser
+let blSheetOwner='tom';
+
+function blItems(){ return schedEntries.filter(e=>e.col===TODO_COL&&!e.start); }
+
+function blRender(){
+  const body=document.getElementById('dash-backlog-body'); if(!body) return;
+  const all=blItems();
+  const open=all.filter(t=>!t.done);
+  const doneN=all.length-open.length;
+  document.getElementById('bl-count').textContent=open.length?open.length:'';
+  const n=u=>open.filter(t=>t.owner===u).length;
+  document.getElementById('bl-filter').innerHTML=
+    [['all','All',open.length],['tom','Tom',n('tom')],['fraser','Fraser',n('fraser')]]
+      .map(([id,lbl,c])=>`<button class="bl-fbtn${blFilter===id?' on':''}" onclick="blSetFilter('${id}')">${lbl}${c?' · '+c:''}</button>`).join('')+
+    (doneN?`<button class="bl-fbtn bl-clear" onclick="blClearDone()">Clear ${doneN} done</button>`:'');
+
+  const list=all.filter(t=>blFilter==='all'||t.owner===blFilter)
+    .sort((a,b)=>(a.done-b.done)||((a.createdAt||a.updatedAt||0)-(b.createdAt||b.updatedAt||0)));
+  if(!list.length){
+    body.innerHTML=`<div class="dash-empty">${all.length?'Nothing here for this filter':'Nothing on the list — tap “+ Add list” to dump a few in'}</div>`;
+    return;
+  }
+  body.innerHTML=list.map(t=>`
+    <div class="bl-row${t.done?' done':''}" data-id="${t.id}" draggable="${schedIsDesktop()}"
+      ondragstart="schedIsDesktop()&&schedDragStart(event,'${t.id}')" title="${schedIsDesktop()?'Drag onto a day in the calendar, or use Book':''}">
+      <button class="bl-check${t.done?' on':''}" onclick="daypToggleTodo('${t.id}')" aria-label="${t.done?'Mark not done':'Mark done'}">
+        ${t.done?'<svg width="11" height="9" viewBox="0 0 10 8" fill="none"><polyline points="1 4 3.6 6.6 9 1.2" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>':''}
+      </button>
+      <div class="bl-text">${esc(t.text||'')}</div>
+      <button class="dayp-td-owner" onclick="daypSwapTodoOwner('${t.id}')" title="Tap to reassign">${todoOwnerName(t.owner)}</button>
+      ${t.done?'':`<label class="bl-book" title="Book onto a day">Book
+        <input type="date" onclick="try{this.showPicker()}catch(e){}" onchange="blBook('${t.id}',this.value)"/>
+      </label>`}
+      <button class="bl-del" onclick="daypDeleteTodo('${t.id}')" aria-label="Delete">&#215;</button>
+    </div>`).join('');
+}
+
+function blSetFilter(f){ blFilter=f; blRender(); }
+
+function blAdd(lines,owner){
+  const now=Date.now();
+  lines.forEach((text,i)=>schedEntries.push({
+    id:genId()+i, col:TODO_COL, type:'todo', text, done:false,
+    owner, createdBy:currentUser(), start:'', end:'', jobId:'',
+    createdAt:now+i, updatedAt:now+i
+  }));
+  schedSaveToAPI();
+  blRender();
+}
+
+function blQuickAdd(){
+  const inp=document.getElementById('bl-quick-inp');
+  const text=(inp.value||'').trim();
+  if(!text){ inp.focus(); return; }
+  blAdd([text], blFilter==='all'?currentUser():blFilter);
+  inp.value='';
+  inp.focus();
+}
+
+function blOpenSheet(){
+  blSheetOwner=blFilter==='all'?currentUser():blFilter;
+  blSheetRenderAssign();
+  const ta=document.getElementById('bl-sheet-ta'); ta.value='';
+  blSheetCount();
+  document.getElementById('bl-sheet-bg').classList.add('open');
+  document.body.classList.add('bl-lock');
+  setTimeout(()=>ta.focus(),60);
+}
+function blCloseSheet(){
+  const ta=document.getElementById('bl-sheet-ta');
+  if(ta) ta.blur();
+  document.getElementById('bl-sheet-bg').classList.remove('open');
+  document.body.classList.remove('bl-lock');
+}
+function blSheetRenderAssign(){
+  document.getElementById('bl-sheet-assign').innerHTML='<span>For</span>'+
+    ['tom','fraser'].map(u=>`<button class="dayp-td-assign-btn${blSheetOwner===u?' on':''}" onclick="blSheetOwner='${u}';blSheetRenderAssign()">${todoOwnerName(u)}</button>`).join('');
+}
+function blSheetLines(){
+  // Strip bullets / numbering people paste in from notes or WhatsApp
+  return (document.getElementById('bl-sheet-ta').value||'').split('\n')
+    .map(l=>l.replace(/^\s*(?:[-*•·▪◦☐⬜✅]|\d+[.)])\s*/,'').trim()).filter(Boolean);
+}
+function blSheetCount(){
+  const n=blSheetLines().length;
+  document.getElementById('bl-sheet-hint').textContent=n
+    ? n+' to-do'+(n!==1?'s':'')+' for '+todoOwnerName(blSheetOwner)+' — tap Save'
+    : 'One to-do per line. Book them onto a day later.';
+  document.querySelector('.bl-sheet-save').disabled=!n;
+}
+function blSaveSheet(){
+  const lines=blSheetLines();
+  if(!lines.length){ blCloseSheet(); return; }
+  blAdd(lines,blSheetOwner);
+  blCloseSheet();
+  showToast(lines.length+' to-do'+(lines.length!==1?'s':'')+' added');
+}
+
+function blBook(id,date){
+  if(!date) return;
+  const idx=schedEntries.findIndex(x=>x.id===id); if(idx<0) return;
+  schedEntries[idx]={...schedEntries[idx], start:date, end:date, updatedAt:Date.now()};
+  schedSaveToAPI();
+  schedRender();
+  const d=schedParseDate(date);
+  showToast('Booked for '+DAYP_DOW[d.getDay()].slice(0,3)+' '+d.getDate()+' '+DAYP_MON_S[d.getMonth()]);
+}
+function blUnbook(id){
+  const idx=schedEntries.findIndex(x=>x.id===id); if(idx<0) return;
+  schedEntries[idx]={...schedEntries[idx], start:'', end:'', updatedAt:Date.now()};
+  schedSaveToAPI();
+  daypRender();
+  schedRender();
+  showToast('Moved back to the to-do list');
+}
+function blClearDone(){
+  const n=blItems().filter(t=>t.done).length;
+  schedEntries=schedEntries.filter(e=>!(e.col===TODO_COL&&!e.start&&e.done));
+  schedSaveToAPI();
+  blRender();
+  showToast('Cleared '+n+' done');
 }
 
 // Plain-text summary of the day — for pasting into WhatsApp or an email
